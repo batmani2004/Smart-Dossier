@@ -1,0 +1,24 @@
+REPUBLIKA E SHQIPËRISË
+BASHKIA TIRANË
+NJESIA ADMINISTRATIVE NR. 5
+
+ÇERTIFIKATË FAMILJARE
+Nr. çertifikate: CF-2026-04412
+
+Kryefamiljari: Arta Beqiri
+ID kombëtare: I85ABC123G  (maskoje: I85*****G)
+Adresa: Rruga "Don Bosko", Pallati 12, Ap. 7, Tiranë
+Telefon: +355 69 234 5566
+Email: arta.beqiri@example.al
+
+Anëtarët e familjes: 4
+  1. Arta Beqiri  — kryefamiljare
+  2. Petrit Beqiri — bashkëshort
+  3. Era Beqiri   — bijë
+  4. Klea Beqiri  — bijë
+
+Të ardhura mujore familjare të deklaruara: 12,000 ALL
+Norma e strehimit (m2/person): 9.0
+
+Lëshuar më: 2026-05-14
+Institucioni: Bashkia Tiranë, Drejtoria e Gjendjes Civile

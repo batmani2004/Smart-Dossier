@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "AlbTurf Mobile",
+    "slug": "albturf-mobile",
+    "scheme": "albturf",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.albturf.mobile" },
+    "android": { "package": "com.albturf.mobile" },
+    "plugins": ["expo-router"],
+    "extra": {
+      "apiBaseUrl": "http://localhost:8080"
+    }
+  }
+}
