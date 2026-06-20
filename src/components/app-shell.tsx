@@ -4,15 +4,13 @@ import {
   BarChart3,
   Bell,
   Building2,
-  ChevronRight,
   FileUp,
   FolderKanban,
   HelpCircle,
-  Home,
   LayoutDashboard,
-  Menu,
-  Rocket,
+  Plus,
   Scale,
+  Settings,
   ShieldCheck,
   UserRound,
 } from "lucide-react";
@@ -23,7 +21,7 @@ import { useDemoRole } from "@/lib/demo-access";
 import { cn } from "@/lib/utils";
 
 const primaryNav = [
-  { to: "/", label: "Faqja kryesore", icon: LayoutDashboard, exact: true },
+  { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/dosjet", label: "Dosjet", icon: FolderKanban, badge: "4" },
 ] satisfies {
   to: string;
@@ -35,20 +33,8 @@ const primaryNav = [
 
 const managementNav = [
   { to: "/raporte", label: "Raporte", icon: BarChart3 },
-  { to: "/faq", label: "Ndihme", icon: HelpCircle },
+  { to: "/faq", label: "Ndihmë & FAQ", icon: HelpCircle },
 ] satisfies { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[];
-
-function pageLabel(path: string) {
-  if (path.startsWith("/dosja/")) return "Regjenerimi Urban i Bregdetit...";
-  if (path.startsWith("/dosjet")) return "Dosjet";
-  if (path.startsWith("/raporte")) return "Raporte";
-  if (path.startsWith("/faq")) return "FAQ";
-  if (path.startsWith("/aplikim/dokumentacion")) return "Dokumentacioni për operatorin";
-  if (path.startsWith("/aplikim")) return "Aplikim i ri";
-  if (path.startsWith("/biznes")) return "Regjistrim prone";
-  if (path.startsWith("/track/")) return "Gjurmim qytetar";
-  return "Faqja kryesore";
-}
 
 type ShellNotification = {
   id?: string | number;
@@ -64,7 +50,7 @@ export function AppShell({
   notifications?: ShellNotification[];
 }) {
   const loc = useLocation();
-  const { role } = useDemoRole();
+  const { role, profile, can } = useDemoRole();
   const path = loc.pathname;
   const citizenPortalActive = path.startsWith("/track/");
   const businessPortalActive = path.startsWith("/biznes");
@@ -82,178 +68,60 @@ export function AppShell({
         : path.startsWith(item.to);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="hidden min-h-[78px] items-center justify-between gap-4 border-b-4 border-accent bg-[var(--brand-navy)] px-8 text-white md:flex">
-        <div className="flex min-w-0 items-center gap-4">
-          <div className="grid size-10 shrink-0 place-items-center rounded-full bg-destructive text-white shadow-soft">
-            <Rocket className="size-5" />
-          </div>
-          <div className="min-w-0">
-            <div className="text-[10px] font-bold uppercase text-accent">Materiali C</div>
-            <div className="truncate text-xl font-semibold leading-tight">
-              Smart Dossier - Menaxhimi i Dosjeve
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar */}
+      <aside
+        className="hidden md:flex fixed left-0 top-0 h-full flex-col z-50 border-r border-sidebar-border"
+        style={{
+          width: "280px",
+          background: "linear-gradient(180deg, #141c2b 0%, #101827 100%)",
+        }}
+      >
+        {/* Logo */}
+        <div className="px-6 pt-7 pb-8">
+          <div className="flex items-center gap-3">
+            <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-accent/20 text-white">
+              <ShieldCheck className="size-5" />
             </div>
-            <div className="mt-0.5 truncate text-xs text-white/75">
-              Pamje orientuese e nje platforme per menaxhimin e dosjeve te prones.
+            <div>
+              <div className="text-[17px] font-bold text-white leading-tight tracking-tight">
+                Smart Dossier
+              </div>
+              <div className="text-[11px] text-white/50 font-mono tracking-wider">
+                Dosja Inteligjente
+              </div>
             </div>
           </div>
         </div>
-        <div className="shrink-0">
-          <RoleSwitcher variant="header" />
-        </div>
-      </div>
 
-      <div className="flex min-h-screen md:min-h-[calc(100vh-5.125rem)]">
-        <aside className="hidden w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
-          <div className="border-b border-sidebar-border px-4 pb-4 pt-4">
-            <div className="flex items-center gap-2.5">
-              <div className="grid size-9 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground shadow-soft">
-                <ShieldCheck className="size-4" />
-              </div>
-              <div className="min-w-0 leading-tight">
-                <div className="truncate text-sm font-semibold tracking-tight text-primary">
-                  Menaxhimi i Dosjeve
-                </div>
-                <div className="truncate text-[10px] uppercase text-sidebar-foreground/60">
-                  Smart Dossier
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <nav className="flex-1 space-y-5 px-3 py-5">
-            {role === "citizen" || role === "business" ? (
-              <div className="space-y-1">
-                <SidebarGroupLabel>Navigimi Kryesor</SidebarGroupLabel>
-                <SidebarLink
-                  to="/aplikim"
-                  active={applicationPortalActive}
-                  icon={Scale}
-                  label="Aplikim i ri"
-                />
-                <SidebarLink
-                  to="/aplikim/dokumentacion"
-                  active={applicationDocsActive}
-                  icon={FileUp}
-                  label="Dokumentacioni"
-                  nested
-                />
-                {role === "business" ? (
-                  <SidebarLink
-                    to="/biznes"
-                    active={businessPortalActive}
-                    icon={Building2}
-                    label="Regjistrim prone"
-                  />
-                ) : (
-                  <SidebarLink
-                    to="/track/$code"
-                    params={{ code: "EKB-2026-000014" }}
-                    active={citizenPortalActive}
-                    icon={UserRound}
-                    label="Gjurmim qytetar"
-                  />
-                )}
-                <SidebarLink to="/faq" active={faqActive} icon={HelpCircle} label="FAQ dhe AI" />
-              </div>
-            ) : (
-              <>
-                <div className="space-y-1">
-                  <SidebarGroupLabel>Navigimi Kryesor</SidebarGroupLabel>
-                  {primaryNav.map((item) => (
-                    <SidebarLink
-                      key={item.to}
-                      to={item.to}
-                      active={isActive(item)}
-                      icon={item.icon}
-                      label={item.label}
-                      badge={item.badge}
-                    />
-                  ))}
-                </div>
-                <div className="space-y-1">
-                  <SidebarGroupLabel>Menaxhimi</SidebarGroupLabel>
-                  {managementNav.map((item) => (
-                    <SidebarLink
-                      key={item.to}
-                      to={item.to}
-                      active={isActive(item)}
-                      icon={item.icon}
-                      label={item.label}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </nav>
-
-          <div className="m-3">
-            <RoleSwitcher compact variant="sidebar" />
-          </div>
-        </aside>
-
-        <main className="min-w-0 flex-1 bg-background pb-16 md:pb-0">
-          <div className="hidden h-12 items-center justify-between border-b border-border bg-[#e8eef7] px-5 text-xs text-muted-foreground md:flex">
-            <div className="flex min-w-0 items-center gap-3">
-              <button
-                type="button"
-                className="grid size-7 place-items-center rounded-md text-foreground/65 hover:bg-white/60"
-                aria-label="Menu"
-              >
-                <Menu className="size-4" />
-              </button>
-              <Home className="size-3.5" />
-              <ChevronRight className="size-3" />
-              <span>Dosjet</span>
-              <ChevronRight className="size-3" />
-              <span className="truncate font-semibold text-foreground">{pageLabel(path)}</span>
-            </div>
-            <NotificationsPopover notifications={notifications} />
-          </div>
-
-          <div className="flex items-center gap-2 border-b-4 border-accent bg-[var(--brand-navy)] px-4 py-2.5 text-white md:hidden">
-            <div className="grid size-8 shrink-0 place-items-center rounded-full bg-destructive">
-              <Rocket className="size-4" />
-            </div>
-            <span className="min-w-0 flex-1 truncate text-sm font-semibold">Smart Dossier</span>
-            <div className="w-[190px] shrink-0">
-              <RoleSwitcher compact variant="header" />
-            </div>
-          </div>
-          {children}
-        </main>
-
-        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-sidebar-border bg-sidebar text-sidebar-foreground md:hidden">
+        {/* Navigation */}
+        <nav className="flex-1 px-3 space-y-1">
           {role === "citizen" || role === "business" ? (
             <>
-              <MobileLink
-                to="/aplikim"
-                active={applicationPortalActive || applicationDocsActive}
-                icon={Scale}
-                label="Aplikim"
-              />
+              <NavItem to="/aplikim" active={applicationPortalActive} icon={Scale} label="Aplikim i ri" />
+              <NavItem to="/aplikim/dokumentacion" active={applicationDocsActive} icon={FileUp} label="Dokumentacioni" nested />
               {role === "business" ? (
-                <MobileLink
-                  to="/biznes"
-                  active={businessPortalActive}
-                  icon={Building2}
-                  label="Regjistrim"
-                />
+                <NavItem to="/biznes" active={businessPortalActive} icon={Building2} label="Regjistrim prone" />
               ) : (
-                <MobileLink
-                  to="/track/$code"
-                  params={{ code: "EKB-2026-000014" }}
-                  active={citizenPortalActive}
-                  icon={UserRound}
-                  label="Gjurmim"
-                />
+                <NavItem to="/track/$code" params={{ code: "EKB-2026-000014" }} active={citizenPortalActive} icon={UserRound} label="Gjurmim qytetar" />
               )}
-              <MobileLink to="/faq" active={faqActive} icon={HelpCircle} label="FAQ" />
+              <NavItem to="/faq" active={faqActive} icon={HelpCircle} label="FAQ dhe AI" />
             </>
           ) : (
             <>
-              {[...primaryNav, managementNav[0]].map((item) => (
-                <MobileLink
+              {primaryNav.map((item) => (
+                <NavItem
+                  key={item.to}
+                  to={item.to}
+                  active={isActive(item)}
+                  icon={item.icon}
+                  label={item.label}
+                  badge={item.badge}
+                />
+              ))}
+              <div className="my-3 border-t border-white/8" />
+              {managementNav.map((item) => (
+                <NavItem
                   key={item.to}
                   to={item.to}
                   active={isActive(item)}
@@ -264,7 +132,98 @@ export function AppShell({
             </>
           )}
         </nav>
-      </div>
+
+        {/* Bottom section */}
+        <div className="px-3 pb-6 space-y-2">
+          {can("createDossier") ? (
+            <Link
+              to="/dosjet"
+              className="w-full flex items-center justify-center gap-2 bg-accent text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-accent/90 transition-colors"
+            >
+              <Plus className="size-4" />
+              Aplikim i ri
+            </Link>
+          ) : null}
+
+          <div className="border-t border-white/8 pt-3 space-y-1">
+            <div className="flex items-center gap-2 px-3 py-1.5 text-white/50 text-xs">
+              <span>AL | EN</span>
+            </div>
+            <Link
+              to="/login"
+              className="flex items-center gap-2 px-3 py-1.5 text-white/60 hover:text-white text-sm transition-colors rounded-lg hover:bg-white/5"
+            >
+              <Settings className="size-4" />
+              <span>Cilësimet</span>
+            </Link>
+          </div>
+
+          {/* User profile */}
+          <div className="border-t border-white/8 pt-3">
+            <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+              <div className="size-9 rounded-full bg-accent/30 flex items-center justify-center shrink-0">
+                <UserRound className="size-4 text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-semibold text-white truncate">
+                  {profile?.displayName ?? "Përdoruesi"}
+                </div>
+                <div className="text-[11px] text-white/50 truncate">
+                  {profile?.credentialLabel ?? role}
+                </div>
+              </div>
+              <RoleSwitcher compact variant="sidebar" />
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <main
+        className="flex-1 min-w-0 bg-background pb-16 md:pb-0"
+        style={{ marginLeft: "280px" }}
+      >
+        {/* Desktop top bar */}
+        <div className="hidden md:flex h-12 items-center justify-between border-b border-border bg-surface px-6 text-xs text-muted-foreground sticky top-0 z-30">
+          <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            Smart Dossier
+          </div>
+          <NotificationsPopover notifications={notifications} />
+        </div>
+
+        {/* Mobile header */}
+        <div className="flex items-center gap-3 border-b border-border bg-sidebar px-4 py-3 text-white md:hidden">
+          <div className="size-7 rounded-lg bg-accent/20 flex items-center justify-center shrink-0">
+            <ShieldCheck className="size-4" />
+          </div>
+          <span className="flex-1 text-sm font-bold truncate">Smart Dossier</span>
+          <RoleSwitcher compact variant="header" />
+        </div>
+
+        {children}
+      </main>
+
+      {/* Mobile bottom nav */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-sidebar-border bg-sidebar text-white md:hidden">
+        {role === "citizen" || role === "business" ? (
+          <>
+            <MobileLink to="/aplikim" active={applicationPortalActive || applicationDocsActive} icon={Scale} label="Aplikim" />
+            {role === "business" ? (
+              <MobileLink to="/biznes" active={businessPortalActive} icon={Building2} label="Regjistrim" />
+            ) : (
+              <MobileLink to="/track/$code" params={{ code: "EKB-2026-000014" }} active={citizenPortalActive} icon={UserRound} label="Gjurmim" />
+            )}
+            <MobileLink to="/faq" active={faqActive} icon={HelpCircle} label="FAQ" />
+          </>
+        ) : (
+          <>
+            {[...primaryNav, managementNav[0]].map((item) => (
+              <MobileLink key={item.to} to={item.to} active={isActive(item)} icon={item.icon} label={item.label} />
+            ))}
+          </>
+        )}
+      </nav>
+
       {showCitizenAgent ? <CitizenVirtualAgent /> : null}
     </div>
   );
@@ -272,18 +231,17 @@ export function AppShell({
 
 function NotificationsPopover({ notifications }: { notifications: ShellNotification[] }) {
   const count = notifications.length;
-
   return (
     <Popover>
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="console-pill border-accent/40 bg-accent/15 text-accent-foreground"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-secondary transition-colors"
           aria-label="Hap njoftimet"
         >
           <Bell className="size-3.5" />
           Njoftime
-          <span className="grid size-4 place-items-center rounded-full bg-accent text-[10px] font-bold">
+          <span className="grid size-4 place-items-center rounded-full bg-accent text-[10px] font-bold text-white">
             {count}
           </span>
         </button>
@@ -292,16 +250,13 @@ function NotificationsPopover({ notifications }: { notifications: ShellNotificat
         <div className="border-b px-3 py-2">
           <div className="text-sm font-semibold">Njoftime</div>
           <div className="text-[11px] text-muted-foreground">
-            {count ? `${count} njoftime publike` : "Nuk ka njoftime te reja"}
+            {count ? `${count} njoftime publike` : "Nuk ka njoftime të reja"}
           </div>
         </div>
         {count ? (
           <ul className="max-h-80 overflow-y-auto p-2">
             {notifications.map((notification, index) => (
-              <li
-                key={notification.id ?? index}
-                className="rounded-md border-l-2 border-primary/35 px-2 py-2 text-xs hover:bg-muted/60"
-              >
+              <li key={notification.id ?? index} className="rounded-md border-l-2 border-primary/35 px-2 py-2 text-xs hover:bg-muted/60">
                 <div className="leading-snug text-foreground">{notification.title}</div>
                 {notification.meta ? (
                   <div className="mt-1 text-[11px] text-muted-foreground">{notification.meta}</div>
@@ -311,7 +266,7 @@ function NotificationsPopover({ notifications }: { notifications: ShellNotificat
           </ul>
         ) : (
           <div className="p-3 text-xs text-muted-foreground">
-            Njoftimet e dosjes do te shfaqen ketu kur te kete perditesime.
+            Njoftimet e dosjes do të shfaqen këtu kur të ketë përditësime.
           </div>
         )}
       </PopoverContent>
@@ -319,13 +274,7 @@ function NotificationsPopover({ notifications }: { notifications: ShellNotificat
   );
 }
 
-function SidebarGroupLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="px-2 pb-2 text-[10px] font-semibold text-sidebar-foreground/55">{children}</div>
-  );
-}
-
-function SidebarLink({
+function NavItem({
   to,
   params,
   active,
@@ -347,22 +296,17 @@ function SidebarLink({
       to={to}
       params={params}
       className={cn(
-        "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
-        nested && "ml-6 py-1.5 text-xs",
+        "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-all duration-150",
+        nested && "ml-5 py-2 text-xs",
         active
-          ? "bg-primary text-primary-foreground font-semibold shadow-soft"
-          : "text-sidebar-foreground/75 hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
+          ? "bg-accent text-white font-semibold"
+          : "text-white/65 hover:text-white hover:bg-white/8",
       )}
     >
-      <Icon className="size-[16px] shrink-0" />
+      <Icon className={cn("shrink-0", nested ? "size-3.5" : "size-[18px]")} />
       <span className="truncate">{label}</span>
       {badge ? (
-        <span
-          className={cn(
-            "ml-auto grid size-5 place-items-center rounded-full text-[10px] font-bold",
-            active ? "bg-white/20 text-white" : "bg-destructive text-destructive-foreground",
-          )}
-        >
+        <span className={cn("ml-auto grid size-5 place-items-center rounded-full text-[10px] font-bold", active ? "bg-white/20 text-white" : "bg-destructive text-white")}>
           {badge}
         </span>
       ) : null}
@@ -389,7 +333,7 @@ function MobileLink({
       params={params}
       className={cn(
         "flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] transition-colors",
-        active ? "text-sidebar-accent-foreground" : "text-sidebar-foreground/70",
+        active ? "text-accent" : "text-white/50",
       )}
     >
       <Icon className={cn("size-[18px]", active && "text-accent")} />

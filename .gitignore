@@ -20,10 +20,11 @@ dist-ssr
 .wrangler/
 .dev.vars
 
-# Environment variables (never commit these)
+# Environment variables and API keys (never commit these)
 .env
 .env.*
 !.env.example
+.mcp.json
 
 # Editor directories and files
 .vscode/*
