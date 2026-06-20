@@ -209,7 +209,12 @@ function LoginPage() {
             />
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <AlbanianLanguageFlag />
+            <img
+              src="/brand/albanian-flag.svg"
+              alt="Gjuha shqip"
+              title="Gjuha shqip"
+              className="hidden h-[18px] w-[26px] shrink-0 object-cover sm:block"
+            />
             <Button
               asChild
               variant="ghost"
@@ -577,32 +582,5 @@ function FieldShell({ icon: Icon, children }: { icon: typeof UserRound; children
       <Icon className="size-5 shrink-0 text-primary" />
       {children}
     </div>
-  );
-}
-
-function AlbanianLanguageFlag() {
-  return (
-    <span
-      className="hidden h-8 w-10 items-center justify-center rounded-md border bg-white shadow-soft sm:inline-flex"
-      role="img"
-      aria-label="Gjuha shqip"
-      title="Gjuha shqip"
-    >
-      <svg
-        width="26"
-        height="18"
-        viewBox="0 0 26 18"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <rect width="26" height="18" rx="2" fill="#E41E20" />
-        <path
-          d="M13 4.2c-.7.9-1.1 1.6-1.1 2.3 0 .4.2.8.4 1.1-.7-.3-1.4-.7-2-1.2-.7-.5-1.4-.8-2.2-.8.6.6.8 1.2.7 1.9-.8-.3-1.6-.3-2.4.1.8.4 1.3.9 1.6 1.6-.7.1-1.3.5-1.8 1.1.8 0 1.5.2 2.1.6-.4.5-.5 1.1-.4 1.8.8-.5 1.7-.8 2.6-.8.8 0 1.5.3 2.1.9v1.4h-1.4v1h3.6v-1h-1.4v-1.4c.6-.6 1.3-.9 2.1-.9.9 0 1.8.3 2.6.8.1-.7 0-1.3-.4-1.8.6-.4 1.3-.6 2.1-.6-.5-.6-1.1-1-1.8-1.1.3-.7.8-1.2 1.6-1.6-.8-.4-1.6-.4-2.4-.1-.1-.7.1-1.3.7-1.9-.8 0-1.5.3-2.2.8-.6.5-1.3.9-2 1.2.2-.3.4-.7.4-1.1 0-.7-.4-1.4-1.1-2.3Z"
-          fill="#111111"
-        />
-        <path d="M11.2 4.5 9.8 3.1h2.1L13 2l1.1 1.1h2.1l-1.4 1.4H11.2Z" fill="#111111" />
-      </svg>
-    </span>
   );
 }
