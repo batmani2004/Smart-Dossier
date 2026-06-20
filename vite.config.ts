@@ -14,6 +14,9 @@ export default defineConfig({
   },
   vite: {
     cacheDir: ".tanstack/vite",
+    resolve: {
+      dedupe: ["react", "react-dom", "@tanstack/react-router", "@tanstack/react-start"],
+    },
     server: {
       watch: {
         ignored: ["**/apps/mobile/**"],
