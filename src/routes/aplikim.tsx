@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
@@ -231,6 +231,34 @@ function defaultDocs(kind: ApplicationKind, type: ApplicantType) {
       };
 }
 
+const APPLICATION_DOCS_STORAGE_PREFIX = "smart-dossier-application-docs";
+
+function applicationDocsStorageKey(kind: ApplicationKind, type: ApplicantType) {
+  return `${APPLICATION_DOCS_STORAGE_PREFIX}:${kind}:${type}`;
+}
+
+function readSavedDocumentNames(kind: ApplicationKind, type: ApplicantType) {
+  const defaults = defaultDocs(kind, type);
+  if (typeof window === "undefined") return defaults;
+  try {
+    const raw = window.localStorage.getItem(applicationDocsStorageKey(kind, type));
+    if (!raw) return defaults;
+    const saved = JSON.parse(raw) as Record<string, string>;
+    return { ...defaults, ...saved };
+  } catch {
+    return defaults;
+  }
+}
+
+function saveDocumentNames(
+  kind: ApplicationKind,
+  type: ApplicantType,
+  documentNames: Record<string, string>,
+) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(applicationDocsStorageKey(kind, type), JSON.stringify(documentNames));
+}
+
 function applicationTitle(kind: ApplicationKind) {
   if (kind === "ekb_privatization") return "Privatizim banese EKB";
   if (kind === "property_registration") return "Regjistrim prone biznesi";
@@ -258,6 +286,16 @@ function applicantTypeForRole(role: string): ApplicantType {
 }
 
 function ApplicationPortal() {
+  const isDocumentationRoute = useRouterState({
+    select: (state) => state.location.pathname.startsWith("/aplikim/dokumentacion"),
+  });
+
+  if (isDocumentationRoute) return <Outlet />;
+
+  return <ApplicationPortalHome />;
+}
+
+function ApplicationPortalHome() {
   const { role, profile } = useDemoRole();
   const createGeneric = useServerFn(createDossier);
   const createBusinessProperty = useServerFn(createBusinessPropertyApplication);
@@ -286,7 +324,7 @@ function ApplicationPortal() {
     "Kerkohet hapja e dosjes dhe shqyrtimi nga operatori perkates.",
   );
   const [documentNames, setDocumentNames] = useState<Record<string, string>>(
-    defaultDocs(defaultApplicationForRole(role), applicantTypeForRole(role)),
+    readSavedDocumentNames(defaultApplicationForRole(role), applicantTypeForRole(role)),
   );
   const [created, setCreated] = useState<{ id: string; trackingCode: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -318,11 +356,15 @@ function ApplicationPortal() {
     [docs, documentNames],
   );
 
+  useEffect(() => {
+    saveDocumentNames(applicationKind, effectiveApplicantType, documentNames);
+  }, [applicationKind, documentNames, effectiveApplicantType]);
+
   function chooseApplication(kind: ApplicationKind) {
     const nextType: ApplicantType =
       role === "business" || kind === "property_registration" ? "business" : "citizen";
     setApplicationKind(kind);
-    setDocumentNames(defaultDocs(kind, nextType));
+    setDocumentNames(readSavedDocumentNames(kind, nextType));
     setCreated(null);
     setCopied(false);
 
@@ -630,9 +672,12 @@ function ApplicationPortal() {
                 <div className="min-w-0">
                   <h2 className="text-sm font-semibold">Dokumentacioni për operatorin</h2>
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    Lista e dokumenteve të kërkuara është zhvendosur në një nënfaqe të veçantë për
-                    aplikimin.
+                    Shto ose ndrysho dokumentet në nënfaqen e dokumentacionit. Ato ruhen dhe
+                    dërgohen bashkë me aplikimin.
                   </p>
+                  <div className="mt-2 text-[11px] font-semibold text-primary">
+                    {selectedDocs.length}/{docs.length} dokumente të zgjedhura
+                  </div>
                 </div>
               </div>
               <Button asChild size="sm" variant="outline" className="shrink-0">
