@@ -142,7 +142,7 @@ export function fallbackFaqAnswer(question: string) {
   if (!matches.length) {
     return {
       answer:
-        "Nuk gjeta nje pergjigje te sakte ne FAQ. Provoni te pyesni per gjurmimin, dokumentet, proceduren e pershpejtuar, ankesen, EKB ose shpronesimin.",
+        "Nuk gjeta nje pergjigje te sakte te pyetjet e shpeshta. Provoni te pyesni per gjurmimin, dokumentet, proceduren e pershpejtuar, ankesen, EKB ose shpronesimin.",
       citations: [],
       hasEnoughInfo: false,
     };

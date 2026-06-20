@@ -16,10 +16,10 @@ import { CITIZEN_FAQ } from "@/lib/faq";
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
-      { title: "FAQ qytetar - Smart Dossier" },
+      { title: "Pyetje te shpeshta - Smart Dossier" },
       {
         name: "description",
-        content: "Pyetje te shpeshta dhe ndihmes AI per qytetaret ne Smart Dossier.",
+        content: "Pyetje te shpeshta per qytetaret ne Smart Dossier.",
       },
     ],
   }),
@@ -55,7 +55,7 @@ function FaqPage() {
               Rubrike qytetare
             </div>
             <h1 className="mt-1 text-xl font-semibold tracking-tight md:text-2xl">
-              FAQ dhe ndihmes AI
+              Pyetje te shpeshta
             </h1>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
               Pyetje te shpeshta per Smart Dossier, shpronesimin per interes publik, privatizimin e
@@ -78,7 +78,7 @@ function FaqPage() {
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Kerko ne FAQ..."
+                placeholder="Kerko te pyetjet e shpeshta..."
                 className="h-9 border-0 bg-muted/40 focus-visible:ring-1"
               />
             </div>
