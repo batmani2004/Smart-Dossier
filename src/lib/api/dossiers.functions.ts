@@ -18,7 +18,13 @@ import type {
   RequesterClaimType,
   RequesterVerificationStatus,
 } from "@/core/types";
-import { DEMO_OPERATORS, operatorName } from "@/lib/demo-operators";
+import {
+  addDemoOperator,
+  listDemoOperators,
+  operatorName,
+  removeDemoOperator,
+  resetDemoOperators,
+} from "@/lib/demo-operators";
 import { audit, inferPriority, notFound, type Priority } from "./dossiers-helpers";
 
 const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
@@ -66,19 +72,26 @@ function isActiveDossier(d: Dossier) {
 }
 
 function operatorWorkloads(dossiers = allDossiers()) {
-  return DEMO_OPERATORS.map((operator) => ({
-    ...operator,
-    activeCases: dossiers.filter((d) => isActiveDossier(d) && d.assignedOperatorId === operator.id)
-      .length,
-  })).sort((a, b) => a.activeCases - b.activeCases || a.name.localeCompare(b.name));
+  return listDemoOperators()
+    .map((operator) => ({
+      ...operator,
+      activeCases: dossiers.filter(
+        (d) => isActiveDossier(d) && d.assignedOperatorId === operator.id,
+      ).length,
+    }))
+    .sort((a, b) => a.activeCases - b.activeCases || a.name.localeCompare(b.name));
 }
 
 function leastLoadedOperator(dossiers = allDossiers()) {
-  return operatorWorkloads(dossiers)[0] ?? DEMO_OPERATORS[0];
+  return operatorWorkloads(dossiers)[0] ?? listDemoOperators()[0];
 }
 
 function applyAssignment(d: Dossier, operatorId: string, mode: "manual" | "auto") {
-  const operator = DEMO_OPERATORS.find((item) => item.id === operatorId) ?? leastLoadedOperator();
+  const operator =
+    listDemoOperators().find((item) => item.id === operatorId) ?? leastLoadedOperator();
+  if (!operator) {
+    throw new Error("Nuk ka operatore aktive per caktim.");
+  }
   d.assignedOperatorId = operator.id;
   d.assignedOperatorName = operator.name;
   d.assignedAt = new Date().toISOString();
@@ -977,6 +990,50 @@ export const runAutoAssignment = createServerFn({ method: "POST" }).handler(asyn
   return { ok: true, assigned: applyDueAutoAssignments() };
 });
 
+export const addOperator = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        name: z.string().min(2),
+        unit: z.string().min(2),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const operator = addDemoOperator(data);
+    return { ok: true, operator };
+  });
+
+export const removeOperator = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => z.object({ id: z.string().min(1) }).parse(input))
+  .handler(async ({ data }) => {
+    if (listDemoOperators().length <= 1) {
+      throw new Error("Duhet te mbetet te pakten nje operator aktiv.");
+    }
+    const removed = removeDemoOperator(data.id);
+    if (!removed) {
+      throw new Error("Operatori nuk u gjet.");
+    }
+    const now = new Date().toISOString();
+    let requeued = 0;
+    for (const dossier of allDossiers()) {
+      if (dossier.assignedOperatorId !== removed.id) continue;
+      dossier.assignedOperatorId = undefined;
+      dossier.assignedOperatorName = undefined;
+      dossier.assignedAt = undefined;
+      dossier.assignmentMode = undefined;
+      dossier.assignmentDueAt = now;
+      audit(dossier, {
+        actor: "admin_demo",
+        action: "Operatori u hoq nga lista aktive",
+        details: `${removed.name} u hoq; dosja u kthye ne radhen e caktimit.`,
+      });
+      upsert(dossier);
+      requeued += 1;
+    }
+    return { ok: true, removed, requeued };
+  });
+
 // --------------------- dashboard ---------------------
 
 export const getDashboard = createServerFn({ method: "GET" }).handler(async () => {
@@ -1167,6 +1224,7 @@ export const getProcesses = createServerFn({ method: "GET" }).handler(async () =
 // --------------------- reset demo data ---------------------
 
 export const resetDemo = createServerFn({ method: "POST" }).handler(async () => {
+  resetDemoOperators();
   return resetStore();
 });
 

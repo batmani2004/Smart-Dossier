@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   Building2,
   CalendarClock,
+  ExternalLink,
   FileText,
   FolderKanban,
   Link2,
@@ -17,12 +18,15 @@ import {
   Sparkles,
   TimerReset,
   TrendingDown,
+  Trash2,
   UserCheck,
+  UserPlus,
   Wrench,
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
@@ -60,10 +64,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  addOperator,
   aiRiskBrief,
   assignDossier,
   getDashboard,
   listDossiers,
+  removeOperator,
   resetDemo,
   runAutoAssignment,
 } from "@/lib/api/dossiers.functions";
@@ -86,6 +92,9 @@ function DashboardPage() {
   const [processFilter, setProcessFilter] = useState<"all" | ProcessKind>("all");
   const [briefOpen, setBriefOpen] = useState(false);
   const [selectedOperators, setSelectedOperators] = useState<Record<string, string>>({});
+  const [publicTrackingCode, setPublicTrackingCode] = useState("EKB-2026-000014");
+  const [newOperatorName, setNewOperatorName] = useState("");
+  const [newOperatorUnit, setNewOperatorUnit] = useState("Kadaster - Tirane");
   const { role, profile, can } = useDemoRole();
   const qc = useQueryClient();
   const dash = useServerFn(getDashboard);
@@ -94,6 +103,8 @@ function DashboardPage() {
   const brief = useServerFn(aiRiskBrief);
   const assign = useServerFn(assignDossier);
   const autoAssign = useServerFn(runAutoAssignment);
+  const addOperatorFn = useServerFn(addOperator);
+  const removeOperatorFn = useServerFn(removeOperator);
 
   const briefQ = useQuery({
     queryKey: ["ai-risk-brief"],
@@ -130,6 +141,9 @@ function DashboardPage() {
   useEffect(() => {
     if (listQ.error) toast.error("Gabim gjatë ngarkimit të dosjeve");
   }, [listQ.error]);
+  useEffect(() => {
+    setPublicTrackingCode(role === "business" ? "BIZ-2026-000901" : "EKB-2026-000014");
+  }, [role]);
 
   async function handleReset() {
     if (!can("resetDemo")) {
@@ -178,7 +192,51 @@ function DashboardPage() {
     }
   }
 
+  async function handleAddOperator() {
+    if (!can("manageUsers")) {
+      toast.error("Vetem Admin mund te menaxhoje operatoret.");
+      return;
+    }
+    if (!newOperatorName.trim() || !newOperatorUnit.trim()) {
+      toast.error("Plotesoni emrin dhe njesine e operatorit.");
+      return;
+    }
+    try {
+      const result = await addOperatorFn({
+        data: { name: newOperatorName.trim(), unit: newOperatorUnit.trim() },
+      });
+      toast.success(`Operatori u shtua: ${result.operator.name}`);
+      setNewOperatorName("");
+      await Promise.all([dashQ.refetch(), listQ.refetch()]);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Shtimi i operatorit deshtoi");
+    }
+  }
+
+  async function handleRemoveOperator(id: string) {
+    if (!can("manageUsers")) {
+      toast.error("Vetem Admin mund te menaxhoje operatoret.");
+      return;
+    }
+    try {
+      const result = await removeOperatorFn({ data: { id } });
+      toast.success(
+        result.requeued
+          ? `Operatori u hoq; ${result.requeued} dosje u kthyen ne radhe.`
+          : "Operatori u hoq.",
+      );
+      await Promise.all([dashQ.refetch(), listQ.refetch()]);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Heqja e operatorit deshtoi");
+    }
+  }
+
   if (role === "citizen" || role === "business") {
+    const normalizedTrackingCode = publicTrackingCode.trim().toUpperCase();
+    const trackingHref = normalizedTrackingCode
+      ? `/track/${encodeURIComponent(normalizedTrackingCode)}`
+      : "";
+
     return (
       <AppShell>
         <div className="px-4 md:px-6 py-5 max-w-[900px] mx-auto space-y-4">
@@ -206,6 +264,42 @@ function DashboardPage() {
               <Button asChild size="sm" className="shrink-0">
                 <Link to="/aplikim">Nis aplikimin</Link>
               </Button>
+            </div>
+          </Card>
+          <Card className="p-4">
+            <div className="flex items-start gap-3">
+              <div className="grid size-10 shrink-0 place-items-center rounded-md bg-[var(--brand-blue-soft)] text-primary">
+                <Link2 className="size-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-semibold">Gjurmim aplikimi</div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {role === "business"
+                    ? "Vendos kodin BIZ ose hap linkun e gjeneruar ne momentin e aplikimit."
+                    : "Vendos kodin e gjurmimit ose hap linkun e gjeneruar ne momentin e aplikimit."}
+                </p>
+                <div className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+                  <Input
+                    value={publicTrackingCode}
+                    onChange={(event) => setPublicTrackingCode(event.target.value)}
+                    placeholder={role === "business" ? "BIZ-2026-000901" : "EKB-2026-000014"}
+                    className="h-10 font-mono text-sm"
+                    aria-label="Kodi i gjurmimit"
+                  />
+                  {trackingHref ? (
+                    <Button asChild type="button" className="shrink-0">
+                      <a href={trackingHref}>
+                        <ExternalLink className="mr-1.5 size-4" />
+                        Gjurmo aplikimin
+                      </a>
+                    </Button>
+                  ) : (
+                    <Button type="button" disabled className="shrink-0">
+                      Gjurmo aplikimin
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
           </Card>
           <SmartDossierFocus compact />
@@ -347,10 +441,10 @@ function DashboardPage() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <UserCheck className="size-4 text-primary" />
-                  <h2 className="text-sm font-semibold">Konfirmo caktimet e AI</h2>
+                  <h2 className="text-sm font-semibold">Operatoret dhe caktimet</h2>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Agjenti krahason ngarkesen dhe propozon operatorin; admini vetem konfirmon.
+                  Admini shton, heq dhe cakton operatore sipas ngarkeses se dosjeve.
                 </p>
               </div>
               <Button
@@ -367,13 +461,46 @@ function DashboardPage() {
             <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2">
               {dashQ.data.assignment.operatorWorkloads.map((operator) => (
                 <div key={operator.id} className="rounded-md border bg-muted/30 px-3 py-2">
-                  <div className="text-sm font-medium">{operator.name}</div>
-                  <div className="text-[11px] text-muted-foreground">{operator.unit}</div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">{operator.name}</div>
+                      <div className="text-[11px] text-muted-foreground">{operator.unit}</div>
+                    </div>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
+                      onClick={() => handleRemoveOperator(operator.id)}
+                      aria-label={`Hiq ${operator.name}`}
+                    >
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  </div>
                   <div className="mt-1 text-xs font-semibold text-primary">
                     {operator.activeCases} çështje aktive
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-3 grid gap-2 rounded-md border bg-background p-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+              <Input
+                value={newOperatorName}
+                onChange={(event) => setNewOperatorName(event.target.value)}
+                placeholder="Emri i operatorit"
+                className="h-9 text-sm"
+              />
+              <Input
+                value={newOperatorUnit}
+                onChange={(event) => setNewOperatorUnit(event.target.value)}
+                placeholder="Njesia / institucioni"
+                className="h-9 text-sm"
+              />
+              <Button type="button" size="sm" onClick={handleAddOperator}>
+                <UserPlus className="mr-1.5 size-3.5" />
+                Shto operator
+              </Button>
             </div>
 
             <div className="mt-3 space-y-2">

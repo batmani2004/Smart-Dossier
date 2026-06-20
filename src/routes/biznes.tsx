@@ -184,8 +184,8 @@ function BusinessPortal() {
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-semibold">Aplikimi u regjistrua</div>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Dosja hyri ne radhen e operatorit. Admini mund ta caktoje manualisht ose sistemi
-                    e cakton automatikisht pas 30 minutash.
+                    U gjenerua linku i gjurmimit per biznesin. Subjekti mund ta hape nga kjo faqe
+                    ose nga opsioni "Gjurmim aplikimi" duke vendosur kodin BIZ.
                   </p>
                   <div className="mt-3 grid gap-2 md:grid-cols-[160px_minmax(0,1fr)]">
                     <div className="rounded-md border bg-background px-2 py-1.5 font-mono text-xs">
@@ -203,7 +203,7 @@ function BusinessPortal() {
                     <Button asChild type="button" size="sm" variant="outline">
                       <a href={createdUrl} target="_blank" rel="noreferrer">
                         <ExternalLink className="mr-1.5 size-3.5" />
-                        Hap gjurmimin
+                        Hap linkun e gjurmimit
                       </a>
                     </Button>
                   </div>
