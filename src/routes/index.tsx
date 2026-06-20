@@ -442,10 +442,17 @@ function DashboardPage() {
               <div className="flex items-center gap-2">
                 <ShieldAlert className="size-4 text-destructive" />
                 <h2 className="text-sm font-semibold">AI Risk Brief</h2>
-                {briefQ.isLoading && <Loader2 className="size-3.5 animate-spin text-muted-foreground" />}
+                {briefQ.isLoading && (
+                  <Loader2 className="size-3.5 animate-spin text-muted-foreground" />
+                )}
               </div>
               {briefQ.data?.ok && (
-                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setBriefOpen(true)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs"
+                  onClick={() => setBriefOpen(true)}
+                >
                   Detaje të plota
                 </Button>
               )}
@@ -456,7 +463,11 @@ function DashboardPage() {
             {briefQ.data?.ok && (
               <div className="space-y-3">
                 <div className="text-sm leading-relaxed">
-                  <Markdown>{briefQ.data.brief.length > 600 ? briefQ.data.brief.slice(0, 600) + "…" : briefQ.data.brief}</Markdown>
+                  <Markdown>
+                    {briefQ.data.brief.length > 600
+                      ? briefQ.data.brief.slice(0, 600) + "…"
+                      : briefQ.data.brief}
+                  </Markdown>
                 </div>
                 <div className="flex flex-wrap gap-1.5 pt-1 border-t">
                   {briefQ.data.ranked.slice(0, 3).map((r) => (
@@ -1121,7 +1132,7 @@ function SmartDossierFocus({ compact = false }: { compact?: boolean }) {
       icon: FileText,
       title: "Aksesimi i dokumenteve",
       body: "Dokumentet vulosen, ruhen ne dosje dhe hapen per shkarkim pas verifikimit te te drejtes.",
-      action: "FAQ",
+      action: "Pyetje te shpeshta",
       href: "/faq",
     },
   ];

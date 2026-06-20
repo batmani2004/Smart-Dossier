@@ -366,7 +366,7 @@ export function CitizenVirtualAgent({
                           variant={message.mode === "ai" ? "secondary" : "outline"}
                           className="text-[10px]"
                         >
-                          {message.mode === "ai" ? "AI" : "FAQ lokale"}
+                          {message.mode === "ai" ? "AI" : "Pyetje te shpeshta"}
                         </Badge>
                         {!message.hasEnoughInfo ? (
                           <Badge variant="outline" className="text-[10px]">

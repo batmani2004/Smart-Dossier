@@ -134,16 +134,18 @@ export const Route = createFileRoute("/api/public/faq-assist")({
 
         const system =
           "Je ndihmes AI per qytetaret ne Smart Dossier. Pergjigju shkurt ne shqip. " +
-          "Perdor vetem FAQ-te dhe statusin publik te dosjes qe jepen. Mos jep keshille ligjore perfundimtare dhe mos shpik afate, tarifa ose institucione. " +
-          'Nese FAQ nuk mjafton, kthe hasEnoughInfo=false dhe answer="Kjo pyetje nuk mbulohet nga FAQ aktuale." ' +
-          "Kthe vetem JSON me fushat answer, citations (id te FAQ-ve te perdorura), hasEnoughInfo.";
+          "Perdor vetem pyetjet e shpeshta dhe statusin publik te dosjes qe jepen. Mos jep keshille ligjore perfundimtare dhe mos shpik afate, tarifa ose institucione. " +
+          'Nese pyetjet e shpeshta nuk mjaftojne, kthe hasEnoughInfo=false dhe answer="Kjo pyetje nuk mbulohet nga pyetjet e shpeshta aktuale." ' +
+          "Kthe vetem JSON me fushat answer, citations (id te pyetjeve te perdorura), hasEnoughInfo.";
         const user = [
           `PYETJA: ${parsed.question}`,
           tracking ? "" : null,
           tracking ? "STATUS PUBLIK I DOSJES:" : null,
           tracking ? renderTrackingForPrompt(tracking) : null,
           "",
-          sourceItems.length ? "FAQ:" : "FAQ: nuk ka perputhje te forte",
+          sourceItems.length
+            ? "PYETJE TE SHPESHTA:"
+            : "PYETJE TE SHPESHTA: nuk ka perputhje te forte",
           sourceItems.length ? renderFaqForPrompt(sourceItems) : "",
         ]
           .filter((line) => line !== null)

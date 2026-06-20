@@ -50,14 +50,14 @@ const primaryNav = [
 
 const managementNav = [
   { to: "/raporte", label: "Raporte", icon: BarChart3 },
-  { to: "/faq", label: "Pyetje të shpeshta", icon: HelpCircle },
+  { to: "/faq", label: "Pyetje te shpeshta", icon: HelpCircle },
 ] satisfies { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[];
 
 function pageLabel(path: string) {
   if (path.startsWith("/dosja/")) return "Detaje dosje";
   if (path.startsWith("/dosjet")) return "Dosjet";
   if (path.startsWith("/raporte")) return "Raporte";
-  if (path.startsWith("/faq")) return "FAQ";
+  if (path.startsWith("/faq")) return "Pyetje te shpeshta";
   if (path.startsWith("/aplikim/dokumentacion")) return "Dokumentacioni";
   if (path.startsWith("/aplikim")) return "Aplikim i ri";
   if (path.startsWith("/biznes")) return "Regjistrim prone";
@@ -133,24 +133,59 @@ export function AppShell({
           {role === "citizen" || role === "business" ? (
             <>
               <NavGroupLabel>Navigimi</NavGroupLabel>
-              <NavItem to="/aplikim" active={applicationPortalActive} icon={Scale} label="Aplikim i ri" />
-              <NavItem to="/aplikim/dokumentacion" active={applicationDocsActive} icon={FileUp} label="Dokumentacioni" nested />
+              <NavItem
+                to="/aplikim"
+                active={applicationPortalActive}
+                icon={Scale}
+                label="Aplikim i ri"
+              />
+              <NavItem
+                to="/aplikim/dokumentacion"
+                active={applicationDocsActive}
+                icon={FileUp}
+                label="Dokumentacioni"
+                nested
+              />
               {role === "business" ? (
-                <NavItem to="/biznes" active={businessPortalActive} icon={Building2} label="Regjistrim prone" />
+                <NavItem
+                  to="/biznes"
+                  active={businessPortalActive}
+                  icon={Building2}
+                  label="Regjistrim prone"
+                />
               ) : (
-                <NavItem to="/track/$code" params={{ code: "EKB-2026-000014" }} active={citizenPortalActive} icon={UserRound} label="Gjurmo aplikimin" />
+                <NavItem
+                  to="/track/$code"
+                  params={{ code: "EKB-2026-000014" }}
+                  active={citizenPortalActive}
+                  icon={UserRound}
+                  label="Gjurmo aplikimin"
+                />
               )}
-              <NavItem to="/faq" active={faqActive} icon={HelpCircle} label="FAQ dhe AI" />
+              <NavItem to="/faq" active={faqActive} icon={HelpCircle} label="Pyetje te shpeshta" />
             </>
           ) : (
             <>
               <NavGroupLabel>Kryesore</NavGroupLabel>
               {primaryNav.map((item) => (
-                <NavItem key={item.to} to={item.to} active={isActive(item)} icon={item.icon} label={item.label} badge={item.badge} />
+                <NavItem
+                  key={item.to}
+                  to={item.to}
+                  active={isActive(item)}
+                  icon={item.icon}
+                  label={item.label}
+                  badge={item.badge}
+                />
               ))}
               <NavGroupLabel className="mt-4">Menaxhimi</NavGroupLabel>
               {managementNav.map((item) => (
-                <NavItem key={item.to} to={item.to} active={isActive(item)} icon={item.icon} label={item.label} />
+                <NavItem
+                  key={item.to}
+                  to={item.to}
+                  active={isActive(item)}
+                  icon={item.icon}
+                  label={item.label}
+                />
               ))}
             </>
           )}
@@ -203,15 +238,16 @@ export function AppShell({
             <ShieldCheck className="size-4" />
           </div>
           <span className="flex-1 text-sm font-bold truncate">Smart Dossier</span>
-          <Link to="/login" className="text-[11px] text-white/60 hover:text-white transition-colors">
+          <Link
+            to="/login"
+            className="text-[11px] text-white/60 hover:text-white transition-colors"
+          >
             {profile.displayName}
           </Link>
         </div>
 
         {/* Page content */}
-        <main className="flex-1 pb-16 md:pb-0">
-          {children}
-        </main>
+        <main className="flex-1 pb-16 md:pb-0">{children}</main>
       </div>
 
       {/* ── Mobile bottom nav ─────────────────────────────── */}
@@ -225,18 +261,40 @@ export function AppShell({
       >
         {role === "citizen" || role === "business" ? (
           <>
-            <MobileLink to="/aplikim" active={applicationPortalActive || applicationDocsActive} icon={Scale} label="Aplikim" />
+            <MobileLink
+              to="/aplikim"
+              active={applicationPortalActive || applicationDocsActive}
+              icon={Scale}
+              label="Aplikim"
+            />
             {role === "business" ? (
-              <MobileLink to="/biznes" active={businessPortalActive} icon={Building2} label="Regjistrim" />
+              <MobileLink
+                to="/biznes"
+                active={businessPortalActive}
+                icon={Building2}
+                label="Regjistrim"
+              />
             ) : (
-              <MobileLink to="/track/$code" params={{ code: "EKB-2026-000014" }} active={citizenPortalActive} icon={UserRound} label="Gjurmim" />
+              <MobileLink
+                to="/track/$code"
+                params={{ code: "EKB-2026-000014" }}
+                active={citizenPortalActive}
+                icon={UserRound}
+                label="Gjurmim"
+              />
             )}
-            <MobileLink to="/faq" active={faqActive} icon={HelpCircle} label="FAQ" />
+            <MobileLink to="/faq" active={faqActive} icon={HelpCircle} label="Pyetje te shpeshta" />
           </>
         ) : (
           <>
             {[...primaryNav, managementNav[0]].map((item) => (
-              <MobileLink key={item.to} to={item.to} active={isActive(item)} icon={item.icon} label={item.label} />
+              <MobileLink
+                key={item.to}
+                to={item.to}
+                active={isActive(item)}
+                icon={item.icon}
+                label={item.label}
+              />
             ))}
           </>
         )}
@@ -249,7 +307,12 @@ export function AppShell({
 
 function NavGroupLabel({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/30", className)}>
+    <div
+      className={cn(
+        "px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/30",
+        className,
+      )}
+    >
       {children}
     </div>
   );
@@ -287,7 +350,12 @@ function NavItem({
       <Icon className={cn("shrink-0", nested ? "size-3.5" : "size-[18px]")} />
       <span className="truncate">{label}</span>
       {badge ? (
-        <span className={cn("ml-auto grid size-5 place-items-center rounded-full text-[10px] font-bold", active ? "bg-white/20 text-white" : "bg-destructive/80 text-white")}>
+        <span
+          className={cn(
+            "ml-auto grid size-5 place-items-center rounded-full text-[10px] font-bold",
+            active ? "bg-white/20 text-white" : "bg-destructive/80 text-white",
+          )}
+        >
           {badge}
         </span>
       ) : null}
@@ -350,9 +418,14 @@ function NotificationsPopover({ notifications }: { notifications: ShellNotificat
         {count ? (
           <ul className="max-h-80 overflow-y-auto p-2 space-y-1">
             {notifications.map((n, i) => (
-              <li key={n.id ?? i} className="rounded-lg border-l-2 border-accent/40 bg-muted/40 px-3 py-2 text-xs hover:bg-muted/70 transition-colors">
+              <li
+                key={n.id ?? i}
+                className="rounded-lg border-l-2 border-accent/40 bg-muted/40 px-3 py-2 text-xs hover:bg-muted/70 transition-colors"
+              >
                 <div className="font-medium text-foreground leading-snug">{n.title}</div>
-                {n.meta ? <div className="mt-0.5 text-[11px] text-muted-foreground">{n.meta}</div> : null}
+                {n.meta ? (
+                  <div className="mt-0.5 text-[11px] text-muted-foreground">{n.meta}</div>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -375,7 +448,9 @@ async function callAi(prompt: string): Promise<string> {
     });
     const d = (await res.json()) as { summary?: string };
     if (d.summary) return d.summary;
-  } catch {}
+  } catch {
+    return "";
+  }
   return "";
 }
 
@@ -430,13 +505,17 @@ function UserMenuPopover({
     setDialog(type);
     if (type === "settings" && !aiSettings) {
       setLoadingAi(true);
-      const text = await callAi("Gjenero cilësimet e platformës Smart Dossier për nëpunësin civil.");
+      const text = await callAi(
+        "Gjenero cilësimet e platformës Smart Dossier për nëpunësin civil.",
+      );
       setAiSettings(text || SETTINGS_CONTENT);
       setLoadingAi(false);
     }
     if (type === "about" && !aiAbout) {
       setLoadingAi(true);
-      const text = await callAi("Gjenero një përshkrim të shkurtër të platformës Smart Dossier dhe rolit të AI.");
+      const text = await callAi(
+        "Gjenero një përshkrim të shkurtër të platformës Smart Dossier dhe rolit të AI.",
+      );
       setAiAbout(text || ABOUT_CONTENT);
       setLoadingAi(false);
     }
@@ -449,7 +528,10 @@ function UserMenuPopover({
           <button
             type="button"
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all duration-150 hover:bg-white/[0.07] group"
-            style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)" }}
+            style={{
+              border: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(255,255,255,0.04)",
+            }}
           >
             <div className="relative shrink-0">
               <div className="size-9 rounded-full flex items-center justify-center bg-gradient-to-br from-accent/60 to-accent/30 ring-2 ring-accent/20">
@@ -458,7 +540,9 @@ function UserMenuPopover({
               <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-success border-2 border-[#101827]" />
             </div>
             <div className="min-w-0 flex-1 text-left">
-              <div className="text-sm font-semibold text-white truncate leading-tight">{profile.displayName}</div>
+              <div className="text-sm font-semibold text-white truncate leading-tight">
+                {profile.displayName}
+              </div>
               <div className="text-[11px] text-white/45 truncate">{profile.credentialLabel}</div>
             </div>
             <ChevronsUpDown className="size-3.5 text-white/30 group-hover:text-white/60 transition-colors shrink-0" />
@@ -473,7 +557,10 @@ function UserMenuPopover({
           style={{ background: "#1a2540", border: "1px solid rgba(255,255,255,0.10)" }}
         >
           {/* User header */}
-          <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <div
+            className="px-4 py-3 flex items-center gap-3"
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          >
             <div className="size-8 rounded-full flex items-center justify-center bg-gradient-to-br from-accent/60 to-accent/30 shrink-0">
               <RoleIcon className="size-4 text-white" />
             </div>
@@ -485,9 +572,26 @@ function UserMenuPopover({
 
           {/* Menu items */}
           <div className="px-2 py-2 space-y-0.5">
-            <MenuItem icon={Bell} label="Njoftime" desc="Alarme dhe përditësime" onClick={() => openDialog("njoftime")} />
-            <MenuItem icon={Settings2} label="Cilësimet" desc="Preferencat e platformës" onClick={() => openDialog("settings")} badge="AI" />
-            <MenuItem icon={Info} label="Rreth platformës" desc="Smart Dossier v2.0" onClick={() => openDialog("about")} badge="AI" />
+            <MenuItem
+              icon={Bell}
+              label="Njoftime"
+              desc="Alarme dhe përditësime"
+              onClick={() => openDialog("njoftime")}
+            />
+            <MenuItem
+              icon={Settings2}
+              label="Cilësimet"
+              desc="Preferencat e platformës"
+              onClick={() => openDialog("settings")}
+              badge="AI"
+            />
+            <MenuItem
+              icon={Info}
+              label="Rreth platformës"
+              desc="Smart Dossier v2.0"
+              onClick={() => openDialog("about")}
+              badge="AI"
+            />
           </div>
 
           <div className="px-2 pb-2" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
@@ -524,7 +628,16 @@ function UserMenuPopover({
             ) : (
               <div className="space-y-2 text-foreground/90 whitespace-pre-wrap">
                 {(aiSettings || SETTINGS_CONTENT).split("\n").map((line, i) => (
-                  <p key={i} className={line.startsWith("**") && line.endsWith("**") ? "font-semibold text-foreground" : ""}>{line.replace(/\*\*/g, "")}</p>
+                  <p
+                    key={i}
+                    className={
+                      line.startsWith("**") && line.endsWith("**")
+                        ? "font-semibold text-foreground"
+                        : ""
+                    }
+                  >
+                    {line.replace(/\*\*/g, "")}
+                  </p>
                 ))}
               </div>
             )}
@@ -553,7 +666,16 @@ function UserMenuPopover({
             ) : (
               <div className="space-y-2 text-foreground/90">
                 {(aiAbout || ABOUT_CONTENT).split("\n").map((line, i) => (
-                  <p key={i} className={line.startsWith("**") && line.endsWith("**") ? "font-semibold text-foreground" : ""}>{line.replace(/\*\*/g, "")}</p>
+                  <p
+                    key={i}
+                    className={
+                      line.startsWith("**") && line.endsWith("**")
+                        ? "font-semibold text-foreground"
+                        : ""
+                    }
+                  >
+                    {line.replace(/\*\*/g, "")}
+                  </p>
                 ))}
               </div>
             )}
@@ -572,9 +694,21 @@ function UserMenuPopover({
           </DialogHeader>
           <div className="space-y-2 py-2">
             {[
-              { title: "EKB-2026-000014 — alarm kritik", meta: "Certifikata familjare mungon · Tani", color: "border-destructive/50 bg-destructive/5" },
-              { title: "3 dosje me afat brenda 7 ditëve", meta: "Shpronësim · Sot", color: "border-warning/50 bg-warning/5" },
-              { title: "AI ekstraktoi dokumentin me 92% besueshmëri", meta: "EXP-2026-000003 · 2 orë më parë", color: "border-accent/30 bg-accent/5" },
+              {
+                title: "EKB-2026-000014 — alarm kritik",
+                meta: "Certifikata familjare mungon · Tani",
+                color: "border-destructive/50 bg-destructive/5",
+              },
+              {
+                title: "3 dosje me afat brenda 7 ditëve",
+                meta: "Shpronësim · Sot",
+                color: "border-warning/50 bg-warning/5",
+              },
+              {
+                title: "AI ekstraktoi dokumentin me 92% besueshmëri",
+                meta: "EXP-2026-000003 · 2 orë më parë",
+                color: "border-accent/30 bg-accent/5",
+              },
             ].map((n, i) => (
               <div key={i} className={cn("rounded-xl border px-3 py-2.5", n.color)}>
                 <div className="text-sm font-medium text-foreground">{n.title}</div>
@@ -611,12 +745,15 @@ function MenuItem({
         <Icon className="size-3.5 text-white/60 group-hover:text-accent transition-colors" />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-sm text-white/80 group-hover:text-white transition-colors font-medium">{label}</div>
+        <div className="text-sm text-white/80 group-hover:text-white transition-colors font-medium">
+          {label}
+        </div>
         <div className="text-[10px] text-white/35">{desc}</div>
       </div>
       {badge && (
         <span className="text-[9px] font-bold text-accent bg-accent/15 px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shrink-0">
-          <Sparkles className="size-2" />{badge}
+          <Sparkles className="size-2" />
+          {badge}
         </span>
       )}
     </button>
