@@ -893,7 +893,7 @@ function DashboardPage() {
                 <StatPill label="Aktive" value={briefQ.data.stats.activeDossiers} />
                 <StatPill label="Bllokuara" value={briefQ.data.stats.blocked} tone="critical" />
                 <StatPill
-                  label="Pres. jashtë"
+                  label="Institucionale"
                   value={briefQ.data.stats.awaitingExternal}
                   tone="warning"
                 />

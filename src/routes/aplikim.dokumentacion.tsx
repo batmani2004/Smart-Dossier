@@ -15,17 +15,16 @@ import { AppShell } from "@/components/app-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { useDemoRole } from "@/lib/demo-access";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/aplikim/dokumentacion")({
   head: () => ({
     meta: [
-      { title: "Dokumentacioni për operatorin - Smart Dossier" },
+      { title: "Dokumentet e aplikimit - Smart Dossier" },
       {
         name: "description",
-        content: "Shtoni dokumentet që do të ruhen me aplikimin dhe do t'i kalojnë operatorit.",
+        content: "Ngarkoni dokumentet e aplikimit në një pamje të qartë për qytetarin.",
       },
     ],
   }),
@@ -337,50 +336,76 @@ function OperatorDocumentationPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[1180px] space-y-4 px-4 py-5 md:px-6">
-        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
-              <FileUp className="size-4" />
-              Dokumentacioni për operatorin
+      <div className="mx-auto max-w-[1120px] space-y-4 px-4 py-4 md:px-6">
+        <div className="rounded-lg border border-primary/15 bg-white p-4 shadow-soft">
+          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+                <FileUp className="size-3.5" />
+                Dokumentet e aplikimit
+              </div>
+              <h1 className="mt-1 text-xl font-semibold tracking-tight">
+                Ngarkoni dokumentet për dosjen tuaj
+              </h1>
+              <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+                Shfaqen vetëm dokumentet që duhen për profilin aktiv {roleLabel.toLowerCase()}.
+                Zgjidhni PDF ose imazhe, kontrolloni statusin dhe kthehuni te aplikimi për ta
+                dërguar dosjen.
+              </p>
             </div>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-              Shto dokumentet e aplikimit
-            </h1>
-            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              Shfaqen vetëm dokumentet për rolin aktiv {roleLabel.toLowerCase()}. Zgjedhjet ruhen
-              automatikisht dhe përdoren kur dërgon aplikimin nga faqja kryesore e aplikimit.
-            </p>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <Badge variant="secondary" className="h-9 rounded-md px-3 text-xs">
+                {roleLabel} · {selectedTotal} dokumente
+              </Badge>
+              <Button asChild size="sm" variant="outline" className="h-9">
+                <Link to="/aplikim">
+                  <ArrowLeft className="size-3.5" />
+                  Kthehu te aplikimi
+                </Link>
+              </Button>
+            </div>
           </div>
-          <Button asChild size="sm" variant="outline" className="shrink-0">
-            <Link to="/aplikim">
-              <ArrowLeft className="size-3.5" />
-              Kthehu te aplikimi
-            </Link>
-          </Button>
+
+          <div className="mt-4 grid gap-2 md:grid-cols-3">
+            <GuidanceStep
+              number="1"
+              title="Zgjidh procesin"
+              body="Privatizim, shpronësim ose regjistrim prone sipas profilit."
+            />
+            <GuidanceStep
+              number="2"
+              title="Ngarko dokumentet"
+              body="Çdo dokument ka shpjegim të shkurtër dhe status të dukshëm."
+            />
+            <GuidanceStep
+              number="3"
+              title="Dërgo aplikimin"
+              body="Dokumentet ruhen dhe bashkëngjiten automatikisht në dosje."
+            />
+          </div>
         </div>
 
-        <Card className="border-primary/25 bg-primary/5 p-4">
+        <div className="rounded-lg border border-sky-200 bg-sky-50/80 px-3 py-2.5">
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-start gap-3">
-              <div className="grid size-9 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground">
-                <Scale className="size-4" />
+              <div className="grid size-7 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground">
+                <Scale className="size-3" />
               </div>
               <div className="min-w-0">
-                <div className="text-sm font-semibold">Ruajtje automatike</div>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                  Pasi zgjedh një skedar, emri i tij ruhet për aplikimin përkatës dhe do të dërgohet
-                  në dosje kur klikon `Dërgo aplikimin`.
+                <div className="text-sm font-semibold leading-tight">Ruajtje automatike</div>
+                <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                  Emrat e dokumenteve ruhen menjëherë. Kur klikoni `Dërgo aplikimin`, dokumentet e
+                  zgjedhura kalojnë bashkë me dosjen.
                 </p>
               </div>
             </div>
             <Badge variant="secondary" className="shrink-0">
-              {roleLabel} · {selectedTotal} të zgjedhura
+              {selectedTotal} të zgjedhura
             </Badge>
           </div>
-        </Card>
+        </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-3 lg:grid-cols-2">
           {visibleGroups.map((group) => (
             <DocumentationCard
               key={group.id}
@@ -398,6 +423,20 @@ function OperatorDocumentationPage() {
   );
 }
 
+function GuidanceStep({ number, title, body }: { number: string; title: string; body: string }) {
+  return (
+    <div className="flex gap-2.5 rounded-lg border bg-muted/20 p-2.5">
+      <div className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">
+        {number}
+      </div>
+      <div className="min-w-0">
+        <div className="text-xs font-semibold">{title}</div>
+        <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{body}</p>
+      </div>
+    </div>
+  );
+}
+
 function DocumentationCard({
   group,
   active,
@@ -411,61 +450,111 @@ function DocumentationCard({
 }) {
   const Icon = group.icon;
   const selectedCount = group.docs.filter((doc) => documentNames[doc.type]?.trim()).length;
+  const progress = Math.round((selectedCount / group.docs.length) * 100);
 
   return (
-    <Card className={cn("p-4", active && "border-primary/30 bg-primary/[0.03]")}>
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-3">
-          <div
-            className={cn(
-              "grid size-9 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground",
-              active && "bg-primary text-primary-foreground",
-            )}
-          >
-            <Icon className="size-4" />
+    <Card
+      className={cn(
+        "overflow-hidden border-slate-200 bg-white p-0 shadow-sm",
+        active && "border-primary/35",
+      )}
+    >
+      <div
+        className={cn(
+          "border-b bg-slate-50/75 p-3",
+          active && "border-primary/15 bg-primary/[0.04]",
+        )}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-3">
+            <div
+              className={cn(
+                "grid size-8 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground",
+                active && "bg-primary text-primary-foreground",
+              )}
+            >
+              <Icon className="size-3.5" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-sm font-semibold leading-snug">{group.title}</h2>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{group.subtitle}</p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <h2 className="text-sm font-semibold leading-snug">{group.title}</h2>
-            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{group.subtitle}</p>
-          </div>
+          <Badge variant="secondary" className="shrink-0 text-[11px]">
+            {selectedCount}/{group.docs.length}
+          </Badge>
         </div>
-        <Badge variant="secondary" className="shrink-0 text-[11px]">
-          {selectedCount}/{group.docs.length}
-        </Badge>
+        <div className="mt-3 h-1 overflow-hidden rounded-full bg-white">
+          <div
+            className="h-full rounded-full bg-primary transition-all"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       </div>
 
-      <ul className="space-y-2">
+      <ul className="divide-y divide-slate-100">
         {group.docs.map((doc) => {
           const selectedName = documentNames[doc.type]?.trim();
+          const inputId = `${group.id}-${doc.type}`;
           return (
-            <li key={doc.type} className="rounded-md border bg-card p-3">
-              <div className="flex items-start gap-2">
-                <FileCheck2
-                  className={cn(
-                    "mt-0.5 size-4 shrink-0",
-                    selectedName ? "text-success" : "text-muted-foreground",
-                  )}
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <div className="text-sm font-medium">{doc.label}</div>
-                    {doc.required ? (
-                      <span className="rounded-md bg-destructive/10 px-1.5 py-0.5 text-[10px] font-semibold text-destructive">
-                        i detyrueshëm
-                      </span>
-                    ) : null}
+            <li
+              key={doc.type}
+              className={cn(
+                "bg-card px-3 py-2 transition-colors",
+                selectedName ? "bg-success/[0.035]" : "hover:bg-muted/25",
+              )}
+            >
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 items-start gap-2">
+                  <div
+                    className={cn(
+                      "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full",
+                      selectedName
+                        ? "bg-success/15 text-success"
+                        : "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {selectedName ? (
+                      <CheckCircle2 className="size-3" />
+                    ) : (
+                      <FileCheck2 className="size-3" />
+                    )}
                   </div>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{doc.helper}</p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <div className="text-[13px] font-semibold leading-tight">{doc.label}</div>
+                      {selectedName ? (
+                        <span className="rounded-md bg-success/10 px-1.5 py-0.5 text-[9px] font-semibold text-success">
+                          Gati
+                        </span>
+                      ) : null}
+                      {doc.required ? (
+                        <span className="rounded-md bg-destructive/10 px-1.5 py-0.5 text-[9px] font-semibold text-destructive">
+                          i detyrueshëm
+                        </span>
+                      ) : (
+                        <span className="rounded-md bg-muted px-1.5 py-0.5 text-[9px] font-semibold text-muted-foreground">
+                          opsional
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
+                      {doc.helper}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex min-w-0 shrink-0 items-center gap-1.5 sm:max-w-[240px]">
                   {selectedName ? (
-                    <div className="mt-2 flex items-center justify-between gap-2 rounded-md border bg-background px-2 py-1.5">
-                      <span className="truncate font-mono text-[11px] text-muted-foreground">
+                    <div className="flex min-w-0 flex-1 items-center gap-1 rounded-md bg-muted/60 px-2 py-1">
+                      <span className="truncate font-mono text-[11px] text-foreground">
                         {selectedName}
                       </span>
                       <Button
                         type="button"
                         size="icon"
                         variant="ghost"
-                        className="size-7 shrink-0"
+                        className="size-5 shrink-0"
                         onClick={() => onDocumentNameChange(doc.type, "")}
                         aria-label="Hiq dokumentin"
                       >
@@ -473,10 +562,18 @@ function DocumentationCard({
                       </Button>
                     </div>
                   ) : null}
-                  <Input
+                  <label
+                    htmlFor={inputId}
+                    className="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-primary/25 bg-primary/5 px-2.5 py-1 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/10"
+                  >
+                    <FileUp className="size-3" />
+                    {selectedName ? "Ndrysho" : "Ngarko"}
+                  </label>
+                  <input
+                    id={inputId}
                     type="file"
                     accept="application/pdf,image/*"
-                    className="mt-2 h-9 text-sm"
+                    className="sr-only"
                     onChange={(event) => {
                       const file = event.target.files?.[0];
                       if (!file) return;
@@ -490,7 +587,7 @@ function DocumentationCard({
         })}
       </ul>
 
-      <div className="mt-4 flex items-center gap-2 border-t pt-3 text-[11px] text-muted-foreground">
+      <div className="flex items-center gap-2 border-t bg-slate-50/70 px-3 py-2 text-[11px] text-muted-foreground">
         <CheckCircle2 className="size-3.5 text-success" />
         Do të ruhet me aplikimin për këtë proces.
       </div>

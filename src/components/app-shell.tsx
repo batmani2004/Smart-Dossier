@@ -58,7 +58,7 @@ function pageLabel(path: string) {
   if (path.startsWith("/dosjet")) return "Dosjet";
   if (path.startsWith("/raporte")) return "Raporte";
   if (path.startsWith("/faq")) return "Pyetje te shpeshta";
-  if (path.startsWith("/aplikim/dokumentacion")) return "Dokumentacioni";
+  if (path.startsWith("/aplikim/dokumentacion")) return "Dokumentet e aplikimit";
   if (path.startsWith("/aplikim")) return "Aplikim i ri";
   if (path.startsWith("/biznes")) return "Regjistrim prone";
   if (path.startsWith("/track/")) return "Gjurmim qytetar";
@@ -144,7 +144,7 @@ export function AppShell({
                 to="/aplikim/dokumentacion"
                 active={applicationDocsActive}
                 icon={FileUp}
-                label="Dokumentacioni"
+                label="Dokumentet"
                 nested
               />
               {role === "business" ? (

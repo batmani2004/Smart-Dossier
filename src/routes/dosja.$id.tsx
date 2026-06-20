@@ -39,7 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -359,37 +359,81 @@ function DossierWorkspace() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid h-auto w-full grid-cols-2 items-stretch gap-2 rounded-xl border bg-muted/40 p-2 shadow-none sm:grid-cols-3 xl:flex xl:flex-wrap">
-            <DossierSectionTab value="permbledhje" icon={Sparkles} label="Kryesore" />
-            <DossierSectionTab value="dokumentet" icon={FileText} label="Dokumente" />
-            <DossierSectionTab value="verifikimi" icon={UserCheck} label="Verifikim" />
-            <DossierSectionTab
-              value="pershpejtimi"
-              icon={Clock}
-              label="Afate"
-              badge={d.expeditedProcedure?.status === "submitted" ? 1 : undefined}
-              badgeTone="warning"
+          <div className="grid w-full gap-3 rounded-xl border bg-white/80 p-3 shadow-soft md:grid-cols-2 xl:grid-cols-5">
+            <DossierTabDropdown
+              title="Orientim"
+              description="Pamja e shpejte"
+              activeTab={activeTab}
+              onSelect={setActiveTab}
+              options={[{ value: "permbledhje", icon: Sparkles, label: "Kryesore" }]}
             />
-            {can("viewAudit") ? (
-              <DossierSectionTab
-                value="ankesa"
-                icon={MessageSquare}
-                label="Ankesa"
-                badge={d.citizenComplaints?.length || undefined}
-                badgeTone="danger"
-              />
-            ) : null}
-            <DossierSectionTab value="lista" icon={ListChecks} label="Hapat" />
-            <DossierSectionTab value="workflow" icon={ClipboardCheck} label="Miratimi" />
-            <DossierSectionTab value="gis" icon={MapPinned} label="Harta" />
-            {can("runAi") ? <DossierSectionTab value="ai" icon={Sparkles} label="AI" /> : null}
-            {can("generateDocuments") ? (
-              <DossierSectionTab value="gjenero" icon={FileText} label="Gjenero" />
-            ) : null}
-            {can("viewAudit") ? (
-              <DossierSectionTab value="historiku" icon={History} label="Historik" />
-            ) : null}
-          </TabsList>
+
+            <DossierTabDropdown
+              title="Dosja"
+              description="Dokumente dhe kontroll"
+              activeTab={activeTab}
+              onSelect={setActiveTab}
+              options={[
+                { value: "dokumentet", icon: FileText, label: "Dokumente" },
+                { value: "verifikimi", icon: UserCheck, label: "Verifikim" },
+              ]}
+            />
+
+            <DossierTabDropdown
+              title="Ndjekje"
+              description="Afate, ankesa, hapa"
+              activeTab={activeTab}
+              onSelect={setActiveTab}
+              options={[
+                {
+                  value: "pershpejtimi",
+                  icon: Clock,
+                  label: "Afate",
+                  badge: d.expeditedProcedure?.status === "submitted" ? 1 : undefined,
+                  badgeTone: "warning",
+                },
+                ...(can("viewAudit")
+                  ? [
+                      {
+                        value: "ankesa",
+                        icon: MessageSquare,
+                        label: "Ankesa",
+                        badge: d.citizenComplaints?.length || undefined,
+                        badgeTone: "danger" as const,
+                      },
+                    ]
+                  : []),
+                { value: "lista", icon: ListChecks, label: "Hapat" },
+              ]}
+            />
+
+            <DossierTabDropdown
+              title="Vendim"
+              description="Miratim dhe dalje"
+              activeTab={activeTab}
+              onSelect={setActiveTab}
+              options={[
+                { value: "workflow", icon: ClipboardCheck, label: "Miratimi" },
+                ...(can("generateDocuments")
+                  ? [{ value: "gjenero", icon: FileText, label: "Gjenero" }]
+                  : []),
+                ...(can("viewAudit")
+                  ? [{ value: "historiku", icon: History, label: "Historik" }]
+                  : []),
+              ]}
+            />
+
+            <DossierTabDropdown
+              title="Harta & AI"
+              description="GIS dhe asistence"
+              activeTab={activeTab}
+              onSelect={setActiveTab}
+              options={[
+                { value: "gis", icon: MapPinned, label: "Harta" },
+                ...(can("runAi") ? [{ value: "ai", icon: Sparkles, label: "AI" }] : []),
+              ]}
+            />
+          </div>
 
           {/* Përmbledhje */}
           <TabsContent value="permbledhje" className="space-y-3">
@@ -758,39 +802,82 @@ function phaseDurationDays(phase: PhaseDefinition) {
   return phase.steps.reduce((total, step) => total + (step.slaDays ?? 0), 0);
 }
 
-function DossierSectionTab({
-  value,
-  icon: Icon,
-  label,
-  badge,
-  badgeTone = "neutral",
-}: {
+type DossierTabOption = {
   value: string;
   icon: LucideIcon;
   label: string;
   badge?: string | number;
   badgeTone?: "neutral" | "warning" | "danger";
+};
+
+function DossierTabDropdown({
+  title,
+  description,
+  options,
+  activeTab,
+  onSelect,
+}: {
+  title: string;
+  description: string;
+  options: DossierTabOption[];
+  activeTab: string;
+  onSelect: (value: string) => void;
 }) {
+  const activeOption = options.find((option) => option.value === activeTab);
+
   return (
-    <TabsTrigger
-      value={value}
-      className="group min-h-11 w-full justify-start gap-2 rounded-lg border border-transparent bg-white px-3 py-2 text-sm text-foreground/80 shadow-none hover:border-primary/25 hover:text-primary data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-soft xl:w-auto xl:min-w-32"
+    <div
+      className={cn(
+        "rounded-lg border border-border/80 bg-muted/30 p-2.5 transition-colors",
+        activeOption && "border-primary/40 bg-primary/5",
+      )}
     >
-      <Icon className="size-4 shrink-0" />
-      <span className="truncate">{label}</span>
-      {badge !== undefined ? (
-        <span
+      <div className="mb-2 flex items-baseline justify-between gap-2">
+        <div className="text-[11px] font-semibold uppercase tracking-wide text-foreground">
+          {title}
+        </div>
+        <div className="hidden text-[10px] text-muted-foreground 2xl:block">{description}</div>
+      </div>
+      <Select value={activeOption?.value} onValueChange={onSelect}>
+        <SelectTrigger
           className={cn(
-            "ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none group-data-[state=active]:bg-white/20 group-data-[state=active]:text-current",
-            badgeTone === "danger" && "bg-destructive/15 text-destructive",
-            badgeTone === "warning" && "bg-warning/20 text-warning-foreground",
-            badgeTone === "neutral" && "bg-muted text-muted-foreground",
+            "h-10 w-full rounded-md border bg-white text-sm font-semibold shadow-none",
+            activeOption && "border-primary/40 text-primary",
           )}
         >
-          {badge}
-        </span>
-      ) : null}
-    </TabsTrigger>
+          <SelectValue placeholder="Zgjidh seksionin" />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => {
+            const Icon = option.icon;
+            const tone = option.badgeTone ?? "neutral";
+            return (
+              <SelectItem key={option.value} value={option.value}>
+                <span className="flex w-full items-center gap-2">
+                  <Icon className="size-3.5 shrink-0 text-muted-foreground" />
+                  <span>{option.label}</span>
+                  {option.badge !== undefined ? (
+                    <span
+                      className={cn(
+                        "ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none",
+                        tone === "danger" && "bg-destructive/15 text-destructive",
+                        tone === "warning" && "bg-warning/20 text-warning-foreground",
+                        tone === "neutral" && "bg-muted text-muted-foreground",
+                      )}
+                    >
+                      {option.badge}
+                    </span>
+                  ) : null}
+                </span>
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
+      </Select>
+      <div className="mt-1.5 truncate text-[11px] text-muted-foreground">
+        {activeOption ? `Aktive: ${activeOption.label}` : description}
+      </div>
+    </div>
   );
 }
 
@@ -1100,61 +1187,151 @@ function DossierProgressRail({
     phases.findIndex((phase) => phase.id === currentPhaseId),
   );
   const progress = phases.length > 1 ? ((currentIndex + 1) / phases.length) * 100 : 100;
+  const currentPhase = phases[currentIndex] ?? phases[0];
+  const nextPhase = phases[currentIndex + 1];
+  const completedCount = currentIndex;
+  const waitingCount = Math.max(phases.length - currentIndex - 1, 0);
 
   return (
-    <div className="mt-4 rounded-md border border-border bg-white/70 p-4">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div>
-          <div className="text-[11px] font-semibold text-muted-foreground">Progresi</div>
-          <div className="mt-1 h-1.5 w-48 overflow-hidden rounded-full bg-primary/15">
-            <div className="h-full rounded-full bg-primary" style={{ width: `${progress}%` }} />
+    <div className="mt-4 rounded-xl border border-border bg-white p-4 shadow-soft">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="grid size-14 shrink-0 place-items-center rounded-full bg-primary text-xl font-semibold text-primary-foreground shadow-soft ring-4 ring-primary/10">
+            {currentIndex + 1}
+          </div>
+          <div className="min-w-0">
+            <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Ecuria e dosjes
+            </div>
+            <h2 className="mt-1 truncate text-base font-semibold text-foreground">
+              Hapi aktual: {currentPhase?.title ?? "Ne proces"}
+            </h2>
+            <p className="mt-1 text-sm leading-5 text-muted-foreground">
+              Dosja eshte ne hapin {currentIndex + 1} nga {phases.length}.
+              {nextPhase ? ` Pas ketij hapi vijon: ${nextPhase.title}.` : " Ky eshte hapi final."}
+            </p>
           </div>
         </div>
-        <div className="text-[11px] font-semibold text-primary">
-          {currentIndex + 1}/{phases.length} Hapa
+
+        <div className="grid grid-cols-3 gap-3 text-center sm:min-w-[360px]">
+          <ProgressFact label="Kryer" value={completedCount} tone="success" />
+          <ProgressFact label="Ne proces" value={1} tone="primary" />
+          <ProgressFact label="Ne pritje" value={waitingCount} tone="muted" />
         </div>
       </div>
 
-      <div className="-mx-1 overflow-x-auto px-1">
+      <div className="mt-4">
+        <div className="mb-1.5 flex items-center justify-between gap-3 text-xs">
+          <span className="font-medium text-foreground">
+            {Math.round(progress)}% ecuri e procesit
+          </span>
+          <span className="font-semibold text-primary">
+            {currentIndex + 1}/{phases.length} hapa
+          </span>
+        </div>
+        <div className="h-2.5 overflow-hidden rounded-full bg-primary/12">
+          <div
+            className="h-full rounded-full bg-primary transition-all"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
+      <div className="-mx-1 mt-5 overflow-x-auto px-1 pb-1">
         <ol
-          className="grid min-w-[720px] gap-0 overflow-hidden text-center md:min-w-0"
+          className="grid min-w-[920px] gap-0 md:min-w-0"
           style={{ gridTemplateColumns: `repeat(${phases.length}, minmax(0, 1fr))` }}
         >
           {phases.map((phase, index) => {
             const isCurrent = index === currentIndex;
             const isDone = index < currentIndex;
             return (
-              <li key={phase.id} className="relative px-1">
+              <li key={phase.id} className="relative px-1 text-center">
                 {index > 0 ? (
                   <span
                     aria-hidden
                     className={cn(
-                      "absolute left-[-50%] top-4 h-px w-full",
-                      isDone || isCurrent ? "bg-primary/45" : "bg-border",
+                      "absolute left-[-50%] top-5 z-0 h-1 w-full rounded-full",
+                      index <= currentIndex ? "bg-success/55" : "bg-primary/15",
                     )}
                   />
                 ) : null}
-                <div
-                  className={cn(
-                    "relative mx-auto grid size-8 place-items-center rounded-full border bg-card text-[11px] font-semibold shadow-soft",
-                    isDone && "border-success bg-success/10 text-success",
-                    isCurrent && "border-primary bg-primary text-primary-foreground",
-                  )}
-                >
-                  {isDone ? <CheckCircle2 className="size-4" /> : index + 1}
-                </div>
-                <div
-                  className={cn(
-                    "mt-2 line-clamp-2 text-[10px] leading-tight",
-                    isCurrent ? "font-semibold text-primary" : "text-muted-foreground",
-                  )}
-                >
-                  {phase.title}
+                <div className="relative z-10 flex flex-col items-center">
+                  <div
+                    className={cn(
+                      "grid size-11 shrink-0 place-items-center rounded-full border bg-white text-sm font-semibold transition-all",
+                      isDone && "border-success bg-success text-white shadow-soft",
+                      isCurrent &&
+                        "animate-pulse border-primary bg-primary text-primary-foreground ring-4 ring-primary/15 shadow-soft",
+                      !isDone &&
+                        !isCurrent &&
+                        "animate-pulse border-primary/25 bg-primary/5 text-primary/70 ring-2 ring-primary/10",
+                    )}
+                  >
+                    {isDone ? <CheckCircle2 className="size-5" /> : index + 1}
+                  </div>
+                  <div className="mt-2 min-w-0">
+                    <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      Hapi {index + 1}
+                    </div>
+                    <div
+                      className={cn(
+                        "mx-auto mt-0.5 line-clamp-2 max-w-[9.5rem] text-[11px] font-medium leading-tight",
+                        isCurrent ? "text-primary" : "text-foreground",
+                      )}
+                    >
+                      {phase.title}
+                    </div>
+                  </div>
+                  <div
+                    className={cn(
+                      "mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                      isDone && "bg-success/10 text-success",
+                      isCurrent && "bg-primary/10 text-primary",
+                      !isDone && !isCurrent && "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {isDone ? "Kryer" : isCurrent ? "Ne proces" : "Ne pritje"}
+                  </div>
                 </div>
               </li>
             );
           })}
         </ol>
+      </div>
+    </div>
+  );
+}
+
+function ProgressFact({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "success" | "primary" | "muted";
+}) {
+  return (
+    <div
+      className={cn(
+        "px-2 py-1",
+        tone === "success" && "text-success",
+        tone === "primary" && "text-primary",
+      )}
+    >
+      <div
+        className={cn(
+          "text-lg font-semibold tabular-nums",
+          tone === "success" && "text-success",
+          tone === "primary" && "text-primary",
+          tone === "muted" && "text-foreground",
+        )}
+      >
+        {value}
+      </div>
+      <div className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
       </div>
     </div>
   );

@@ -674,10 +674,10 @@ function ApplicationPortalHome() {
                   <FileUp className="size-4" />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-sm font-semibold">Dokumentacioni për operatorin</h2>
+                  <h2 className="text-sm font-semibold">Dokumentet e aplikimit</h2>
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    Shto ose ndrysho dokumentet në nënfaqen e dokumentacionit. Ato ruhen dhe
-                    dërgohen bashkë me aplikimin.
+                    Ngarkoni dokumentet që duhen për aplikimin. Ato ruhen dhe dërgohen bashkë me
+                    dosjen.
                   </p>
                   <div className="mt-2 text-[11px] font-semibold text-primary">
                     {selectedDocs.length}/{docs.length} dokumente të zgjedhura
@@ -686,7 +686,7 @@ function ApplicationPortalHome() {
               </div>
               <Button asChild size="sm" variant="outline" className="shrink-0">
                 <Link to="/aplikim/dokumentacion">
-                  Hap dokumentacionin
+                  Hap dokumentet
                   <ExternalLink className="size-3.5" />
                 </Link>
               </Button>

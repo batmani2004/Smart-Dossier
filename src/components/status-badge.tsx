@@ -5,7 +5,7 @@ const STATUS_STYLES: Record<DossierStatus, { label: string; cls: string }> = {
   draft: { label: "Draft", cls: "bg-muted text-muted-foreground" },
   in_progress: { label: "Në proces", cls: "bg-info/15 text-info" },
   blocked: { label: "Bllokuar", cls: "bg-destructive/15 text-destructive" },
-  awaiting_external: { label: "Pres jashtë", cls: "bg-warning/15 text-warning" },
+  awaiting_external: { label: "Pritje institucionale", cls: "bg-warning/15 text-warning" },
   completed: { label: "Mbyllur", cls: "bg-success/15 text-success" },
   rejected: { label: "Refuzuar", cls: "bg-destructive/15 text-destructive" },
 };

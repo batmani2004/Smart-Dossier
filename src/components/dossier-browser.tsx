@@ -76,7 +76,7 @@ const CATEGORY_LABELS: Record<DossierCategory, { label: string; helper: string }
   high_priority: { label: "Prioritet i larte", helper: "Per tu hapur i pari" },
   blocked: { label: "Bllokuar", helper: "Nuk ecen pa veprim" },
   due_soon: { label: "Afat i afert", helper: "Sot, vonese ose 7 dite" },
-  waiting_external: { label: "Pres jasht", helper: "Institucion tjeter" },
+  waiting_external: { label: "Pritje institucionale", helper: "Koordinim me institucion" },
   completed: { label: "Mbyllur", helper: "Te perfunduara" },
 };
 
@@ -84,7 +84,7 @@ const STATUS_LABELS: Record<DossierStatus, string> = {
   draft: "Draft",
   in_progress: "Ne proces",
   blocked: "Bllokuar",
-  awaiting_external: "Pres jasht",
+  awaiting_external: "Pritje institucionale",
   completed: "Mbyllur",
   rejected: "Refuzuar",
 };

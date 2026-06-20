@@ -158,7 +158,7 @@ function DosjetPage() {
               <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="in_progress">Ne proces</SelectItem>
               <SelectItem value="blocked">Bllokuar</SelectItem>
-              <SelectItem value="awaiting_external">Pres jasht</SelectItem>
+              <SelectItem value="awaiting_external">Pritje institucionale</SelectItem>
               <SelectItem value="completed">Mbyllur</SelectItem>
             </SelectContent>
           </Select>
