@@ -26,6 +26,7 @@ import {
   Upload,
   UserCheck,
   UsersRound,
+  type LucideIcon,
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
@@ -358,68 +359,35 @@ function DossierWorkspace() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="flex h-auto w-full justify-start overflow-x-auto rounded-md border bg-secondary/85 p-1">
-            <TabsTrigger value="permbledhje" className="text-xs">
-              <Sparkles className="size-3.5" />
-              Përmbledhje
-            </TabsTrigger>
-            <TabsTrigger value="dokumentet" className="text-xs">
-              <FileText className="size-3.5" />
-              Dokumentet
-            </TabsTrigger>
-            <TabsTrigger value="verifikimi" className="text-xs">
-              <UserCheck className="size-3.5" />
-              Verifikimi
-            </TabsTrigger>
-            <TabsTrigger value="pershpejtimi" className="text-xs">
-              <Clock className="size-3.5" />
-              Pershpejtimi
-              {d.expeditedProcedure?.status === "submitted" ? (
-                <span className="ml-1 rounded bg-warning/20 px-1 text-[10px] text-warning-foreground">
-                  1
-                </span>
-              ) : null}
-            </TabsTrigger>
+          <TabsList className="grid h-auto w-full grid-cols-2 items-stretch gap-2 rounded-xl border bg-muted/40 p-2 shadow-none sm:grid-cols-3 xl:flex xl:flex-wrap">
+            <DossierSectionTab value="permbledhje" icon={Sparkles} label="Kryesore" />
+            <DossierSectionTab value="dokumentet" icon={FileText} label="Dokumente" />
+            <DossierSectionTab value="verifikimi" icon={UserCheck} label="Verifikim" />
+            <DossierSectionTab
+              value="pershpejtimi"
+              icon={Clock}
+              label="Afate"
+              badge={d.expeditedProcedure?.status === "submitted" ? 1 : undefined}
+              badgeTone="warning"
+            />
             {can("viewAudit") ? (
-              <TabsTrigger value="ankesa" className="text-xs">
-                <MessageSquare className="size-3.5" />
-                Ankesa
-                {d.citizenComplaints?.length ? (
-                  <span className="ml-1 rounded bg-destructive/15 px-1 text-[10px] text-destructive">
-                    {d.citizenComplaints.length}
-                  </span>
-                ) : null}
-              </TabsTrigger>
+              <DossierSectionTab
+                value="ankesa"
+                icon={MessageSquare}
+                label="Ankesa"
+                badge={d.citizenComplaints?.length || undefined}
+                badgeTone="danger"
+              />
             ) : null}
-            <TabsTrigger value="lista" className="text-xs">
-              <ListChecks className="size-3.5" />
-              Lista
-            </TabsTrigger>
-            <TabsTrigger value="workflow" className="text-xs">
-              <ClipboardCheck className="size-3.5" />
-              Workflow
-            </TabsTrigger>
-            <TabsTrigger value="gis" className="text-xs">
-              <MapPinned className="size-3.5" />
-              AI GIS
-            </TabsTrigger>
-            {can("runAi") ? (
-              <TabsTrigger value="ai" className="text-xs">
-                <Sparkles className="size-3.5" />
-                AI
-              </TabsTrigger>
-            ) : null}
+            <DossierSectionTab value="lista" icon={ListChecks} label="Hapat" />
+            <DossierSectionTab value="workflow" icon={ClipboardCheck} label="Miratimi" />
+            <DossierSectionTab value="gis" icon={MapPinned} label="Harta" />
+            {can("runAi") ? <DossierSectionTab value="ai" icon={Sparkles} label="AI" /> : null}
             {can("generateDocuments") ? (
-              <TabsTrigger value="gjenero" className="text-xs">
-                <FileText className="size-3.5" />
-                Gjenero
-              </TabsTrigger>
+              <DossierSectionTab value="gjenero" icon={FileText} label="Gjenero" />
             ) : null}
             {can("viewAudit") ? (
-              <TabsTrigger value="historiku" className="text-xs">
-                <History className="size-3.5" />
-                Historiku
-              </TabsTrigger>
+              <DossierSectionTab value="historiku" icon={History} label="Historik" />
             ) : null}
           </TabsList>
 
@@ -788,6 +756,42 @@ function DossierWorkspace() {
 
 function phaseDurationDays(phase: PhaseDefinition) {
   return phase.steps.reduce((total, step) => total + (step.slaDays ?? 0), 0);
+}
+
+function DossierSectionTab({
+  value,
+  icon: Icon,
+  label,
+  badge,
+  badgeTone = "neutral",
+}: {
+  value: string;
+  icon: LucideIcon;
+  label: string;
+  badge?: string | number;
+  badgeTone?: "neutral" | "warning" | "danger";
+}) {
+  return (
+    <TabsTrigger
+      value={value}
+      className="group min-h-11 w-full justify-start gap-2 rounded-lg border border-transparent bg-white px-3 py-2 text-sm text-foreground/80 shadow-none hover:border-primary/25 hover:text-primary data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-soft xl:w-auto xl:min-w-32"
+    >
+      <Icon className="size-4 shrink-0" />
+      <span className="truncate">{label}</span>
+      {badge !== undefined ? (
+        <span
+          className={cn(
+            "ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none group-data-[state=active]:bg-white/20 group-data-[state=active]:text-current",
+            badgeTone === "danger" && "bg-destructive/15 text-destructive",
+            badgeTone === "warning" && "bg-warning/20 text-warning-foreground",
+            badgeTone === "neutral" && "bg-muted text-muted-foreground",
+          )}
+        >
+          {badge}
+        </span>
+      ) : null}
+    </TabsTrigger>
+  );
 }
 
 function fmtAll(value: number | undefined | null) {
