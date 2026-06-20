@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   Building2,
@@ -38,9 +38,11 @@ export const Route = createFileRoute("/login")({
 });
 
 type LoginStep = "credentials" | "otp" | "done";
+type AuthMode = "login" | "register";
+type LoginRole = Exclude<DemoRole, "admin">;
 
 const LOGIN_ROLES: Array<{
-  role: DemoRole;
+  role: LoginRole;
   title: string;
   hint: string;
   idLabel: string;
@@ -75,15 +77,6 @@ const LOGIN_ROLES: Array<{
     icon: UserCog,
     demoId: "OP-1024",
   },
-  {
-    role: "admin",
-    title: "Admin",
-    hint: "Administrim portali",
-    idLabel: "ID e administratorit",
-    idPlaceholder: "ADM-001",
-    icon: ShieldCheck,
-    demoId: "ADM-001",
-  },
 ];
 
 const DEMO_OTP = "246810";
@@ -104,7 +97,9 @@ const SERVICE_SHORTCUTS = [
 function LoginPage() {
   const navigate = useNavigate();
   const { setRole } = useDemoRole();
-  const [selectedRole, setSelectedRole] = useState<DemoRole>("citizen");
+  const [selectedRole, setSelectedRole] = useState<LoginRole>("citizen");
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
+  const [fullName, setFullName] = useState("Elira Kola");
   const [identifier, setIdentifier] = useState(LOGIN_ROLES[0].demoId);
   const [password, setPassword] = useState("demo2026");
   const [showPassword, setShowPassword] = useState(false);
@@ -118,16 +113,34 @@ function LoginPage() {
   );
   const SelectedIcon = selected.icon;
 
-  function chooseRole(role: DemoRole) {
+  function chooseRole(role: LoginRole) {
     const next = LOGIN_ROLES.find((item) => item.role === role) ?? LOGIN_ROLES[0];
     setSelectedRole(next.role);
+    setFullName(DEMO_ROLES[next.role].displayName);
     setIdentifier(next.demoId);
     setPassword("demo2026");
     setOtp("");
     setStep("credentials");
   }
 
+  function startRegister() {
+    setAuthMode("register");
+    setStep("credentials");
+    setOtp("");
+    setFullName(DEMO_ROLES[selectedRole].displayName);
+  }
+
+  function startLogin() {
+    setAuthMode("login");
+    setStep("credentials");
+    setOtp("");
+  }
+
   function continueToOtp() {
+    if (authMode === "register" && !fullName.trim()) {
+      toast.error("Plotësoni emrin për të vazhduar me regjistrimin.");
+      return;
+    }
     if (!identifier.trim() || !password.trim()) {
       toast.error("Plotësoni të dhënat e identifikimit për të vazhduar.");
       return;
@@ -143,7 +156,11 @@ function LoginPage() {
     }
     setStep("done");
     setRole(selectedRole);
-    toast.success(`Hyrja u krye si ${DEMO_ROLES[selectedRole].label}`);
+    toast.success(
+      authMode === "register"
+        ? `Regjistrimi u krye si ${DEMO_ROLES[selectedRole].label}`
+        : `Hyrja u krye si ${DEMO_ROLES[selectedRole].label}`,
+    );
     await navigate({ to: DEMO_ROLES[selectedRole].defaultRoute });
   }
 
@@ -159,9 +176,17 @@ function LoginPage() {
           <div className="flex w-full items-center justify-between gap-3 md:w-auto">
             <span className="font-medium text-foreground">SQ</span>
             <Button
+              asChild
+              variant="ghost"
+              className="h-8 px-3 text-sm font-semibold text-muted-foreground hover:text-primary"
+            >
+              <Link to="/admin-login">Hyrje admin</Link>
+            </Button>
+            <Button
               type="button"
               variant="ghost"
               className="h-8 px-3 text-sm font-semibold text-primary"
+              onClick={startRegister}
             >
               Regjistrohu
             </Button>
@@ -232,7 +257,7 @@ function LoginPage() {
             <div className="mb-4 text-sm font-semibold text-muted-foreground">
               Zgjidhni profilin e hyrjes
             </div>
-            <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {LOGIN_ROLES.map((item) => {
                 const Icon = item.icon;
                 const active = item.role === selectedRole;
@@ -266,17 +291,39 @@ function LoginPage() {
               Hyr në portal
             </div>
             <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-              {step === "otp" ? "Verifikimi me kod OTP" : "Identifikimi elektronik"}
+              {step === "otp"
+                ? "Verifikimi me kod OTP"
+                : authMode === "register"
+                  ? "Regjistrim i ri"
+                  : "Identifikimi elektronik"}
             </h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {step === "otp"
                 ? "Vendosni kodin e dërguar për të përfunduar hyrjen."
-                : `Profili aktiv: ${DEMO_ROLES[selectedRole].label}. Të dhënat janë të plotësuara për demo.`}
+                : authMode === "register"
+                  ? `Krijoni profil demo si ${DEMO_ROLES[selectedRole].label} dhe konfirmojeni me OTP.`
+                  : `Profili aktiv: ${DEMO_ROLES[selectedRole].label}. Të dhënat janë të plotësuara për demo.`}
             </p>
           </div>
 
           {step === "credentials" ? (
             <div className="mt-6 space-y-5">
+              {authMode === "register" ? (
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-foreground">
+                    Emri i plotë <span className="text-primary">*</span>
+                  </Label>
+                  <div className="flex items-center gap-3 rounded-md border bg-card px-3">
+                    <UserRound className="size-5 text-primary" />
+                    <Input
+                      value={fullName}
+                      onChange={(event) => setFullName(event.target.value)}
+                      className="h-12 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
+                    />
+                  </div>
+                </div>
+              ) : null}
+
               <div className="space-y-2">
                 <Label className="text-sm font-semibold text-foreground">
                   {selected.idLabel} <span className="text-primary">*</span>
@@ -327,20 +374,43 @@ function LoginPage() {
               </label>
 
               <div className="space-y-3 pt-2">
-                <Button
-                  type="button"
-                  onClick={continueToOtp}
-                  className="h-12 w-full text-base font-semibold"
-                >
-                  Hyr
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-12 w-full border-primary text-base font-semibold text-primary hover:bg-primary/10"
-                >
-                  Regjistrohu
-                </Button>
+                {authMode === "register" ? (
+                  <>
+                    <Button
+                      type="button"
+                      onClick={continueToOtp}
+                      className="h-12 w-full text-base font-semibold"
+                    >
+                      Regjistrohu
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="h-11 w-full text-primary"
+                      onClick={startLogin}
+                    >
+                      Kam llogari, hyr
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      type="button"
+                      onClick={continueToOtp}
+                      className="h-12 w-full text-base font-semibold"
+                    >
+                      Hyr
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 w-full border-primary text-base font-semibold text-primary hover:bg-primary/10"
+                      onClick={startRegister}
+                    >
+                      Regjistrohu
+                    </Button>
+                  </>
+                )}
               </div>
 
               <div className="rounded-md bg-muted p-3 text-xs leading-5 text-muted-foreground">

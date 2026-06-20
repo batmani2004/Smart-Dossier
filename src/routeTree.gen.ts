@@ -15,6 +15,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DosjetRouteImport } from './routes/dosjet'
 import { Route as BiznesRouteImport } from './routes/biznes'
 import { Route as AplikimRouteImport } from './routes/aplikim'
+import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TrackCodeRouteImport } from './routes/track.$code'
 import { Route as DosjaIdRouteImport } from './routes/dosja.$id'
@@ -57,6 +58,11 @@ const BiznesRoute = BiznesRouteImport.update({
 const AplikimRoute = AplikimRouteImport.update({
   id: '/aplikim',
   path: '/aplikim',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin-login',
+  path: '/admin-login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -127,6 +133,7 @@ const ApiPublicDossiersIdRoute = ApiPublicDossiersIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin-login': typeof AdminLoginRoute
   '/aplikim': typeof AplikimRouteWithChildren
   '/biznes': typeof BiznesRoute
   '/dosjet': typeof DosjetRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin-login': typeof AdminLoginRoute
   '/aplikim': typeof AplikimRouteWithChildren
   '/biznes': typeof BiznesRoute
   '/dosjet': typeof DosjetRoute
@@ -170,6 +178,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin-login': typeof AdminLoginRoute
   '/aplikim': typeof AplikimRouteWithChildren
   '/biznes': typeof BiznesRoute
   '/dosjet': typeof DosjetRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin-login'
     | '/aplikim'
     | '/biznes'
     | '/dosjet'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin-login'
     | '/aplikim'
     | '/biznes'
     | '/dosjet'
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin-login'
     | '/aplikim'
     | '/biznes'
     | '/dosjet'
@@ -257,6 +269,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   AplikimRoute: typeof AplikimRouteWithChildren
   BiznesRoute: typeof BiznesRoute
   DosjetRoute: typeof DosjetRoute
@@ -317,6 +330,13 @@ declare module '@tanstack/react-router' {
       path: '/aplikim'
       fullPath: '/aplikim'
       preLoaderRoute: typeof AplikimRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-login': {
+      id: '/admin-login'
+      path: '/admin-login'
+      fullPath: '/admin-login'
+      preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -437,6 +457,7 @@ const ApiPublicDossiersRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminLoginRoute: AdminLoginRoute,
   AplikimRoute: AplikimRouteWithChildren,
   BiznesRoute: BiznesRoute,
   DosjetRoute: DosjetRoute,
