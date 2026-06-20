@@ -5,6 +5,7 @@ import {
   PROCESSES,
   buildAiGisAssessment,
   buildDossierSummaryFacts,
+  calculateEkbDetailedValuation,
   getCriticalAlerts,
   getDeadlineState,
   getNextStep,
@@ -758,6 +759,78 @@ export const patchDossier = createServerFn({ method: "POST" })
       upsert(d);
     }
     return { ok: true, changes };
+  });
+
+export const calculateEkbValuation = createServerFn({ method: "POST" })
+  .validator((input: unknown) => z.object({ id: z.string() }).parse(input))
+  .handler(async ({ data }) => {
+    const d = getById(data.id);
+    if (!d) notFound();
+    if (d.process !== "ekb_privatization") {
+      throw new Error("Akt Vleresimi eshte i vlefshem vetem per dosjet EKB.");
+    }
+
+    const income = d.property.familyIncomeAll;
+    const market = d.property.marketPriceAll;
+    const land = d.property.landPriceAll ?? 0;
+
+    if (income === undefined || market === undefined) {
+      throw new Error(
+        "Mungojne te ardhurat familjare ose cmimi i tregut. Kryeni nxjerrjen/verifikimin e dokumenteve fillimisht.",
+      );
+    }
+
+    const valuation = calculateEkbDetailedValuation({
+      familyIncomeAll: income,
+      marketPriceAll: market,
+      landPriceAll: land,
+      areaSqm: d.property.areaSqm,
+    });
+    d.finalValueAll = valuation.finalValueAll;
+    d.insights = [
+      ...d.insights,
+      {
+        id: `ai-val-${d.insights.length + 1}-${Date.now().toString(36)}`,
+        kind: "valuation",
+        createdAt: new Date().toISOString(),
+        text: `Akt Vleresimi: ${valuation.finalValueAll.toLocaleString("sq-AL")} ALL (${valuation.ruleApplied})`,
+        data: {
+          formula: valuation.formula,
+          finalValueAll: valuation.finalValueAll,
+          housingPayableAll: valuation.housingPayableAll,
+          landPayableAll: valuation.landPayableAll,
+          legalReferences: valuation.legalReferences,
+          steps: valuation.steps.map((step) => ({
+            title: step.title,
+            legalReference: step.legalReference,
+            formula: step.formula,
+            resultAll: step.resultAll ?? null,
+            explanation: step.explanation,
+          })),
+        },
+        confidence: 1,
+      },
+    ];
+
+    const docNumber = d.documents.filter((doc) => doc.type === "ekb_value_calculation").length + 1;
+    const documentRecord: DossierDocument = {
+      id: `val-${docNumber}-${Date.now().toString(36)}`,
+      type: "ekb_value_calculation",
+      name: `Akt Vleresimi - ${d.trackingCode}`,
+      status: "uploaded",
+      uploadedAt: new Date().toISOString(),
+      uploadedBy: "ai_assistant",
+      notes: `Vlera finale ${valuation.finalValueAll.toLocaleString("sq-AL")} ALL; ${valuation.formula}`,
+    };
+    d.documents = [...d.documents, documentRecord];
+    d.missingDocumentTypes = d.missingDocumentTypes.filter((type) => type !== "valuation_report");
+    audit(d, {
+      actor: d.assignedOperatorId ?? "ai_assistant",
+      action: "AI llogariti Akt Vleresimi",
+      details: `${valuation.formula} = ${valuation.finalValueAll.toLocaleString("sq-AL")} ALL; dokument=${documentRecord.name}`,
+    });
+    upsert(d);
+    return { ok: true as const, valuation, document: documentRecord };
   });
 
 // --------------------- requester / legal representative verification ---------------------

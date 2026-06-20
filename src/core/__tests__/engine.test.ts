@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ekbPrivatizationProcess, expropriationProcess } from "../processes";
 import { getNextStep, getCriticalAlerts, getDeadlineState } from "../engine";
-import { calculateEkbPrivatizationValue } from "../value";
+import { calculateEkbDetailedValuation, calculateEkbPrivatizationValue } from "../value";
 import { SEED_CORE_DOSSIERS } from "../seed";
 import type { Dossier } from "../types";
 
@@ -185,6 +185,23 @@ describe("calculateEkbPrivatizationValue", () => {
         landPriceAll: 1,
       }),
     ).toThrow();
+  });
+
+  it("returns a detailed VKM valuation trail", () => {
+    const r = calculateEkbDetailedValuation({
+      familyIncomeAll: 12_000,
+      marketPriceAll: 2_000_000,
+      landPriceAll: 300_000,
+      previousPaymentsAll: 50_000,
+      approvedDeductionsAll: 25_000,
+      areaSqm: 68,
+    });
+    expect(r.formula).toBe("Vp = Vb + Vt - Vsh - Vg");
+    expect(r.housingPayableAll).toBe(1_000_000);
+    expect(r.landPayableAll).toBe(300_000);
+    expect(r.finalValueAll).toBe(1_225_000);
+    expect(r.steps.length).toBeGreaterThanOrEqual(5);
+    expect(r.legalReferences.join(" ")).toContain("VKM nr. 898");
   });
 });
 

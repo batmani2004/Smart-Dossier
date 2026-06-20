@@ -239,17 +239,26 @@ function DashboardPage() {
 
     return (
       <AppShell>
-        <div className="px-4 md:px-6 py-5 max-w-[900px] mx-auto space-y-4">
-          <AccessNotice
-            title={role === "business" ? "Pamje biznesi" : "Pamje qytetari"}
-            body={
-              role === "business"
-                ? "Ky nivel nuk ka akses ne dashboard-in e brendshem. Biznesi aplikon me NIPT dhe ndjek vetem dosjet e veta me kod gjurmimi."
-                : "Ky nivel nuk ka akses ne dashboard-in e brendshem, audit, AI apo dokumente pune. Qytetari ndjek vetem statusin publik te dosjes."
-            }
-          />
-          <Card className="border-primary/25 bg-primary/5 p-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto max-w-[960px] space-y-4 px-4 py-5 md:px-6">
+          <div className="rounded-md border bg-white p-4 shadow-soft">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wider text-primary">
+                  {role === "business" ? "Portal biznesi" : "Portal qytetari"}
+                </div>
+                <h1 className="mt-1 text-xl font-semibold tracking-tight">
+                  Mire se erdhe, {profile.displayName}
+                </h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Zgjidh nje veprim dhe vazhdo pa menu te panevojshme.
+                </p>
+              </div>
+              <div className="text-xs text-muted-foreground">{profile.credentialLabel}</div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            <Card className="flex flex-col justify-between gap-3 border-primary/25 bg-primary/5 p-4">
               <div className="flex min-w-0 items-start gap-3">
                 <div className="grid size-10 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground">
                   <Scale className="size-5" />
@@ -261,13 +270,12 @@ function DashboardPage() {
                   </p>
                 </div>
               </div>
-              <Button asChild size="sm" className="shrink-0">
+              <Button asChild size="sm" className="w-fit shrink-0">
                 <Link to="/aplikim">Nis aplikimin</Link>
               </Button>
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-start gap-3">
+            </Card>
+
+            <Card className="flex items-start gap-3 p-4">
               <div className="grid size-10 shrink-0 place-items-center rounded-md bg-[var(--brand-blue-soft)] text-primary">
                 <Link2 className="size-5" />
               </div>
@@ -300,32 +308,10 @@ function DashboardPage() {
                   )}
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
+
           <SmartDossierFocus compact />
-          <Card className="p-4">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">
-              Perdoruesi aktiv
-            </div>
-            <h1 className="mt-1 text-xl font-semibold">{profile.displayName}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {profile.credentialLabel} - {profile.description}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button asChild size="sm">
-                <Link to="/aplikim">Aplikim i ri</Link>
-              </Button>
-              <Button asChild size="sm" variant="outline">
-                {role === "business" ? (
-                  <Link to="/biznes">Regjistrim prone me NIPT</Link>
-                ) : (
-                  <Link to="/track/$code" params={{ code: "EKB-2026-000014" }}>
-                    Hap gjurmimin demo
-                  </Link>
-                )}
-              </Button>
-            </div>
-          </Card>
         </div>
       </AppShell>
     );

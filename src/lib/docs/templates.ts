@@ -1,11 +1,11 @@
 import type { Dossier, ProcessDefinition } from "@/core/types";
-import { calculateEkbPrivatizationValue } from "@/core/value";
+import { calculateEkbDetailedValuation, calculateEkbPrivatizationValue } from "@/core/value";
 import type { DocSection, DocTemplateKey, GeneratedDoc } from "./types";
 
 export const TEMPLATE_LABELS: Record<DocTemplateKey, string> = {
   ekb_missing_docs_notice: "EKB — Njoftim për dokumente që mungojnë",
   ekb_refusal_decision: "EKB — Vendim refuzimi me arsye",
-  ekb_value_calculation: "EKB — Fletë llogaritjeje e vlerës",
+  ekb_value_calculation: "EKB - Akt Vleresimi",
   ekb_citizen_invoice: "EKB - Fature qytetari / mandat pagese",
   ekb_contract_draft: "EKB — Draft kontrate privatizimi",
   exp_owner_notification: "Shpronësim — Njoftim pronari (afat 30 ditë)",
@@ -224,10 +224,11 @@ function tplEkbValueCalc(d: Dossier, process: ProcessDefinition): GeneratedDoc {
 
   const calc = (() => {
     try {
-      return calculateEkbPrivatizationValue({
+      return calculateEkbDetailedValuation({
         familyIncomeAll: income,
         marketPriceAll: market,
         landPriceAll: land,
+        areaSqm: p.areaSqm,
       });
     } catch {
       return null;
@@ -239,17 +240,30 @@ function tplEkbValueCalc(d: Dossier, process: ProcessDefinition): GeneratedDoc {
       heading: "Të dhënat hyrëse",
       paragraphs: [
         `Të ardhura mujore familjare: ${fmtAll(income)}`,
+        `Sipërfaqja e pasurisë: ${p.areaSqm ? `${p.areaSqm} m²` : "e papërcaktuar"}`,
         `Çmimi i tregut i banesës: ${fmtAll(market)}`,
         `Çmimi i truallit: ${fmtAll(land)}`,
       ],
     },
     {
-      heading: "Rregulli i aplikuar",
+      heading: "Baza ligjore dhe formula",
       paragraphs: [
         calc?.ruleApplied ?? "Të dhënat hyrëse janë të pamjaftueshme për të aplikuar rregullin.",
-        "Rregullat ligjore: >14000 ALL → 100% banesë + 100% trualli; 9000–14000 ALL → 50% banesë + 100% trualli; <9000 ALL → pa pagesë (0% trualli).",
+        "Formula e aktit: Vp = Vb + Vt - Vsh - Vg.",
+        "Referenca: VKM 179/2020 per proceduren e privatizimit dhe VKM 898/2020 per vleresimin sipas normave te strehimit.",
       ],
     },
+    ...(calc
+      ? [
+          {
+            heading: "Hapat e llogaritjes",
+            paragraphs: calc.steps.map(
+              (step, index) =>
+                `${index + 1}. ${step.title}: ${step.formula}. ${step.explanation} (${step.legalReference})`,
+            ),
+          },
+        ]
+      : []),
   ];
 
   return {
@@ -257,13 +271,13 @@ function tplEkbValueCalc(d: Dossier, process: ProcessDefinition): GeneratedDoc {
       d,
       process,
       "ekb_value_calculation",
-      "Fletë llogaritjeje e vlerës së privatizimit",
+      "Akt Vleresimi i vleres se privatizimit",
       "LL",
     ),
     sections,
     table: calc
       ? {
-          heading: "Llogaritja",
+          heading: "Tabela e llogaritjes",
           columns: ["Zëri", "Bazë (ALL)", "Përqindje", "Pagueshme (ALL)"],
           rows: [
             [
@@ -278,7 +292,13 @@ function tplEkbValueCalc(d: Dossier, process: ProcessDefinition): GeneratedDoc {
               `${calc.landPercent}%`,
               new Intl.NumberFormat("sq-AL").format(calc.landPayableAll),
             ],
-            ["TOTAL", "", "", new Intl.NumberFormat("sq-AL").format(calc.totalPayableAll)],
+            [
+              "Zbritje / pagesa te meparshme",
+              "",
+              "",
+              `-${new Intl.NumberFormat("sq-AL").format(calc.previousPaymentsAll + calc.approvedDeductionsAll)}`,
+            ],
+            ["TOTAL", "", "", new Intl.NumberFormat("sq-AL").format(calc.finalValueAll)],
           ],
         }
       : undefined,
@@ -287,7 +307,7 @@ function tplEkbValueCalc(d: Dossier, process: ProcessDefinition): GeneratedDoc {
       { role: "Përgjegjës sektori", institution: institutionForPhase(d, process) },
     ],
     footer:
-      "Llogaritja është deterministe sipas VKM 179/2020 dhe VKM 898/2020. Çdo ndryshim regjistrohet në Historikun e dosjes.",
+      "Akt Vleresimi i gjeneruar nga Smart Dossier. Llogaritja eshte deterministe dhe auditohet me kohe, operator dhe rezultat.",
   };
 }
 

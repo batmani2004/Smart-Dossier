@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowRight,
   BookOpen,
+  Bot,
   Loader2,
+  RefreshCw,
   ScrollText,
   Send,
   Sparkles,
@@ -37,11 +39,11 @@ type AssistMsg =
     };
 
 const EXAMPLES = [
-  "Çfarë mungon për hapin tjetër?",
-  "Pse është kjo dosje e bllokuar?",
-  "Cili është afati i ankimit?",
+  "Cfare mungon per hapin tjeter?",
+  "Pse eshte dosja e bllokuar?",
+  "Cili eshte afati i ankimit?",
   "Si llogaritet vlera e privatizimit?",
-  "Cili institucion ka radhën?",
+  "Cili institucion ka radhen?",
 ];
 
 async function postJson<T>(path: string, body: unknown): Promise<T> {
@@ -59,50 +61,56 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
 
 export function AiAssistPanel({ dossier }: Props) {
   const qc = useQueryClient();
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["dossier", dossier.id] });
-
-  // --- Summary ---
   const [summary, setSummary] = useState<string | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
-
-  // --- Next step ---
   const [nextStep, setNextStep] = useState<NextStepResult | null>(null);
   const [nextStepSource, setNextStepSource] = useState<string | null>(null);
   const [nextStepLoading, setNextStepLoading] = useState(false);
-
-  // --- Assistant chat ---
   const [messages, setMessages] = useState<AssistMsg[]>([]);
   const [question, setQuestion] = useState("");
   const [askLoading, setAskLoading] = useState(false);
 
-  async function runSummary() {
-    setSummaryLoading(true);
-    try {
-      const r = await postJson<{ summary: string }>("/api/ai/summary", { id: dossier.id });
-      setSummary(r.summary);
-      invalidate();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Gabim");
-    } finally {
-      setSummaryLoading(false);
-    }
-  }
+  const invalidate = useCallback(
+    () => qc.invalidateQueries({ queryKey: ["dossier", dossier.id] }),
+    [dossier.id, qc],
+  );
 
-  async function runNextStep() {
-    setNextStepLoading(true);
-    try {
-      const r = await postJson<{ result: NextStepResult; source?: string }>("/api/ai/next-step", {
-        id: dossier.id,
-      });
-      setNextStep(r.result);
-      setNextStepSource(r.source ?? r.result.legalOrProcessSource);
-      invalidate();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Gabim");
-    } finally {
+  const refreshAiReview = useCallback(
+    async (showToast = true) => {
+      setSummaryLoading(true);
+      setNextStepLoading(true);
+      const [summaryRes, nextStepRes] = await Promise.allSettled([
+        postJson<{ summary: string }>("/api/ai/summary", { id: dossier.id }),
+        postJson<{ result: NextStepResult; source?: string }>("/api/ai/next-step", {
+          id: dossier.id,
+        }),
+      ]);
+
+      if (summaryRes.status === "fulfilled") setSummary(summaryRes.value.summary);
+      if (nextStepRes.status === "fulfilled") {
+        setNextStep(nextStepRes.value.result);
+        setNextStepSource(nextStepRes.value.source ?? nextStepRes.value.result.legalOrProcessSource);
+      }
+
+      if (summaryRes.status === "fulfilled" || nextStepRes.status === "fulfilled") {
+        invalidate();
+        if (showToast) toast.success("AI rifreskoi udhezimin e dosjes.");
+      } else if (showToast) {
+        toast.error(summaryRes.reason instanceof Error ? summaryRes.reason.message : "AI deshtoi");
+      }
+
+      setSummaryLoading(false);
       setNextStepLoading(false);
-    }
-  }
+    },
+    [dossier.id, invalidate],
+  );
+
+  useEffect(() => {
+    setSummary(null);
+    setNextStep(null);
+    setNextStepSource(null);
+    void refreshAiReview(false);
+  }, [refreshAiReview]);
 
   async function ask(text: string) {
     if (!text.trim()) return;
@@ -133,107 +141,121 @@ export function AiAssistPanel({ dossier }: Props) {
     }
   }
 
+  const reviewLoading = summaryLoading || nextStepLoading;
+
   return (
     <div className="space-y-3">
-      {/* Summary + Next step row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <Card className="p-3 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ScrollText className="size-4 text-info" />
-              <h3 className="text-sm font-semibold">Përmbledhje për menaxherin</h3>
+      <Card className="overflow-hidden border-primary/20">
+        <div className="flex flex-col gap-3 border-b bg-primary/5 p-3 md:flex-row md:items-center md:justify-between">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+              <Bot className="size-4" />
+              AI per operatorin
+              <Badge variant="secondary" className="text-[10px]">
+                auto
+              </Badge>
             </div>
-            <Button size="sm" variant="outline" onClick={runSummary} disabled={summaryLoading}>
-              {summaryLoading ? (
-                <Loader2 className="size-3.5 mr-1 animate-spin" />
-              ) : (
-                <Sparkles className="size-3.5 mr-1" />
-              )}
-              Gjenero
-            </Button>
+            <h3 className="mt-1 text-base font-semibold">Udhezim i shpejte pa klikime shtese</h3>
           </div>
-          {summary ? (
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">{summary}</p>
-          ) : (
-            <p className="text-xs text-muted-foreground">
-              Klikoni “Gjenero” për përmbledhje 3-5 fjali (ku ndodhet, çfarë mungon, rreziku, hapi
-              tjetër).
-            </p>
-          )}
-        </Card>
-
-        <Card className="p-3 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ArrowRight className="size-4 text-info" />
-              <h3 className="text-sm font-semibold">Hapi tjetër i sugjeruar</h3>
-            </div>
-            <Button size="sm" variant="outline" onClick={runNextStep} disabled={nextStepLoading}>
-              {nextStepLoading ? (
-                <Loader2 className="size-3.5 mr-1 animate-spin" />
-              ) : (
-                <Sparkles className="size-3.5 mr-1" />
-              )}
-              Sugjero
-            </Button>
-          </div>
-          {nextStep ? (
-            <div className="text-xs space-y-1.5">
-              <p className="text-sm">{nextStep.nextAction}</p>
-              <Row label="Institucioni">{nextStep.responsibleInstitution}</Row>
-              <Row label="Dokumente">
-                {nextStep.requiredDocuments.length ? nextStep.requiredDocuments.join(", ") : "—"}
-              </Row>
-              <Row label="Afat">{nextStep.deadline ?? "—"}</Row>
-              <Row label="Rrezik">
-                <span className="flex items-start gap-1">
-                  <TriangleAlert className="size-3 text-warning mt-0.5 shrink-0" />
-                  {nextStep.risk}
-                </span>
-              </Row>
-              <Row label="Burimi">
-                <Badge variant="secondary" className="text-[10px]">
-                  <BookOpen className="size-3 mr-1" />
-                  {nextStepSource ?? nextStep.legalOrProcessSource}
-                </Badge>
-              </Row>
-            </div>
-          ) : (
-            <p className="text-xs text-muted-foreground">
-              Sugjerimi bazohet në procesin përkatës — kurrë jashtë tij.
-            </p>
-          )}
-        </Card>
-      </div>
-
-      {/* Process Assistant (RAG) */}
-      <Card className="p-3 space-y-3">
-        <div className="flex items-center gap-2">
-          <Sparkles className="size-4 text-info" />
-          <h3 className="text-sm font-semibold">Asistenti i procesit (RAG)</h3>
-          <Badge variant="outline" className="text-[10px]">
-            vetëm me burime
-          </Badge>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => refreshAiReview(true)}
+            disabled={reviewLoading}
+            className="w-fit"
+          >
+            {reviewLoading ? (
+              <Loader2 className="mr-1.5 size-3.5 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-1.5 size-3.5" />
+            )}
+            Rifresko AI
+          </Button>
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
-          {EXAMPLES.map((q) => (
-            <button
-              key={q}
-              onClick={() => ask(q)}
-              disabled={askLoading}
-              className="text-[11px] px-2 py-1 rounded-full border bg-muted/40 hover:bg-muted transition disabled:opacity-50"
-            >
-              {q}
-            </button>
-          ))}
+        <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="p-3">
+            <div className="mb-2 flex items-center gap-2">
+              <ScrollText className="size-4 text-primary" />
+              <h4 className="text-sm font-semibold">Permbledhje operative</h4>
+            </div>
+            {summaryLoading && !summary ? (
+              <LoadingLine text="AI po lexon dosjen..." />
+            ) : summary ? (
+              <p className="whitespace-pre-wrap text-sm leading-relaxed">{summary}</p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                AI do te shfaqe ketu vendndodhjen e dosjes, cfare mungon, rrezikun dhe veprimin
+                tjeter.
+              </p>
+            )}
+          </div>
+
+          <div className="border-t bg-muted/25 p-3 lg:border-l lg:border-t-0">
+            <div className="mb-2 flex items-center gap-2">
+              <ArrowRight className="size-4 text-primary" />
+              <h4 className="text-sm font-semibold">Hapi tjeter</h4>
+            </div>
+            {nextStepLoading && !nextStep ? (
+              <LoadingLine text="AI po zgjedh veprimin e radhes..." />
+            ) : nextStep ? (
+              <div className="space-y-2 text-xs">
+                <p className="text-sm font-medium leading-relaxed">{nextStep.nextAction}</p>
+                <Row label="Institucioni">{nextStep.responsibleInstitution}</Row>
+                <Row label="Dokumente">
+                  {nextStep.requiredDocuments.length ? nextStep.requiredDocuments.join(", ") : "-"}
+                </Row>
+                <Row label="Afat">{nextStep.deadline ?? "-"}</Row>
+                <Row label="Rrezik">
+                  <span className="flex items-start gap-1">
+                    <TriangleAlert className="mt-0.5 size-3 shrink-0 text-warning" />
+                    {nextStep.risk}
+                  </span>
+                </Row>
+                <Row label="Burimi">
+                  <Badge variant="secondary" className="text-[10px]">
+                    <BookOpen className="mr-1 size-3" />
+                    {nextStepSource ?? nextStep.legalOrProcessSource}
+                  </Badge>
+                </Row>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Sugjerimi kufizohet te procesi, baza ligjore dhe faktet e dosjes.
+              </p>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      <Card className="space-y-3 p-3">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-2">
+            <Sparkles className="size-4 text-primary" />
+            <h3 className="text-sm font-semibold">Pyetje me burime</h3>
+            <Badge variant="outline" className="text-[10px]">
+              RAG
+            </Badge>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {EXAMPLES.slice(0, 3).map((q) => (
+              <button
+                key={q}
+                onClick={() => ask(q)}
+                disabled={askLoading}
+                className="rounded-md border bg-muted/40 px-2 py-1 text-[11px] transition hover:bg-muted disabled:opacity-50"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="space-y-2 max-h-[28rem] overflow-y-auto">
+        <div className="max-h-[24rem] space-y-2 overflow-y-auto">
           {messages.length === 0 ? (
             <p className="text-xs text-muted-foreground">
-              Bëj një pyetje për procesin ose këtë dosje. Asistenti përgjigjet vetëm nga përkufizimi
-              i procesit, baza ligjore, pikat kritike dhe faktet e dosjes.
+              Pyet vetem kur duhet sqarim. Pergjigja vjen nga procesi, baza ligjore, pikat kritike
+              dhe faktet e dosjes.
             </p>
           ) : (
             messages.map((m, i) =>
@@ -245,19 +267,19 @@ export function AiAssistPanel({ dossier }: Props) {
                   <p className="font-medium">{m.text}</p>
                 </div>
               ) : (
-                <div key={i} className="rounded-md border bg-muted/30 p-2.5 text-sm space-y-1.5">
+                <div key={i} className="space-y-1.5 rounded-md border bg-muted/30 p-2.5 text-sm">
                   <p className="whitespace-pre-wrap leading-relaxed">{m.text}</p>
                   {!m.hasEnoughInfo ? (
-                    <p className="text-[11px] text-warning flex items-center gap-1">
+                    <p className="flex items-center gap-1 text-[11px] text-warning">
                       <TriangleAlert className="size-3" />
-                      Platforma nuk ka informacion të mjaftueshëm për këtë pyetje.
+                      Platforma nuk ka informacion te mjaftueshem per kete pyetje.
                     </p>
                   ) : null}
                   {m.citations.length ? (
-                    <div className="pt-1 border-t flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1 border-t pt-1">
                       {m.citations.map((c) => (
                         <Badge key={c.id} variant="secondary" className="text-[10px]">
-                          <BookOpen className="size-3 mr-1" />
+                          <BookOpen className="mr-1 size-3" />
                           {c.title}
                         </Badge>
                       ))}
@@ -267,11 +289,7 @@ export function AiAssistPanel({ dossier }: Props) {
               ),
             )
           )}
-          {askLoading ? (
-            <div className="text-xs text-muted-foreground flex items-center gap-1.5">
-              <Loader2 className="size-3 animate-spin" /> Duke kërkuar burimet…
-            </div>
-          ) : null}
+          {askLoading ? <LoadingLine text="Duke kerkuar burimet..." /> : null}
         </div>
 
         <form
@@ -284,13 +302,13 @@ export function AiAssistPanel({ dossier }: Props) {
           <Input
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Bëj një pyetje për procesin ose dosjen…"
+            placeholder="Pyetje per procesin ose dosjen..."
             className="h-9 text-sm"
             disabled={askLoading}
           />
           <Button size="sm" type="submit" disabled={askLoading || !question.trim()}>
-            <Send className="size-3.5 mr-1" />
-            Dërgo
+            <Send className="mr-1 size-3.5" />
+            Dergo
           </Button>
         </form>
       </Card>
@@ -298,10 +316,19 @@ export function AiAssistPanel({ dossier }: Props) {
   );
 }
 
+function LoadingLine({ text }: { text: string }) {
+  return (
+    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+      <Loader2 className="size-3 animate-spin" />
+      {text}
+    </div>
+  );
+}
+
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid grid-cols-12 gap-2">
-      <div className="col-span-3 text-muted-foreground text-[11px] uppercase tracking-wide">
+      <div className="col-span-3 text-[11px] uppercase tracking-wide text-muted-foreground">
         {label}
       </div>
       <div className="col-span-9 text-xs">{children}</div>
