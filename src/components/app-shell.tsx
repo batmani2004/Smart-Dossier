@@ -114,9 +114,7 @@ export function AppShell({
         {/* Logo */}
         <div className="px-5 pt-6 pb-7">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent/25 text-white group-hover:bg-accent/35 transition-colors">
-              <ShieldCheck className="size-5" />
-            </div>
+            <img src="/brand/smart-dossier-logo.png" alt="Smart Dossier" className="size-10 object-contain shrink-0" />
             <div>
               <div className="text-base font-bold text-white tracking-tight leading-tight">
                 Smart Dossier
