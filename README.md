@@ -4,6 +4,27 @@ Procedurë e digjitalizuar për EKB (privatizim banese) dhe shpronësim. Stack: 
 
 ## Komandat
 
+Requires Node.js 22.13.0 or newer.
+
+Windows PowerShell:
+
+```powershell
+npm.cmd install
+npm.cmd run dev
+# open http://127.0.0.1:8080
+```
+
+If PowerShell blocks `npm` with `npm.ps1 cannot be loaded`, keep using `npm.cmd`.
+
+If your installed Node is older, for example `v22.11.0`, use the compatibility command:
+
+```powershell
+npm.cmd run dev:compat
+# open http://127.0.0.1:8080
+```
+
+Bun:
+
 ```bash
 bun install
 bun run dev      # http://localhost:8080
