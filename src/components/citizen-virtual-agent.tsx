@@ -59,16 +59,14 @@ async function askFaq(question: string, trackingCode?: string) {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ question, trackingCode: trackingCode?.trim() || undefined }),
   });
-  const payload = (await response.json().catch(() => null)) as
-    | {
-        ok?: boolean;
-        answer?: string;
-        hasEnoughInfo?: boolean;
-        citations?: { id: string; title: string; source: string }[];
-        mode?: "ai" | "local";
-        error?: string;
-      }
-    | null;
+  const payload = (await response.json().catch(() => null)) as {
+    ok?: boolean;
+    answer?: string;
+    hasEnoughInfo?: boolean;
+    citations?: { id: string; title: string; source: string }[];
+    mode?: "ai" | "local";
+    error?: string;
+  } | null;
   if (!response.ok || !payload?.ok) {
     throw new Error(payload?.error ?? "Ndihmesi nuk u pergjigj.");
   }
@@ -81,9 +79,12 @@ async function askFaq(question: string, trackingCode?: string) {
 }
 
 async function fetchTrackingContext(code: string) {
-  const response = await fetch(`/api/public/track/${encodeURIComponent(code.trim().toUpperCase())}`, {
-    cache: "no-store",
-  });
+  const response = await fetch(
+    `/api/public/track/${encodeURIComponent(code.trim().toUpperCase())}`,
+    {
+      cache: "no-store",
+    },
+  );
   if (!response.ok) throw new Error("Kodi i gjurmimit nuk u gjet.");
   return (await response.json()) as TrackingContext;
 }
@@ -392,7 +393,9 @@ export function CitizenVirtualAgent({
             ) : null}
           </div>
 
-          {error ? <div className="border-t px-3 py-2 text-xs text-destructive">{error}</div> : null}
+          {error ? (
+            <div className="border-t px-3 py-2 text-xs text-destructive">{error}</div>
+          ) : null}
 
           <form
             onSubmit={(event) => {
@@ -414,7 +417,11 @@ export function CitizenVirtualAgent({
               disabled={loading || !question.trim()}
               className={cn("h-10 px-3", loading && "opacity-80")}
             >
-              {loading ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
+              {loading ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <Send className="size-3.5" />
+              )}
               <span className="sr-only">Dergo</span>
             </Button>
           </form>

@@ -366,8 +366,7 @@ export const createDossier = createServerFn({ method: "POST" })
         name: doc.name,
         status: "uploaded" as const,
         uploadedAt: now,
-        uploadedBy:
-          data.process === "property_registration" ? "business_portal" : "citizen_portal",
+        uploadedBy: data.process === "property_registration" ? "business_portal" : "citizen_portal",
         requiredAtStepId: first.steps[0].id,
         notes:
           data.process === "property_registration"
@@ -385,7 +384,9 @@ export const createDossier = createServerFn({ method: "POST" })
           ? "verified"
           : "needs_documents",
         requiredDocumentTypes: requesterRequired,
-        verifiedAt: requiredDocumentTypes.every((type) => uploadedTypes.has(type)) ? now : undefined,
+        verifiedAt: requiredDocumentTypes.every((type) => uploadedTypes.has(type))
+          ? now
+          : undefined,
         verifiedBy: requiredDocumentTypes.every((type) => uploadedTypes.has(type))
           ? "system"
           : undefined,
@@ -657,8 +658,7 @@ export const createExpropriationCompensationApplication = createServerFn({ metho
           id: "ins-exp-payment",
           kind: "next_step",
           createdAt: now,
-          text:
-            "Pas verifikimit dhe vleresimit, dosja kalon te faza e pageses nga Ministria e Ekonomise.",
+          text: "Pas verifikimit dhe vleresimit, dosja kalon te faza e pageses nga Ministria e Ekonomise.",
           confidence: 0.88,
         },
       ],

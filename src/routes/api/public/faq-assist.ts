@@ -2,12 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { callOpenAi } from "@/lib/ai/openai";
 import { buildTrackingPayload } from "@/lib/api/dossiers.functions";
-import {
-  fallbackFaqAnswer,
-  renderFaqForPrompt,
-  retrieveFaq,
-  type FaqItem,
-} from "@/lib/faq";
+import { fallbackFaqAnswer, renderFaqForPrompt, retrieveFaq, type FaqItem } from "@/lib/faq";
 
 const inputSchema = z.object({
   question: z.string().min(2).max(1000),
@@ -162,7 +157,9 @@ export const Route = createFileRoute("/api/public/faq-assist")({
         try {
           const llm = llmSchema.parse(JSON.parse(r.content));
           const citations = [
-            ...(tracking && isTrackingQuestion(parsed.question) ? [trackingCitation(tracking)] : []),
+            ...(tracking && isTrackingQuestion(parsed.question)
+              ? [trackingCitation(tracking)]
+              : []),
             ...mapCitations(llm.citations, sourceItems),
           ];
           return json({

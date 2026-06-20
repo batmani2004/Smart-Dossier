@@ -155,7 +155,8 @@ export const Route = createFileRoute("/api/public/track/$code")({
               return Response.json(
                 {
                   error: "invalid_expedite_request",
-                  message: "Plotesoni formularin PDF, dokumentin provues dhe mandatin kur ka tarife.",
+                  message:
+                    "Plotesoni formularin PDF, dokumentin provues dhe mandatin kur ka tarife.",
                 },
                 { status: 400 },
               );

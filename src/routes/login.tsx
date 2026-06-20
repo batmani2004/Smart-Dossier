@@ -14,11 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 import { DEMO_ROLES, type DemoRole, useDemoRole } from "@/lib/demo-access";
 import { cn } from "@/lib/utils";
@@ -263,10 +259,19 @@ function LoginPage() {
                 Kodi OTP demo per {DEMO_ROLES[selectedRole].label} eshte{" "}
                 <span className="font-mono font-semibold text-foreground">{DEMO_OTP}</span>.
               </div>
-              <InputOTP maxLength={6} value={otp} onChange={setOtp} containerClassName="justify-center">
+              <InputOTP
+                maxLength={6}
+                value={otp}
+                onChange={setOtp}
+                containerClassName="justify-center"
+              >
                 <InputOTPGroup>
                   {Array.from({ length: 6 }).map((_, index) => (
-                    <InputOTPSlot key={index} index={index} className="h-12 w-12 bg-white text-lg" />
+                    <InputOTPSlot
+                      key={index}
+                      index={index}
+                      className="h-12 w-12 bg-white text-lg"
+                    />
                   ))}
                 </InputOTPGroup>
               </InputOTP>

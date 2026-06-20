@@ -837,13 +837,11 @@ function AiWorkConsole({
           <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             Veprimi i radhes
           </div>
-          <div className="mt-1 text-sm font-semibold">{loading ? "Duke lexuar..." : recommended}</div>
+          <div className="mt-1 text-sm font-semibold">
+            {loading ? "Duke lexuar..." : recommended}
+          </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Button
-              size="sm"
-              onClick={onAutoAssign}
-              disabled={!canManageUsers || autoDue === 0}
-            >
+            <Button size="sm" onClick={onAutoAssign} disabled={!canManageUsers || autoDue === 0}>
               <TimerReset className="mr-1.5 size-3.5" />
               Auto-cakto
             </Button>
@@ -865,7 +863,12 @@ function AiWorkConsole({
               : "Analizon operatorin me ngarkesen me te ulet."
           }
           action={
-            <Button size="sm" variant="outline" onClick={onAutoAssign} disabled={!canManageUsers || autoDue === 0}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onAutoAssign}
+              disabled={!canManageUsers || autoDue === 0}
+            >
               Konfirmo ndarjen
             </Button>
           }
@@ -966,9 +969,9 @@ function SmartDossierFocus({ compact = false }: { compact?: boolean }) {
         </h2>
         {!compact ? (
           <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-            Programi fokusohet te shpronesimi per interes publik dhe privatizimi i banesave,
-            ndersa aksesimi i dokumenteve sherben si shtresa qe lidh qytetarin, biznesin,
-            operatorin dhe institucionet.
+            Programi fokusohet te shpronesimi per interes publik dhe privatizimi i banesave, ndersa
+            aksesimi i dokumenteve sherben si shtresa qe lidh qytetarin, biznesin, operatorin dhe
+            institucionet.
           </p>
         ) : null}
       </div>
@@ -1008,8 +1011,8 @@ function SmartDossierFocus({ compact = false }: { compact?: boolean }) {
             monitoron fazat.
           </div>
           <div>
-            <span className="font-semibold text-foreground">3. Institucione</span> trajtojne
-            pagesa, VKM, ASHK dhe dokumente.
+            <span className="font-semibold text-foreground">3. Institucione</span> trajtojne pagesa,
+            VKM, ASHK dhe dokumente.
           </div>
           <div>
             <span className="font-semibold text-foreground">4. Gjurmim</span> me link publik dhe

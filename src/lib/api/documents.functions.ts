@@ -106,7 +106,8 @@ export const generateDocument = createServerFn({ method: "POST" })
       }));
     }
 
-    const documentType = data.template === "ekb_citizen_invoice" ? "citizen_invoice" : data.template;
+    const documentType =
+      data.template === "ekb_citizen_invoice" ? "citizen_invoice" : data.template;
     const record: DossierDocument = {
       id: `gen-${d.documents.length + 1}-${Date.now().toString(36)}`,
       type: documentType,

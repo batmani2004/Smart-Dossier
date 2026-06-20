@@ -1,8 +1,4 @@
-import {
-  PROCESSES,
-  getCriticalAlerts,
-  getDeadlineState,
-} from "@/core";
+import { PROCESSES, getCriticalAlerts, getDeadlineState } from "@/core";
 import type { AuditEvent, Dossier } from "@/core/types";
 
 export function audit(d: Dossier, ev: Omit<AuditEvent, "id" | "at">): Dossier {
@@ -26,9 +22,7 @@ export function inferPriority(d: Dossier): Priority {
   if (d.expeditedProcedure?.status === "approved") return "high";
   const ds = getDeadlineState(d, PROCESSES[d.process]);
   if (ds.state === "overdue") return "high";
-  const crit = getCriticalAlerts(d, PROCESSES[d.process]).filter(
-    (a) => a.severity === "critical",
-  );
+  const crit = getCriticalAlerts(d, PROCESSES[d.process]).filter((a) => a.severity === "critical");
   if (crit.length >= 2) return "high";
   if (ds.state === "due_soon" || crit.length === 1) return "normal";
   return "low";

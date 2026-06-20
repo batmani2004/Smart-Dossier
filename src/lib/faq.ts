@@ -126,7 +126,9 @@ function tokenize(value: string) {
 export function retrieveFaq(question: string, limit = 4) {
   const tokens = tokenize(question);
   const scored = CITIZEN_FAQ.map((item) => {
-    const haystack = normalize(`${item.category} ${item.question} ${item.answer} ${item.tags.join(" ")}`);
+    const haystack = normalize(
+      `${item.category} ${item.question} ${item.answer} ${item.tags.join(" ")}`,
+    );
     const score = tokens.reduce((total, token) => total + (haystack.includes(token) ? 1 : 0), 0);
     return { item, score };
   })
