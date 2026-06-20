@@ -58,7 +58,7 @@ export function AiExtractPanel({ dossier }: Props) {
           processKind: dossier.process as ProcessKind,
           documentType: docType,
           text: local.text,
-          fileName: file.name,
+          fileName: f.name,
         },
       });
       setProgress(95);

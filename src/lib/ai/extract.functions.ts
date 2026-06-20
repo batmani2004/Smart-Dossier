@@ -100,7 +100,7 @@ export async function runExtraction(input: ExtractInput): Promise<ExtractRespons
 }
 
 export const extractFromText = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         processKind: z.enum(["ekb_privatization", "expropriation", "property_registration"]),

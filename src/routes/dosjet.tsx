@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { CheckCircle2, Copy, ExternalLink, Plus, Search, Sparkles } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Copy, ExternalLink, Plus, Search, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -258,6 +258,22 @@ function DosjetPage() {
                       </span>
                       <StatusBadge status={d.status} />
                     </div>
+                    {(d.criticalCount > 0 || d.warningCount > 0) && (
+                      <div className="mt-1.5 flex items-center gap-1.5">
+                        {d.criticalCount > 0 && (
+                          <span className="inline-flex items-center gap-1 rounded-md border border-destructive/30 bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
+                            <AlertTriangle className="size-2.5" />
+                            {d.criticalCount} kritike
+                          </span>
+                        )}
+                        {d.warningCount > 0 && (
+                          <span className="inline-flex items-center gap-1 rounded-md border border-warning/30 bg-warning/10 px-1.5 py-0.5 text-[10px] font-medium text-warning-foreground">
+                            <AlertTriangle className="size-2.5" />
+                            {d.warningCount} paralajmërim
+                          </span>
+                        )}
+                      </div>
+                    )}
                     <div className="mt-1 rounded-md bg-muted/40 px-2 py-1 font-mono text-[10px] text-muted-foreground truncate">
                       Link qytetari: /track/{d.trackingCode}
                     </div>
