@@ -149,11 +149,11 @@ export function AppShell({
           )}
         </nav>
 
-        {/* "New Application" CTA */}
-        {can("createDossier") && (
+        {/* "New Application" CTA — citizens only */}
+        {(role === "citizen" || role === "business") && (
           <div className="px-3 pt-2">
             <Link
-              to="/dosjet"
+              to="/aplikim"
               className="flex items-center justify-center gap-2 w-full bg-accent hover:bg-accent/90 text-white py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 shadow-lg shadow-accent/20"
             >
               <Plus className="size-4" />
@@ -162,33 +162,47 @@ export function AppShell({
           </div>
         )}
 
-        {/* User profile footer */}
-        <div className="px-3 py-4 mt-2 border-t border-white/[0.08]">
-          <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/[0.06] transition-colors">
-            <div className="size-9 rounded-full bg-accent/30 flex items-center justify-center shrink-0 ring-2 ring-accent/20">
-              <RoleIcon className="size-4 text-white" />
+        {/* User widget */}
+        <div className="px-3 pb-4 pt-3 mt-auto">
+          <div
+            className="rounded-2xl p-3 space-y-3"
+            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
+          >
+            {/* Avatar + info */}
+            <div className="flex items-center gap-3">
+              <div className="relative shrink-0">
+                <div className="size-10 rounded-full flex items-center justify-center bg-gradient-to-br from-accent/60 to-accent/30 ring-2 ring-accent/30">
+                  <RoleIcon className="size-5 text-white" />
+                </div>
+                <span className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full bg-success border-2 border-[#101827]" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-semibold text-white truncate leading-tight">{profile.displayName}</div>
+                <div className="text-[11px] text-white/50 truncate mt-0.5">{profile.credentialLabel}</div>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-sm font-semibold text-white truncate">{profile.displayName}</div>
-              <div className="text-[11px] text-white/45 truncate">{profile.credentialLabel}</div>
+
+            {/* Divider */}
+            <div className="border-t border-white/[0.08]" />
+
+            {/* Action buttons */}
+            <div className="grid grid-cols-2 gap-1.5">
+              <Link
+                to="/login"
+                className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-[11px] font-semibold text-white/60 hover:text-white transition-all duration-150 hover:bg-white/[0.08] group"
+              >
+                <Settings className="size-3.5 group-hover:rotate-45 transition-transform duration-300" />
+                Cilësimet
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-[11px] font-semibold text-white/60 hover:text-destructive hover:bg-destructive/10 transition-all duration-150 group"
+              >
+                <LogOut className="size-3.5 group-hover:translate-x-0.5 transition-transform duration-150" />
+                Dil
+              </button>
             </div>
-          </div>
-          <div className="flex gap-1.5 mt-2 px-2">
-            <Link
-              to="/login"
-              className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-medium text-white/55 hover:text-white hover:bg-white/[0.08] transition-colors"
-            >
-              <Settings className="size-3" />
-              Ndrysho
-            </Link>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-medium text-white/55 hover:text-white hover:bg-white/[0.08] transition-colors"
-            >
-              <LogOut className="size-3" />
-              Dil
-            </button>
           </div>
         </div>
       </aside>
