@@ -240,7 +240,7 @@ function DashboardPage() {
 
     return (
       <AppShell>
-        <div className="mx-auto max-w-[960px] space-y-4 px-4 py-5 md:px-6">
+        <div className="mx-auto max-w-[960px] space-y-3 px-3 py-4 sm:space-y-4 sm:px-4 md:px-6">
           <div className="rounded-md border bg-white p-4 shadow-soft">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
@@ -273,7 +273,7 @@ function DashboardPage() {
                   </p>
                 </div>
               </div>
-              <Button asChild size="sm" className="w-fit shrink-0">
+              <Button asChild size="sm" className="w-full shrink-0 sm:w-fit">
                 <Link to="/aplikim">Nis aplikimin</Link>
               </Button>
             </Card>
@@ -298,14 +298,14 @@ function DashboardPage() {
                     aria-label="Kodi i gjurmimit"
                   />
                   {trackingHref ? (
-                    <Button asChild type="button" className="shrink-0">
+                    <Button asChild type="button" className="w-full shrink-0 sm:w-auto">
                       <a href={trackingHref}>
                         <ExternalLink className="mr-1.5 size-4" />
                         Gjurmo aplikimin
                       </a>
                     </Button>
                   ) : (
-                    <Button type="button" disabled className="shrink-0">
+                    <Button type="button" disabled className="w-full shrink-0 sm:w-auto">
                       Gjurmo aplikimin
                     </Button>
                   )}
@@ -322,21 +322,20 @@ function DashboardPage() {
 
   return (
     <AppShell>
-      <div className="px-4 md:px-6 py-5 space-y-5 max-w-[1400px] mx-auto">
+      <div className="mx-auto max-w-[1400px] space-y-4 px-3 py-4 sm:px-4 md:space-y-5 md:px-6 md:py-5">
         {/* Header */}
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
+        <div className="grid grid-cols-1 items-center gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-4">
           <div className="min-w-0">
-            <h1 className="text-xl md:text-2xl font-semibold tracking-tight truncate">
-              Qendra e punes
-            </h1>
+            <h1 className="text-xl font-semibold tracking-tight md:text-2xl">Qendra e punes</h1>
             <p className="text-xs md:text-sm text-muted-foreground">
               Rradha e dosjeve, sinjalet kritike dhe agjentet AI qe pergatisin punen per konfirmim.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="grid gap-2 sm:flex sm:flex-wrap sm:items-center lg:justify-end">
             <Button
               size="sm"
               variant="secondary"
+              className="w-full sm:w-auto"
               onClick={() => setBriefOpen(true)}
               data-testid="ai-risk-brief"
               disabled={!can("runAi")}
@@ -344,7 +343,7 @@ function DashboardPage() {
               <ShieldAlert className="size-4 mr-1.5" />
               Analizo me AI
             </Button>
-            <Button size="sm" asChild>
+            <Button size="sm" asChild className="w-full sm:w-auto">
               <Link to="/dosjet">Rradha e dosjeve</Link>
             </Button>
             {can("resetDemo") ? (
@@ -396,7 +395,7 @@ function DashboardPage() {
         />
 
         {/* KPI strip */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3" data-testid="kpi-strip">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4" data-testid="kpi-strip">
           <KpiCard
             icon={<FolderKanban className="size-4" />}
             label="Dosje aktive"
@@ -429,7 +428,7 @@ function DashboardPage() {
         {/* AI Risk Brief — inline, auto-loads for civil servants */}
         {can("runAi") && (briefQ.isLoading || briefQ.data) ? (
           <Card className="p-4 border-destructive/25 bg-destructive/5">
-            <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="size-4 text-destructive" />
                 <h2 className="text-sm font-semibold">AI Risk Brief</h2>
@@ -441,7 +440,7 @@ function DashboardPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-7 text-xs"
+                  className="h-8 w-full text-xs sm:h-7 sm:w-auto"
                   onClick={() => setBriefOpen(true)}
                 >
                   Detaje të plota
@@ -494,6 +493,7 @@ function DashboardPage() {
               <Button
                 size="sm"
                 variant="outline"
+                className="w-full sm:w-auto"
                 onClick={handleAutoAssign}
                 disabled={dashQ.data.assignment.autoDueCount === 0}
               >
@@ -541,7 +541,12 @@ function DashboardPage() {
                 placeholder="Njesia / institucioni"
                 className="h-9 text-sm"
               />
-              <Button type="button" size="sm" onClick={handleAddOperator}>
+              <Button
+                type="button"
+                size="sm"
+                className="w-full md:w-auto"
+                onClick={handleAddOperator}
+              >
                 <UserPlus className="mr-1.5 size-3.5" />
                 Shto operator
               </Button>
@@ -607,6 +612,7 @@ function DashboardPage() {
                       </Select>
                       <Button
                         size="sm"
+                        className="w-full md:w-auto"
                         onClick={() => handleAssignDossier(item.id, selected)}
                         disabled={!selected}
                       >
@@ -625,7 +631,7 @@ function DashboardPage() {
           type="single"
           value={processFilter}
           onValueChange={(v) => v && setProcessFilter(v as typeof processFilter)}
-          className="justify-start"
+          className="grid grid-cols-2 justify-start gap-1 sm:flex sm:flex-wrap"
         >
           <ToggleGroupItem value="all" className="text-xs">
             Të gjitha
@@ -869,7 +875,7 @@ function DashboardPage() {
       </div>
 
       <Dialog open={briefOpen} onOpenChange={setBriefOpen}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-h-[88vh] w-[calc(100vw-1.5rem)] max-w-2xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ShieldAlert className="size-5 text-destructive" />
@@ -889,7 +895,7 @@ function DashboardPage() {
           )}
           {briefQ.data && briefQ.data.ok && (
             <div className="space-y-4">
-              <div className="grid grid-cols-4 gap-2 text-xs">
+              <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
                 <StatPill label="Aktive" value={briefQ.data.stats.activeDossiers} />
                 <StatPill label="Bllokuara" value={briefQ.data.stats.blocked} tone="critical" />
                 <StatPill
@@ -929,16 +935,22 @@ function DashboardPage() {
               </p>
             </div>
           )}
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="grid gap-2 pt-2 sm:flex sm:justify-end">
             <Button
               size="sm"
               variant="outline"
+              className="w-full sm:w-auto"
               onClick={() => briefQ.refetch()}
               disabled={briefQ.isFetching}
             >
               Rigjenero
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => setBriefOpen(false)}>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="w-full sm:w-auto"
+              onClick={() => setBriefOpen(false)}
+            >
               Mbyll
             </Button>
           </div>

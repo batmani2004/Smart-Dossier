@@ -193,9 +193,9 @@ function DossierWorkspace() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[1400px] space-y-4 px-4 py-4 md:px-6">
+      <div className="mx-auto max-w-[1400px] space-y-3 px-3 py-3 sm:space-y-4 sm:px-4 md:px-6">
         {/* Header */}
-        <Card className="work-surface p-4">
+        <Card className="work-surface p-3 sm:p-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <Button asChild size="sm" variant="ghost" className="h-8 px-2 text-xs">
               <Link to="/dosjet">
@@ -212,7 +212,7 @@ function DossierWorkspace() {
               </span>
             </div>
           </div>
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 items-start">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-mono text-xs text-muted-foreground">{d.trackingCode}</span>
@@ -220,7 +220,7 @@ function DossierWorkspace() {
                 <PriorityBadge priority={priority} />
                 <span className="text-[11px] text-muted-foreground">{proc.title}</span>
               </div>
-              <h1 className="mt-1 text-lg md:text-xl font-semibold tracking-tight truncate">
+              <h1 className="mt-1 line-clamp-2 text-lg font-semibold tracking-tight md:text-xl">
                 {d.title}
               </h1>
               <p className="text-xs text-muted-foreground mt-0.5">
@@ -241,10 +241,11 @@ function DossierWorkspace() {
                   : ""}
               </p>
             </div>
-            <div className="shrink-0 flex flex-col gap-1.5 items-end">
+            <div className="flex w-full shrink-0 flex-col gap-2 sm:flex-row sm:flex-wrap lg:w-auto lg:flex-col lg:items-end">
               {can("advanceDossier") ? (
                 <Button
                   size="sm"
+                  className="w-full sm:w-auto"
                   onClick={async () => {
                     try {
                       const r = await advance({ data: { id: d.id } });
@@ -259,9 +260,11 @@ function DossierWorkspace() {
                   Avanco hapin <ArrowRight className="size-3.5 ml-1" />
                 </Button>
               ) : null}
-              <ShareTracking code={d.trackingCode} />
+              <div className="w-full sm:w-auto">
+                <ShareTracking code={d.trackingCode} />
+              </div>
               {nextStep && !nextStep.isFinal ? (
-                <span className="text-[11px] text-muted-foreground text-right">
+                <span className="w-full text-left text-[11px] text-muted-foreground lg:text-right">
                   Tjetri: {nextStep.step.title}
                 </span>
               ) : null}
@@ -359,7 +362,7 @@ function DossierWorkspace() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <div className="grid w-full gap-3 rounded-xl border bg-white/80 p-3 shadow-soft md:grid-cols-2 xl:grid-cols-5">
+          <div className="grid w-full gap-2 rounded-xl border bg-white/80 p-2 shadow-soft sm:grid-cols-2 sm:p-3 xl:grid-cols-5">
             <DossierTabDropdown
               title="Orientim"
               description="Pamja e shpejte"
@@ -1193,17 +1196,17 @@ function DossierProgressRail({
   const waitingCount = Math.max(phases.length - currentIndex - 1, 0);
 
   return (
-    <div className="mt-4 rounded-xl border border-border bg-white p-4 shadow-soft">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="mt-4 rounded-xl border border-border bg-white p-3 shadow-soft sm:p-4">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 items-start gap-3">
-          <div className="grid size-14 shrink-0 place-items-center rounded-full bg-primary text-xl font-semibold text-primary-foreground shadow-soft ring-4 ring-primary/10">
+          <div className="grid size-12 shrink-0 place-items-center rounded-full bg-primary text-lg font-semibold text-primary-foreground shadow-soft ring-4 ring-primary/10 sm:size-14 sm:text-xl">
             {currentIndex + 1}
           </div>
           <div className="min-w-0">
             <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
               Ecuria e dosjes
             </div>
-            <h2 className="mt-1 truncate text-base font-semibold text-foreground">
+            <h2 className="mt-1 line-clamp-2 text-base font-semibold text-foreground">
               Hapi aktual: {currentPhase?.title ?? "Ne proces"}
             </h2>
             <p className="mt-1 text-sm leading-5 text-muted-foreground">
@@ -1213,7 +1216,7 @@ function DossierProgressRail({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 text-center sm:min-w-[360px]">
+        <div className="grid grid-cols-3 gap-2 rounded-lg bg-muted/25 p-1.5 text-center sm:min-w-[360px] sm:gap-3 sm:bg-transparent sm:p-0">
           <ProgressFact label="Kryer" value={completedCount} tone="success" />
           <ProgressFact label="Ne proces" value={1} tone="primary" />
           <ProgressFact label="Ne pritje" value={waitingCount} tone="muted" />
@@ -1237,9 +1240,9 @@ function DossierProgressRail({
         </div>
       </div>
 
-      <div className="-mx-1 mt-5 overflow-x-auto px-1 pb-1">
+      <div className="-mx-1 mt-4 overflow-x-auto px-1 pb-1 sm:mt-5">
         <ol
-          className="grid min-w-[920px] gap-0 md:min-w-0"
+          className="grid min-w-[700px] gap-0 sm:min-w-[860px] lg:min-w-0"
           style={{ gridTemplateColumns: `repeat(${phases.length}, minmax(0, 1fr))` }}
         >
           {phases.map((phase, index) => {
@@ -1251,7 +1254,7 @@ function DossierProgressRail({
                   <span
                     aria-hidden
                     className={cn(
-                      "absolute left-[-50%] top-5 z-0 h-1 w-full rounded-full",
+                      "absolute left-[-50%] top-5 z-0 h-1 w-full rounded-full sm:top-6",
                       index <= currentIndex ? "bg-success/55" : "bg-primary/15",
                     )}
                   />
@@ -1259,7 +1262,7 @@ function DossierProgressRail({
                 <div className="relative z-10 flex flex-col items-center">
                   <div
                     className={cn(
-                      "grid size-11 shrink-0 place-items-center rounded-full border bg-white text-sm font-semibold transition-all",
+                      "grid size-10 shrink-0 place-items-center rounded-full border bg-white text-sm font-semibold transition-all sm:size-12",
                       isDone && "border-success bg-success text-white shadow-soft",
                       isCurrent &&
                         "animate-pulse border-primary bg-primary text-primary-foreground ring-4 ring-primary/15 shadow-soft",
@@ -1270,13 +1273,13 @@ function DossierProgressRail({
                   >
                     {isDone ? <CheckCircle2 className="size-5" /> : index + 1}
                   </div>
-                  <div className="mt-2 min-w-0">
+                  <div className="mt-2 min-w-0 px-1">
                     <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                       Hapi {index + 1}
                     </div>
                     <div
                       className={cn(
-                        "mx-auto mt-0.5 line-clamp-2 max-w-[9.5rem] text-[11px] font-medium leading-tight",
+                        "mx-auto mt-0.5 line-clamp-2 max-w-[7.5rem] text-[11px] font-medium leading-tight sm:max-w-[9.5rem]",
                         isCurrent ? "text-primary" : "text-foreground",
                       )}
                     >
@@ -1315,14 +1318,14 @@ function ProgressFact({
   return (
     <div
       className={cn(
-        "px-2 py-1",
+        "px-1.5 py-1 sm:px-2",
         tone === "success" && "text-success",
         tone === "primary" && "text-primary",
       )}
     >
       <div
         className={cn(
-          "text-lg font-semibold tabular-nums",
+          "text-base font-semibold tabular-nums sm:text-lg",
           tone === "success" && "text-success",
           tone === "primary" && "text-primary",
           tone === "muted" && "text-foreground",
@@ -1330,7 +1333,7 @@ function ProgressFact({
       >
         {value}
       </div>
-      <div className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+      <div className="text-[9px] font-medium uppercase tracking-wide text-muted-foreground sm:text-[10px]">
         {label}
       </div>
     </div>

@@ -137,24 +137,24 @@ export function DossierBrowser({
 
   return (
     <Card className={cn("overflow-hidden p-0", className)}>
-      <div className="border-b px-4 py-3">
+      <div className="border-b px-3 py-3 sm:px-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <FileText className="size-4 shrink-0 text-muted-foreground" />
-              <h2 className="truncate text-sm font-semibold">{title}</h2>
+              <h2 className="min-w-0 text-sm font-semibold">{title}</h2>
               <Badge variant="secondary" className="shrink-0 text-[11px]">
                 {displayedTotal} rekorde
               </Badge>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">{description}</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center lg:w-auto">
             <ToggleGroup
               type="single"
               value={view}
               onValueChange={(value) => value && setView(value as DossierViewMode)}
-              className="justify-start"
+              className="grid grid-cols-3 justify-start sm:flex"
             >
               <ToggleGroupItem value="board" className="h-8 px-2 text-xs" aria-label="Board">
                 <LayoutGrid className="mr-1.5 size-3.5" />
@@ -170,7 +170,7 @@ export function DossierBrowser({
               </ToggleGroupItem>
             </ToggleGroup>
             <Select value={groupBy} onValueChange={(value) => setGroupBy(value as DossierGroupBy)}>
-              <SelectTrigger className="h-8 w-[165px] text-xs">
+              <SelectTrigger className="h-8 w-full text-xs sm:w-[165px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -195,7 +195,7 @@ export function DossierBrowser({
                 type="button"
                 onClick={() => setCategory(key)}
                 className={cn(
-                  "rounded-md border px-2.5 py-2 text-left transition-colors",
+                  "min-h-[4rem] rounded-md border px-2.5 py-2 text-left transition-colors",
                   active
                     ? "border-primary bg-primary text-primary-foreground"
                     : "bg-background hover:border-primary/50 hover:bg-[var(--brand-blue-soft)]",
@@ -226,7 +226,7 @@ export function DossierBrowser({
         </div>
       </div>
 
-      <div className="p-3">
+      <div className="p-2.5 sm:p-3">
         {loading ? (
           <DossierLoading view={view} />
         ) : !visibleItems.length ? (
@@ -375,28 +375,30 @@ function ListView({ groups }: { groups: DossierGroup[] }) {
   return (
     <div className="space-y-3">
       {groups.map((group) => (
-        <section key={group.key} className="rounded-md border">
+        <section key={group.key} className="overflow-hidden rounded-md border">
           <div className="border-b bg-muted/25 px-3 py-2">
             <GroupHeader group={group} compact />
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-xs">Kodi</TableHead>
-                <TableHead className="text-xs">Dosja</TableHead>
-                <TableHead className="hidden text-xs md:table-cell">Aplikuesi</TableHead>
-                <TableHead className="hidden text-xs lg:table-cell">Faza</TableHead>
-                <TableHead className="text-xs">Sinjale</TableHead>
-                <TableHead className="text-xs">Status</TableHead>
-                <TableHead className="text-xs text-right">Veprim</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {group.items.map((item) => (
-                <DossierTableRow key={item.id} item={item} />
-              ))}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <Table className="min-w-[720px]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs">Kodi</TableHead>
+                  <TableHead className="text-xs">Dosja</TableHead>
+                  <TableHead className="hidden text-xs md:table-cell">Aplikuesi</TableHead>
+                  <TableHead className="hidden text-xs lg:table-cell">Faza</TableHead>
+                  <TableHead className="text-xs">Sinjale</TableHead>
+                  <TableHead className="text-xs">Status</TableHead>
+                  <TableHead className="text-xs text-right">Veprim</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {group.items.map((item) => (
+                  <DossierTableRow key={item.id} item={item} />
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </section>
       ))}
     </div>

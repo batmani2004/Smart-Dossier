@@ -247,15 +247,15 @@ function LoginPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3 md:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <img
               src="/brand/smart-dossier-logo.svg"
               alt="Smart Dossier"
-              className="h-12 w-auto max-w-[240px] shrink-0 object-contain sm:h-14 sm:max-w-[270px]"
+              className="h-10 w-auto max-w-[170px] shrink-0 object-contain sm:h-14 sm:max-w-[270px]"
             />
           </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <img
               src="/brand/albanian-flag.svg"
               alt="Gjuha shqip"
@@ -265,14 +265,14 @@ function LoginPage() {
             <Button
               asChild
               variant="ghost"
-              className="h-9 px-2 text-sm font-semibold text-muted-foreground hover:text-primary sm:px-3"
+              className="h-8 px-2 text-xs font-semibold text-muted-foreground hover:text-primary sm:h-9 sm:px-3 sm:text-sm"
             >
               <Link to="/admin-login">Hyrje admin</Link>
             </Button>
             <Button
               type="button"
               variant={authMode === "register" ? "default" : "outline"}
-              className="h-9 px-3 text-sm font-semibold"
+              className="h-8 px-2.5 text-xs font-semibold sm:h-9 sm:px-3 sm:text-sm"
               onClick={startRegister}
             >
               Regjistrohu
@@ -281,12 +281,12 @@ function LoginPage() {
         </div>
       </header>
 
-      <main className="mx-auto grid min-h-[calc(100vh-4.25rem)] max-w-6xl gap-5 px-4 py-5 md:px-6 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-start">
-        <section className="rounded-md border bg-white p-5 shadow-soft md:p-6">
+      <main className="mx-auto grid min-h-[calc(100vh-4.25rem)] max-w-6xl gap-4 px-3 py-4 sm:px-4 md:px-6 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-start">
+        <section className="rounded-md border bg-white p-4 shadow-soft md:p-6">
           <div className="mb-2 inline-flex rounded-md bg-[var(--brand-blue-soft)] px-2.5 py-1 text-xs font-semibold text-primary">
             Hyrje e thjeshte
           </div>
-          <h1 className="max-w-2xl text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+          <h1 className="max-w-2xl text-2xl font-semibold tracking-tight text-foreground sm:text-3xl md:text-4xl">
             Zgjidh profilin dhe hap direkt faqen qe te duhet.
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">

@@ -145,7 +145,7 @@ function BusinessPortal() {
 
   return (
     <AppShell>
-      <div className="mx-auto grid max-w-[1300px] grid-cols-1 gap-4 px-4 py-5 md:px-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="mx-auto grid max-w-[1300px] grid-cols-1 gap-3 px-3 py-4 sm:gap-4 sm:px-4 md:px-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-4">
           {role !== "business" ? (
             <AccessNotice
@@ -168,7 +168,7 @@ function BusinessPortal() {
                 i kadastres per shqyrtim.
               </p>
             </div>
-            <div className="rounded-md border bg-card px-3 py-2 text-sm">
+            <div className="w-full rounded-md border bg-card px-3 py-2 text-sm md:w-auto">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
                 Perdoruesi
               </div>
@@ -195,12 +195,18 @@ function BusinessPortal() {
                       {createdUrl}
                     </div>
                   </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <Button type="button" size="sm" onClick={copyLink}>
+                  <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap">
+                    <Button type="button" size="sm" className="w-full sm:w-auto" onClick={copyLink}>
                       <Copy className="mr-1.5 size-3.5" />
                       {copied ? "Kopjuar" : "Kopjo linkun"}
                     </Button>
-                    <Button asChild type="button" size="sm" variant="outline">
+                    <Button
+                      asChild
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                    >
                       <a href={createdUrl} target="_blank" rel="noreferrer">
                         <ExternalLink className="mr-1.5 size-3.5" />
                         Hap linkun e gjurmimit
@@ -212,7 +218,7 @@ function BusinessPortal() {
             </Card>
           ) : null}
 
-          <Card className="p-4">
+          <Card className="p-3 sm:p-4">
             <div className="mb-4 flex items-center gap-2">
               <Landmark className="size-4 text-primary" />
               <h2 className="text-sm font-semibold">Te dhenat e subjektit dhe prones</h2>
@@ -247,7 +253,7 @@ function BusinessPortal() {
             </div>
           </Card>
 
-          <Card className="p-4">
+          <Card className="p-3 sm:p-4">
             <div className="mb-4 flex items-center gap-2">
               <FileUp className="size-4 text-primary" />
               <h2 className="text-sm font-semibold">Dokumentacioni i aplikimit</h2>
@@ -294,11 +300,21 @@ function BusinessPortal() {
                 );
               })}
             </div>
-            <div className="mt-4 flex flex-wrap justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setCreated(null)}>
+            <div className="mt-4 grid gap-2 sm:flex sm:flex-wrap sm:justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => setCreated(null)}
+              >
                 Pastro njoftimin
               </Button>
-              <Button type="button" onClick={submitApplication} disabled={submitting}>
+              <Button
+                type="button"
+                className="w-full sm:w-auto"
+                onClick={submitApplication}
+                disabled={submitting}
+              >
                 <ShieldCheck className="mr-1.5 size-4" />
                 {submitting ? "Duke derguar..." : "Dergo aplikimin"}
               </Button>
@@ -307,7 +323,7 @@ function BusinessPortal() {
         </div>
 
         <aside className="space-y-4">
-          <Card className="p-4">
+          <Card className="p-3 sm:p-4">
             <div className="text-xs font-semibold uppercase tracking-wider text-primary">
               Si shqyrtohet
             </div>
@@ -353,7 +369,7 @@ function BusinessPortal() {
               Nese pasuria e subjektit preket nga projekt publik, biznesi mund te aplikoje per
               kompensim dhe ta ndjeke pagesen nga Ministria e Ekonomise.
             </p>
-            <Button asChild size="sm" className="mt-3">
+            <Button asChild size="sm" className="mt-3 w-full sm:w-auto">
               <Link to="/aplikim">Apliko per kompensim</Link>
             </Button>
           </Card>

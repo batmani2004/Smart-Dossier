@@ -600,7 +600,7 @@ function TrackPage() {
         meta: fmtDateTime(notification.at),
       }))}
     >
-      <main className="mx-auto max-w-3xl space-y-4 px-4 py-5 pb-12 md:px-6">
+      <main className="mx-auto max-w-3xl space-y-3 px-3 py-4 pb-12 sm:space-y-4 sm:px-4 md:px-6 md:py-5">
         {/* Code card */}
         <Card className="p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -610,7 +610,7 @@ function TrackPage() {
               </div>
               <div className="font-mono text-lg font-bold tracking-tight break-all">{code}</div>
             </div>
-            <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+            <div className="grid shrink-0 gap-1.5 sm:flex sm:flex-wrap sm:items-center sm:justify-end">
               {data && (
                 <Badge
                   variant="secondary"
@@ -626,7 +626,7 @@ function TrackPage() {
                   {STATUS_SQ[data.status] ?? data.status}
                 </Badge>
               )}
-              <Button asChild size="sm" variant="outline" className="h-8">
+              <Button asChild size="sm" variant="outline" className="h-8 w-full sm:w-auto">
                 <a href="/aplikim">
                   <Scale className="size-3.5" />
                   Aplikim i ri
@@ -638,7 +638,7 @@ function TrackPage() {
                 onClick={load}
                 disabled={loading}
                 aria-label="Rifresko"
-                className="h-8"
+                className="h-8 w-full sm:w-auto"
               >
                 <RefreshCw className={cn("size-4", loading && "animate-spin")} />
               </Button>
@@ -730,7 +730,7 @@ function TrackPage() {
 
             {data.processKind === "expropriation" && data.compensation ? (
               <Card className="border-warning/30 bg-warning/5 p-4">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex min-w-0 items-start gap-2">
                     <div className="grid size-8 shrink-0 place-items-center rounded-md bg-warning/20 text-warning-foreground">
                       <CreditCard className="size-4" />
@@ -743,7 +743,7 @@ function TrackPage() {
                       </p>
                     </div>
                   </div>
-                  <Badge variant="secondary" className="shrink-0 text-[11px]">
+                  <Badge variant="secondary" className="w-fit shrink-0 text-[11px]">
                     {data.compensation.statusLabel}
                   </Badge>
                 </div>
@@ -783,7 +783,7 @@ function TrackPage() {
 
             {data.mapPreview ? (
               <Card className="overflow-hidden border-emerald-200 bg-emerald-50/70">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex min-w-0 items-start gap-2 p-4 pr-0">
                     <div className="grid size-8 shrink-0 place-items-center rounded-md border border-emerald-200 bg-emerald-100 text-emerald-800">
                       <MapPinned className="size-4" />
@@ -797,20 +797,35 @@ function TrackPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex shrink-0 flex-wrap justify-end gap-1.5 p-4 pl-0">
-                    <Button asChild size="sm" variant="outline" className="h-8 bg-white">
+                  <div className="grid shrink-0 gap-1.5 px-4 pb-4 sm:flex sm:flex-wrap sm:justify-end sm:p-4 sm:pl-0">
+                    <Button
+                      asChild
+                      size="sm"
+                      variant="outline"
+                      className="h-8 w-full bg-white sm:w-auto"
+                    >
                       <a href={data.mapPreview.url} target="_blank" rel="noreferrer">
                         <ExternalLink className="mr-1 size-3.5" />
                         Harta
                       </a>
                     </Button>
-                    <Button asChild size="sm" variant="outline" className="h-8 bg-white">
+                    <Button
+                      asChild
+                      size="sm"
+                      variant="outline"
+                      className="h-8 w-full bg-white sm:w-auto"
+                    >
                       <a href={mapPdfUrl(data.trackingCode)} download>
                         <Download className="mr-1 size-3.5" />
                         PDF
                       </a>
                     </Button>
-                    <Button asChild size="sm" variant="outline" className="h-8 bg-white">
+                    <Button
+                      asChild
+                      size="sm"
+                      variant="outline"
+                      className="h-8 w-full bg-white sm:w-auto"
+                    >
                       <a href={mapPrintUrl(data.trackingCode)} target="_blank" rel="noreferrer">
                         <ExternalLink className="mr-1 size-3.5" />
                         Printo
@@ -849,7 +864,7 @@ function TrackPage() {
                   : "border-warning/30 bg-warning/5",
               )}
             >
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex items-start gap-2 min-w-0">
                   <div
                     className={cn(
@@ -872,7 +887,7 @@ function TrackPage() {
                 <Badge
                   variant="secondary"
                   className={cn(
-                    "shrink-0 text-[11px]",
+                    "w-fit shrink-0 text-[11px]",
                     data.requesterVerification.canReceiveDocuments
                       ? "bg-success/15 text-success border-success/20"
                       : "bg-warning/15 text-warning-foreground border-warning/30",
@@ -934,7 +949,7 @@ function TrackPage() {
 
             {/* Expedited procedure */}
             <Card className="p-4 border-info/25 bg-info/5">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex items-start gap-2 min-w-0">
                   <div className="size-8 rounded-md bg-primary/10 text-primary grid place-items-center shrink-0">
                     <Clock className="size-4" />
@@ -951,7 +966,7 @@ function TrackPage() {
                 <Badge
                   variant="secondary"
                   className={cn(
-                    "shrink-0 text-[11px]",
+                    "w-fit shrink-0 text-[11px]",
                     data.expeditedProcedure.status === "approved" &&
                       "bg-success/15 text-success border-success/20",
                     data.expeditedProcedure.status === "submitted" &&
@@ -1002,7 +1017,7 @@ function TrackPage() {
                     />
                   </div>
                   <div className="mt-3">
-                    <Button asChild size="sm" variant="outline" className="h-8">
+                    <Button asChild size="sm" variant="outline" className="h-8 w-full sm:w-auto">
                       <a href={expediteFormUrl(data.trackingCode)} download>
                         <Download className="size-3.5 mr-1" />
                         Shkarko formularin bosh
@@ -1021,7 +1036,7 @@ function TrackPage() {
               data.expeditedProcedure.status === "rejected" ? (
                 <div className="mt-3 space-y-3">
                   <div className="flex flex-wrap gap-2">
-                    <Button asChild size="sm" variant="outline" className="h-8">
+                    <Button asChild size="sm" variant="outline" className="h-8 w-full sm:w-auto">
                       <a href={expediteFormUrl(data.trackingCode)} download>
                         <Download className="size-3.5 mr-1" />
                         Shkarko formularin PDF
@@ -1076,7 +1091,7 @@ function TrackPage() {
                         type="button"
                         size="sm"
                         variant="secondary"
-                        className="h-8"
+                        className="h-8 w-full sm:w-auto"
                         onClick={generateExpeditedRequestPdf}
                       >
                         <FileText className="size-3.5 mr-1" />
@@ -1159,12 +1174,12 @@ function TrackPage() {
                       {expediteSuccess}
                     </div>
                   ) : null}
-                  <div className="flex justify-end">
+                  <div className="flex justify-stretch sm:justify-end">
                     <Button
                       size="sm"
                       onClick={submitExpeditedProcedure}
                       disabled={expediteSending}
-                      className="h-8"
+                      className="h-8 w-full sm:w-auto"
                     >
                       {expediteSending ? (
                         <Loader2 className="size-3.5 mr-1 animate-spin" />

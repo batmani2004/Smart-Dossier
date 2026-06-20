@@ -146,7 +146,7 @@ function ReportsPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[1400px] space-y-4 px-4 py-5 md:px-6">
+      <div className="mx-auto max-w-[1400px] space-y-3 px-3 py-4 sm:space-y-4 sm:px-4 md:px-6 md:py-5">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="text-xs font-semibold uppercase tracking-wider text-primary">
@@ -157,7 +157,7 @@ function ReportsPage() {
               Fokus te afatet, bllokimet, ngarkesa e operatoreve dhe impakti i AI.
             </p>
           </div>
-          <Button asChild size="sm" variant="outline">
+          <Button asChild size="sm" variant="outline" className="w-full md:w-auto">
             <Link to="/dosjet">
               <ListChecks className="mr-1.5 size-4" />
               Hap listen e dosjeve
@@ -208,7 +208,7 @@ function ReportsPage() {
               title="Dosje sipas fazes"
               description="Ku po grumbullohet puna."
             />
-            <div className="h-64">
+            <div className="h-56 sm:h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={phaseData}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
@@ -260,7 +260,7 @@ function ReportsPage() {
         <div className="grid gap-3 xl:grid-cols-3">
           <Card className="p-3">
             <PanelHeader icon={PieChartIcon} title="Statusi" description="Shperndarja aktuale." />
-            <div className="h-56">
+            <div className="h-52 sm:h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -287,7 +287,7 @@ function ReportsPage() {
               title="Proceset"
               description="Volumi sipas tipit te aplikimit."
             />
-            <div className="h-56">
+            <div className="h-52 sm:h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={processData} layout="vertical" margin={{ left: 10 }}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
@@ -306,7 +306,7 @@ function ReportsPage() {
 
           <Card className="p-3">
             <PanelHeader icon={Bot} title="AI dhe automatizimi" description="Ku po kursen kohe." />
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
               <MiniMetric label="Dosje me AI" value={aiTouchedDossiers} />
               <MiniMetric label="Insight" value={aiInsightCount} />
               <MiniMetric
@@ -343,7 +343,7 @@ function ReportsPage() {
             <div className="space-y-2">
               {bottlenecks.map((item) => (
                 <div key={`${item.processKind}-${item.phaseId}`} className="rounded-md border p-2">
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <div className="text-sm font-semibold">{item.phaseTitle}</div>
                       <div className="text-[11px] text-muted-foreground">
@@ -351,7 +351,7 @@ function ReportsPage() {
                         {item.avgDaysInPhase} dite
                       </div>
                     </div>
-                    <Badge variant="secondary" className="shrink-0 text-[10px]">
+                    <Badge variant="secondary" className="w-fit shrink-0 text-[10px]">
                       score {item.score}
                     </Badge>
                   </div>

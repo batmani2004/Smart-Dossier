@@ -250,12 +250,14 @@ export function AppShell({
         </div>
 
         {/* Page content */}
-        <main className="flex-1 pb-16 md:pb-0">{children}</main>
+        <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
+          {children}
+        </main>
       </div>
 
       {/* ── Mobile bottom nav ─────────────────────────────── */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 grid border-t md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 grid border-t pb-[env(safe-area-inset-bottom)] md:hidden"
         style={{
           gridTemplateColumns: "repeat(3, 1fr)",
           background: "var(--brand-navy-dark)",

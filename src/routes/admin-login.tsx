@@ -68,7 +68,7 @@ function AdminLoginPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 md:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-3 py-3 sm:px-5 md:px-8">
           <Link
             to="/login"
             className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-primary"
@@ -87,15 +87,15 @@ function AdminLoginPage() {
         </div>
       </header>
 
-      <main className="mx-auto grid min-h-[calc(100vh-3.75rem)] max-w-6xl gap-8 px-5 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-center">
+      <main className="mx-auto grid min-h-[calc(100vh-3.75rem)] max-w-6xl gap-4 px-3 py-4 sm:px-5 sm:py-6 md:px-8 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-center">
         <section className="max-w-2xl">
           <div className="mb-4 inline-flex rounded-md bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary shadow-soft">
             Hyrje e veçantë
           </div>
-          <h1 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl md:text-5xl">
             Paneli i administratorit
           </h1>
-          <p className="mt-4 text-base leading-7 text-muted-foreground">
+          <p className="mt-3 text-sm leading-6 text-muted-foreground sm:mt-4 sm:text-base sm:leading-7">
             Kjo hyrje përdoret vetëm për konfigurim, auditim, menaxhim përdoruesish dhe kontroll të
             plotë mbi platformën.
           </p>
@@ -108,7 +108,7 @@ function AdminLoginPage() {
           </div>
         </section>
 
-        <Card className="border bg-white p-5 shadow-lift md:p-6">
+        <Card className="border bg-white p-4 shadow-lift sm:p-5 md:p-6">
           <div className="border-b pb-5">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
               <ShieldCheck className="size-4" />
@@ -204,7 +204,7 @@ function AdminLoginPage() {
                     <InputOTPSlot
                       key={index}
                       index={index}
-                      className="h-12 w-12 bg-white text-lg"
+                      className="h-10 w-10 bg-white text-base sm:h-12 sm:w-12 sm:text-lg"
                     />
                   ))}
                 </InputOTPGroup>

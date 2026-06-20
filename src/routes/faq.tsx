@@ -47,7 +47,7 @@ function FaqPage() {
 
   return (
     <AppShell>
-      <div className="max-w-6xl space-y-4 p-4 md:p-6">
+      <div className="max-w-6xl space-y-3 p-3 sm:space-y-4 sm:p-4 md:p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
@@ -62,7 +62,7 @@ function FaqPage() {
               banesave, dokumentet, pagesat dhe gjurmimin publik.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {categories.map((category) => (
               <Badge key={category} variant="secondary" className="rounded-md">
                 {category}
@@ -72,7 +72,7 @@ function FaqPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-4">
-          <Card className="p-4">
+          <Card className="p-3 sm:p-4">
             <div className="flex items-center gap-2 border-b pb-3">
               <Search className="size-4 text-muted-foreground" />
               <Input

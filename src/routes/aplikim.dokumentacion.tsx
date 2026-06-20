@@ -336,8 +336,8 @@ function OperatorDocumentationPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[1120px] space-y-4 px-4 py-4 md:px-6">
-        <div className="rounded-lg border border-primary/15 bg-white p-4 shadow-soft">
+      <div className="mx-auto max-w-[1120px] space-y-3 px-3 py-4 sm:space-y-4 sm:px-4 md:px-6">
+        <div className="rounded-lg border border-primary/15 bg-white p-3 shadow-soft sm:p-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div className="min-w-0">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
@@ -353,11 +353,14 @@ function OperatorDocumentationPage() {
                 dërguar dosjen.
               </p>
             </div>
-            <div className="flex shrink-0 flex-wrap gap-2">
-              <Badge variant="secondary" className="h-9 rounded-md px-3 text-xs">
+            <div className="grid w-full shrink-0 gap-2 sm:flex sm:w-auto sm:flex-wrap">
+              <Badge
+                variant="secondary"
+                className="h-9 justify-center rounded-md px-3 text-xs sm:justify-start"
+              >
                 {roleLabel} · {selectedTotal} dokumente
               </Badge>
-              <Button asChild size="sm" variant="outline" className="h-9">
+              <Button asChild size="sm" variant="outline" className="h-9 w-full sm:w-auto">
                 <Link to="/aplikim">
                   <ArrowLeft className="size-3.5" />
                   Kthehu te aplikimi
@@ -366,7 +369,7 @@ function OperatorDocumentationPage() {
             </div>
           </div>
 
-          <div className="mt-4 grid gap-2 md:grid-cols-3">
+          <div className="mt-4 grid gap-2 sm:grid-cols-3">
             <GuidanceStep
               number="1"
               title="Zgjidh procesin"
@@ -386,7 +389,7 @@ function OperatorDocumentationPage() {
         </div>
 
         <div className="rounded-lg border border-sky-200 bg-sky-50/80 px-3 py-2.5">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex min-w-0 items-start gap-3">
               <div className="grid size-7 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground">
                 <Scale className="size-3" />
@@ -399,7 +402,7 @@ function OperatorDocumentationPage() {
                 </p>
               </div>
             </div>
-            <Badge variant="secondary" className="shrink-0">
+            <Badge variant="secondary" className="w-fit shrink-0">
               {selectedTotal} të zgjedhura
             </Badge>
           </div>
@@ -465,7 +468,7 @@ function DocumentationCard({
           active && "border-primary/15 bg-primary/[0.04]",
         )}
       >
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             <div
               className={cn(
@@ -480,7 +483,7 @@ function DocumentationCard({
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{group.subtitle}</p>
             </div>
           </div>
-          <Badge variant="secondary" className="shrink-0 text-[11px]">
+          <Badge variant="secondary" className="w-fit shrink-0 text-[11px]">
             {selectedCount}/{group.docs.length}
           </Badge>
         </div>
@@ -544,7 +547,7 @@ function DocumentationCard({
                   </div>
                 </div>
 
-                <div className="flex min-w-0 shrink-0 items-center gap-1.5 sm:max-w-[240px]">
+                <div className="grid min-w-0 gap-1.5 sm:flex sm:w-auto sm:max-w-[240px] sm:shrink-0 sm:items-center">
                   {selectedName ? (
                     <div className="flex min-w-0 flex-1 items-center gap-1 rounded-md bg-muted/60 px-2 py-1">
                       <span className="truncate font-mono text-[11px] text-foreground">
@@ -564,7 +567,7 @@ function DocumentationCard({
                   ) : null}
                   <label
                     htmlFor={inputId}
-                    className="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-primary/25 bg-primary/5 px-2.5 py-1 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/10"
+                    className="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-primary/25 bg-primary/5 px-2.5 py-1.5 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/10 sm:py-1"
                   >
                     <FileUp className="size-3" />
                     {selectedName ? "Ndrysho" : "Ngarko"}

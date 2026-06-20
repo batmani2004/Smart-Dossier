@@ -483,7 +483,7 @@ function ApplicationPortalHome() {
 
   return (
     <AppShell>
-      <div className="mx-auto grid max-w-[1300px] grid-cols-1 gap-4 px-4 py-5 md:px-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="mx-auto grid max-w-[1300px] grid-cols-1 gap-3 px-3 py-4 sm:gap-4 sm:px-4 md:px-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div className="min-w-0">
@@ -498,7 +498,7 @@ function ApplicationPortalHome() {
                 {applicationDescription(applicationKind, effectiveApplicantType)}
               </p>
             </div>
-            <div className="rounded-md border bg-card px-3 py-2 text-sm">
+            <div className="w-full rounded-md border bg-card px-3 py-2 text-sm md:w-auto">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
                 Perdoruesi
               </div>
@@ -525,12 +525,18 @@ function ApplicationPortalHome() {
                       {createdUrl}
                     </div>
                   </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <Button type="button" size="sm" onClick={copyLink}>
+                  <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap">
+                    <Button type="button" size="sm" className="w-full sm:w-auto" onClick={copyLink}>
                       <Copy className="mr-1.5 size-3.5" />
                       {copied ? "Kopjuar" : "Kopjo linkun"}
                     </Button>
-                    <Button asChild type="button" size="sm" variant="outline">
+                    <Button
+                      asChild
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                    >
                       <a href={createdUrl} target="_blank" rel="noreferrer">
                         <ExternalLink className="mr-1.5 size-3.5" />
                         Hap linkun e gjurmimit
@@ -542,7 +548,7 @@ function ApplicationPortalHome() {
             </Card>
           ) : null}
 
-          <Card className="p-4">
+          <Card className="p-3 sm:p-4">
             <div className="mb-4 flex items-center gap-2">
               <FileUp className="size-4 text-primary" />
               <h2 className="text-sm font-semibold">Zgjidh llojin e aplikimit</h2>
@@ -576,19 +582,19 @@ function ApplicationPortalHome() {
             </div>
           </Card>
 
-          <Card className="p-4">
+          <Card className="p-3 sm:p-4">
             <div className="mb-4 flex items-center gap-2">
               <ApplicantIcon className="size-4 text-primary" />
               <h2 className="text-sm font-semibold">Profili i aplikuesit</h2>
             </div>
             <div className="grid gap-2">
               {role === "business" ? (
-                <Button type="button" variant="default" className="justify-start">
+                <Button type="button" variant="default" className="w-full justify-start">
                   <Building2 className="mr-1.5 size-4" />
                   Biznes
                 </Button>
               ) : (
-                <Button type="button" variant="default" className="justify-start">
+                <Button type="button" variant="default" className="w-full justify-start">
                   <UserRound className="mr-1.5 size-4" />
                   Qytetar
                 </Button>
@@ -596,7 +602,7 @@ function ApplicationPortalHome() {
             </div>
           </Card>
 
-          <Card className="p-4">
+          <Card className="p-3 sm:p-4">
             <div className="mb-4 flex items-center gap-2">
               <Landmark className="size-4 text-primary" />
               <h2 className="text-sm font-semibold">Te dhenat e aplikimit</h2>

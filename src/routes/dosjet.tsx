@@ -95,10 +95,10 @@ function DosjetPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-[1500px] space-y-4 px-4 py-5 md:px-6">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+      <div className="mx-auto max-w-[1500px] space-y-3 px-3 py-4 sm:space-y-4 sm:px-4 md:px-6">
+        <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
           <div className="min-w-0">
-            <h1 className="truncate text-xl font-semibold tracking-tight md:text-2xl">Dosjet</h1>
+            <h1 className="text-xl font-semibold tracking-tight md:text-2xl">Dosjet</h1>
             <p className="text-xs text-muted-foreground">
               Hapni radhen e punes; AI nxjerr sinjalet dhe nepunesi konfirmon veprimin.
             </p>
@@ -128,7 +128,7 @@ function DosjetPage() {
           </div>
         </Card>
 
-        <Card className="grid grid-cols-1 items-center gap-2 p-3 sm:grid-cols-[1fr_auto_auto_auto]">
+        <Card className="grid grid-cols-1 items-center gap-2 p-3 md:grid-cols-[1fr_auto_auto_auto]">
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -139,7 +139,7 @@ function DosjetPage() {
             />
           </div>
           <Select value={process} onValueChange={setProcess}>
-            <SelectTrigger className="h-9 w-[180px] text-sm">
+            <SelectTrigger className="h-9 w-full text-sm md:w-[180px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -150,7 +150,7 @@ function DosjetPage() {
             </SelectContent>
           </Select>
           <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="h-9 w-[150px] text-sm">
+            <SelectTrigger className="h-9 w-full text-sm md:w-[150px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -163,7 +163,7 @@ function DosjetPage() {
             </SelectContent>
           </Select>
           <Select value={priority} onValueChange={setPriority}>
-            <SelectTrigger className="h-9 w-[140px] text-sm">
+            <SelectTrigger className="h-9 w-full text-sm md:w-[140px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -232,7 +232,7 @@ function NewDossierDialog({ onCreated }: { onCreated: () => void }) {
       }}
     >
       <DialogTrigger asChild>
-        <Button size="sm">
+        <Button size="sm" className="w-full sm:w-auto">
           <Plus className="mr-1 size-3.5" /> Aplikim qytetari
         </Button>
       </DialogTrigger>
