@@ -233,7 +233,7 @@ function base64ToBytes(value: string) {
 // --------------------- list / filter ---------------------
 
 export const listDossiers = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         process: processKindSchema.optional(),
@@ -280,7 +280,7 @@ export const listDossiers = createServerFn({ method: "GET" })
 // --------------------- get one ---------------------
 
 export const getDossier = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) => z.object({ id: z.string() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string() }).parse(input))
   .handler(async ({ data }) => {
     const d = getById(data.id);
     if (!d) notFound();
@@ -297,7 +297,7 @@ export const getDossier = createServerFn({ method: "GET" })
 // --------------------- create ---------------------
 
 export const createDossier = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         process: processKindSchema,
@@ -429,7 +429,7 @@ export const createDossier = createServerFn({ method: "POST" })
   });
 
 export const createBusinessPropertyApplication = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         businessName: z.string().min(2),
@@ -537,7 +537,7 @@ export const createBusinessPropertyApplication = createServerFn({ method: "POST"
   });
 
 export const createExpropriationCompensationApplication = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         applicantType: z.enum(["citizen", "business"]),
@@ -715,7 +715,7 @@ export const createExpropriationCompensationApplication = createServerFn({ metho
 // --------------------- patch ---------------------
 
 export const patchDossier = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         id: z.string(),
@@ -762,7 +762,7 @@ export const patchDossier = createServerFn({ method: "POST" })
 // --------------------- requester / legal representative verification ---------------------
 
 export const updateRequesterVerification = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         id: z.string(),
@@ -820,7 +820,7 @@ export const updateRequesterVerification = createServerFn({ method: "POST" })
 // --------------------- expedited procedure review ---------------------
 
 export const reviewExpeditedProcedure = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         id: z.string(),
@@ -858,7 +858,7 @@ export const reviewExpeditedProcedure = createServerFn({ method: "POST" })
 // --------------------- advance phase/step ---------------------
 
 export const advanceDossier = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => z.object({ id: z.string() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string() }).parse(input))
   .handler(async ({ data }) => {
     const d = getById(data.id);
     if (!d) notFound();
@@ -902,7 +902,7 @@ export const advanceDossier = createServerFn({ method: "POST" })
 // --------------------- upload document ---------------------
 
 export const uploadDocument = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         id: z.string(),
@@ -971,7 +971,7 @@ export const uploadDocument = createServerFn({ method: "POST" })
 // --------------------- assignment ---------------------
 
 export const assignDossier = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ id: z.string(), operatorId: z.string().min(1) }).parse(input),
   )
   .handler(async ({ data }) => {
@@ -991,7 +991,7 @@ export const runAutoAssignment = createServerFn({ method: "POST" }).handler(asyn
 });
 
 export const addOperator = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         name: z.string().min(2),
@@ -1005,7 +1005,7 @@ export const addOperator = createServerFn({ method: "POST" })
   });
 
 export const removeOperator = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => z.object({ id: z.string().min(1) }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().min(1) }).parse(input))
   .handler(async ({ data }) => {
     if (listDemoOperators().length <= 1) {
       throw new Error("Duhet te mbetet te pakten nje operator aktiv.");
@@ -2536,7 +2536,7 @@ export function buildUploadedDocumentDownload(
 // --------------------- grounded AI answer ---------------------
 
 export const answerDossierQuestion = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ id: z.string(), question: z.string().min(2).max(2000) }).parse(input),
   )
   .handler(async ({ data }) => {

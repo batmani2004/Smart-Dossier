@@ -109,7 +109,7 @@ function DashboardPage() {
   const briefQ = useQuery({
     queryKey: ["ai-risk-brief"],
     queryFn: () => brief(),
-    enabled: briefOpen,
+    enabled: can("runAi"),
     staleTime: 5 * 60_000,
   });
 
@@ -434,6 +434,48 @@ function DashboardPage() {
             loading={dashQ.isLoading}
           />
         </div>
+
+        {/* AI Risk Brief — inline, auto-loads for civil servants */}
+        {can("runAi") && (briefQ.isLoading || briefQ.data) ? (
+          <Card className="p-4 border-destructive/25 bg-destructive/5">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="size-4 text-destructive" />
+                <h2 className="text-sm font-semibold">AI Risk Brief</h2>
+                {briefQ.isLoading && <Loader2 className="size-3.5 animate-spin text-muted-foreground" />}
+              </div>
+              {briefQ.data?.ok && (
+                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setBriefOpen(true)}>
+                  Detaje të plota
+                </Button>
+              )}
+            </div>
+            {briefQ.isLoading && (
+              <p className="text-xs text-muted-foreground">Po analizohen risqet nga AI…</p>
+            )}
+            {briefQ.data?.ok && (
+              <div className="space-y-3">
+                <div className="text-sm leading-relaxed">
+                  <Markdown>{briefQ.data.brief.length > 600 ? briefQ.data.brief.slice(0, 600) + "…" : briefQ.data.brief}</Markdown>
+                </div>
+                <div className="flex flex-wrap gap-1.5 pt-1 border-t">
+                  {briefQ.data.ranked.slice(0, 3).map((r) => (
+                    <span
+                      key={`${r.phaseId}-${r.label}`}
+                      className="inline-flex items-center gap-1 rounded-md border border-destructive/25 bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive"
+                    >
+                      <AlertTriangle className="size-2.5" />
+                      {r.label} · {r.affectedCount} dosje
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {briefQ.data?.ok === false && (
+              <p className="text-xs text-destructive">{briefQ.data.error}</p>
+            )}
+          </Card>
+        ) : null}
 
         {can("manageUsers") && dashQ.data?.assignment ? (
           <Card className="p-4">
