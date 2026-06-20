@@ -95,6 +95,38 @@ export const CITIZEN_FAQ: FaqItem[] = [
       "Privatizimi i banesave EKB ka shume dokumente, verifikime, fature qytetari, kontrate dhe dergim ne ASHK. Smart Dossier e kthen kete rrugetim ne faza te monitoruara dhe i jep qytetarit mundesi gjurmimi e shkarkimi dokumentesh pas verifikimit.",
     tags: ["ekb", "privatizim", "banesa", "fature", "kontrate"],
   },
+  {
+    id: "operator-first-steps",
+    category: "Udhezues per operatorin",
+    question: "Cfare duhet te beje nje operator i ri ne Smart Dossier?",
+    answer:
+      "Operatori fillon nga Dashboard ose Dosjet. Fillimisht kontrollon dosjet me alarm, afatet dhe dokumentet qe mungojne. Pastaj hap dosjen, perdor tab-in AI per permbledhje, nxjerrje fushash ose sugjerim hapi, verifikon dokumentet dhe avancon procesin vetem pasi te kete kontrolluar faktet.",
+    tags: ["operator", "hapi i pare", "dashboard", "dosje", "ai"],
+  },
+  {
+    id: "ai-valuation-act",
+    category: "AI dhe Akt Vleresimi",
+    question: "Si funksionon AI Akt Vleresimi?",
+    answer:
+      "Te dosjet EKB, AI perdor te dhenat e nxjerra nga dokumentet: te ardhurat familjare, siperfaqen, cmimin e tregut dhe vleren e truallit. Sistemi aplikon formulen e konfigurimit VKM 179/2020 + VKM 898/2020 hap pas hapi, tregon cdo llogaritje, gjeneron dokumentin Akt Vleresimi dhe ruan ne audit kush e llogariti, kur, formulen dhe vleren finale.",
+    tags: ["ai", "akt vleresimi", "vkm", "ekb", "audit"],
+  },
+  {
+    id: "reports-for-managers",
+    category: "Raportet",
+    question: "Si perdoren raportet nga drejtuesit?",
+    answer:
+      "Raportet tregojne ku ndodhen dosjet, cilat faza jane bllokuar, cfare afatesh po afrohen, cilet operatore kane ngarkese dhe sa pune eshte pergatitur nga AI. Qellimi eshte qe drejtuesi te shohë prioritetet pa hapur cdo dosje nje nga nje.",
+    tags: ["raporte", "drejtues", "afate", "operator", "ai"],
+  },
+  {
+    id: "electronic-sealing",
+    category: "Vulosja elektronike",
+    question: "Si vulosen dokumentet elektronikisht?",
+    answer:
+      "Operatori gjeneron ose ngarkon PDF-in final dhe zgjedh opsionin e vulosjes elektronike. Dokumenti merr status te verifikuar, ruhet ne dosje dhe regjistrohet ne audit. Per qytetarin ose biznesin, shkarkimi hapet vetem pasi verifikohet se kerkuesi ka te drejte mbi dosjen ose eshte perfaqesues ligjor.",
+    tags: ["vule", "vulosje", "dokument", "pdf", "audit"],
+  },
 ];
 
 export const FAQ_SUGGESTED_QUESTIONS = [
@@ -105,6 +137,8 @@ export const FAQ_SUGGESTED_QUESTIONS = [
   "Kur mund ta shkarkoj dokumentin e vulosur?",
   "Si dergohet ankesa te operatori?",
   "Cfare ndodh nese aplikon perfaqesuesi ligjor?",
+  "Si funksionon AI Akt Vleresimi?",
+  "Si perdoren raportet nga drejtuesit?",
 ];
 
 function normalize(value: string) {

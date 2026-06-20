@@ -1,28 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
-import {
-  AlertTriangle,
-  CheckCircle2,
-  Copy,
-  ExternalLink,
-  Plus,
-  Search,
-  Sparkles,
-} from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2, Copy, ExternalLink, Plus, Search, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { DossierBrowser } from "@/components/dossier-browser";
 import { AccessNotice } from "@/components/role-switcher";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -31,17 +16,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PriorityBadge, StatusBadge } from "@/components/status-badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createDossier, listDossiers } from "@/lib/api/dossiers.functions";
-import { PROCESSES } from "@/core";
-import type { ProcessKind } from "@/core/types";
+import type { DossierStatus, ProcessKind } from "@/core/types";
 import { useDemoRole } from "@/lib/demo-access";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/dosjet")({
   head: () => ({
-    meta: [{ title: "Dosjet — Smart Dossier" }],
+    meta: [{ title: "Dosjet - Smart Dossier" }],
   }),
   component: DosjetPage,
 });
@@ -60,57 +51,17 @@ function DosjetPage() {
       list({
         data: {
           process: process === "all" ? undefined : (process as ProcessKind),
-          status:
-            status === "all"
-              ? undefined
-              : (status as
-                  | "draft"
-                  | "in_progress"
-                  | "blocked"
-                  | "awaiting_external"
-                  | "completed"
-                  | "rejected"),
+          status: status === "all" ? undefined : (status as DossierStatus),
           priority: priority === "all" ? undefined : (priority as "low" | "normal" | "high"),
           search: q || undefined,
         },
       }),
   });
 
-  // group by phase for column view
-  const grouped = useMemo(() => {
-    const dossierItems = listQ.data?.items ?? [];
-    const map = new Map<
-      string,
-      {
-        phaseTitle: string;
-        order: number;
-        procKind: ProcessKind;
-        items: typeof dossierItems;
-      }
-    >();
-    for (const d of dossierItems) {
-      const proc = PROCESSES[d.process];
-      const phase = proc.phases.find((p) => p.id === d.currentPhaseId);
-      const key = `${d.process}:${d.currentPhaseId}`;
-      const prev = map.get(key);
-      if (prev) prev.items.push(d);
-      else
-        map.set(key, {
-          phaseTitle: phase?.title ?? d.currentPhaseId,
-          order: phase?.order ?? 99,
-          procKind: d.process,
-          items: [d],
-        });
-    }
-    return Array.from(map.values()).sort((a, b) =>
-      a.procKind === b.procKind ? a.order - b.order : a.procKind.localeCompare(b.procKind),
-    );
-  }, [listQ]);
-
   if (role === "citizen" || role === "business") {
     return (
       <AppShell>
-        <div className="px-4 md:px-6 py-5 max-w-[900px] mx-auto space-y-4">
+        <div className="mx-auto max-w-[900px] space-y-4 px-4 py-5 md:px-6">
           <AccessNotice
             title="Lista e dosjeve eshte e brendshme"
             body={
@@ -144,13 +95,12 @@ function DosjetPage() {
 
   return (
     <AppShell>
-      <div className="px-4 md:px-6 py-5 space-y-4 max-w-[1500px] mx-auto">
-        {/* Header */}
+      <div className="mx-auto max-w-[1500px] space-y-4 px-4 py-5 md:px-6">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           <div className="min-w-0">
-            <h1 className="text-xl md:text-2xl font-semibold tracking-tight truncate">Dosjet</h1>
+            <h1 className="truncate text-xl font-semibold tracking-tight md:text-2xl">Dosjet</h1>
             <p className="text-xs text-muted-foreground">
-              Hapni rradhen e punes; AI nxjerr sinjalet dhe nepunesi konfirmon veprimin.
+              Hapni radhen e punes; AI nxjerr sinjalet dhe nepunesi konfirmon veprimin.
             </p>
           </div>
           {can("createDossier") ? <NewDossierDialog onCreated={() => listQ.refetch()} /> : null}
@@ -163,7 +113,7 @@ function DosjetPage() {
                 <Sparkles className="size-4" />
               </div>
               <div className="min-w-0">
-                <div className="text-sm font-semibold">Rradha e asistuar nga AI</div>
+                <div className="text-sm font-semibold">Radha e asistuar nga AI</div>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Filloni me prioritetin e larte; agjenti sugjeron verifikimin, llogaritjen dhe
                   dokumentin per konfirmim.
@@ -178,125 +128,62 @@ function DosjetPage() {
           </div>
         </Card>
 
-        {/* Filters */}
-        <Card className="p-3 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
+        <Card className="grid grid-cols-1 items-center gap-2 p-3 sm:grid-cols-[1fr_auto_auto_auto]">
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Kërko sipas kodit, titullit, qytetarit…"
-              className="pl-8 h-9 text-sm"
+              onChange={(event) => setQ(event.target.value)}
+              placeholder="Kerko sipas kodit, titullit, qytetarit..."
+              className="h-9 pl-8 text-sm"
             />
           </div>
           <Select value={process} onValueChange={setProcess}>
-            <SelectTrigger className="h-9 text-sm w-[180px]">
+            <SelectTrigger className="h-9 w-[180px] text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Të gjitha proceset</SelectItem>
+              <SelectItem value="all">Te gjitha proceset</SelectItem>
               <SelectItem value="ekb_privatization">Privatizim EKB</SelectItem>
-              <SelectItem value="expropriation">Shpronësim</SelectItem>
+              <SelectItem value="expropriation">Shpronesim</SelectItem>
               <SelectItem value="property_registration">Regjistrim prone biznesi</SelectItem>
             </SelectContent>
           </Select>
           <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="h-9 text-sm w-[150px]">
+            <SelectTrigger className="h-9 w-[150px] text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Të gjitha statuset</SelectItem>
+              <SelectItem value="all">Te gjitha statuset</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="in_progress">Në proces</SelectItem>
+              <SelectItem value="in_progress">Ne proces</SelectItem>
               <SelectItem value="blocked">Bllokuar</SelectItem>
-              <SelectItem value="awaiting_external">Pres jashtë</SelectItem>
+              <SelectItem value="awaiting_external">Pres jasht</SelectItem>
               <SelectItem value="completed">Mbyllur</SelectItem>
             </SelectContent>
           </Select>
           <Select value={priority} onValueChange={setPriority}>
-            <SelectTrigger className="h-9 text-sm w-[140px]">
+            <SelectTrigger className="h-9 w-[140px] text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Çdo prioritet</SelectItem>
-              <SelectItem value="high">I lartë</SelectItem>
+              <SelectItem value="all">Cdo prioritet</SelectItem>
+              <SelectItem value="high">I larte</SelectItem>
               <SelectItem value="normal">Normal</SelectItem>
-              <SelectItem value="low">I ulët</SelectItem>
+              <SelectItem value="low">I ulet</SelectItem>
             </SelectContent>
           </Select>
         </Card>
 
-        {/* Phase columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-          {grouped.map((g) => (
-            <Card key={`${g.procKind}:${g.order}`} className="p-3">
-              <div className="flex items-center justify-between mb-2">
-                <div className="min-w-0">
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    {PROCESSES[g.procKind].title}
-                  </div>
-                  <div className="text-sm font-semibold truncate">
-                    Faza {g.order} · {g.phaseTitle}
-                  </div>
-                </div>
-                <span className="text-xs text-muted-foreground tabular-nums shrink-0">
-                  {g.items.length}
-                </span>
-              </div>
-              <div className="space-y-1.5">
-                {g.items.map((d) => (
-                  <Link
-                    key={d.id}
-                    to="/dosja/$id"
-                    params={{ id: d.id }}
-                    className="block rounded-md border bg-card hover:bg-muted/40 p-2"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono text-[11px] text-muted-foreground truncate">
-                        {d.trackingCode}
-                      </span>
-                      <PriorityBadge priority={d.priority} />
-                    </div>
-                    <div className="text-sm font-medium truncate mt-0.5">{d.title}</div>
-                    <div className="text-[11px] text-muted-foreground truncate mt-0.5">
-                      Operator: {d.assignedOperatorName ?? "Pa caktuar"}
-                    </div>
-                    <div className="flex items-center justify-between mt-1">
-                      <span className="text-xs text-muted-foreground truncate">
-                        {d.parties[0]?.fullName ?? "—"}
-                      </span>
-                      <StatusBadge status={d.status} />
-                    </div>
-                    {(d.criticalCount > 0 || d.warningCount > 0) && (
-                      <div className="mt-1.5 flex items-center gap-1.5">
-                        {d.criticalCount > 0 && (
-                          <span className="inline-flex items-center gap-1 rounded-md border border-destructive/30 bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
-                            <AlertTriangle className="size-2.5" />
-                            {d.criticalCount} kritike
-                          </span>
-                        )}
-                        {d.warningCount > 0 && (
-                          <span className="inline-flex items-center gap-1 rounded-md border border-warning/30 bg-warning/10 px-1.5 py-0.5 text-[10px] font-medium text-warning-foreground">
-                            <AlertTriangle className="size-2.5" />
-                            {d.warningCount} paralajmërim
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    <div className="mt-1 rounded-md bg-muted/40 px-2 py-1 font-mono text-[10px] text-muted-foreground truncate">
-                      Link qytetari: /track/{d.trackingCode}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </Card>
-          ))}
-          {!grouped.length && (
-            <Card className="p-6 col-span-full text-center text-sm text-muted-foreground">
-              Nuk u gjet asnjë dosje me filtrat aktualë.
-            </Card>
-          )}
-        </div>
+        <DossierBrowser
+          items={listQ.data?.items ?? []}
+          total={listQ.data?.total}
+          loading={listQ.isLoading}
+          title="Lista dhe kategorizimi i dosjeve"
+          description="Ndrysho pamjen, grupo radhen dhe hap direkt dosjen qe kerkon vemendje."
+          initialView="board"
+          initialGroupBy="phase"
+        />
       </div>
     </AppShell>
   );
@@ -346,7 +233,7 @@ function NewDossierDialog({ onCreated }: { onCreated: () => void }) {
     >
       <DialogTrigger asChild>
         <Button size="sm">
-          <Plus className="size-3.5 mr-1" /> Aplikim qytetari
+          <Plus className="mr-1 size-3.5" /> Aplikim qytetari
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
@@ -387,13 +274,13 @@ function NewDossierDialog({ onCreated }: { onCreated: () => void }) {
         <div className="space-y-3 py-2">
           <div className="space-y-1.5">
             <Label className="text-xs">Procesi</Label>
-            <Select value={process} onValueChange={(v) => setProcess(v as ProcessKind)}>
+            <Select value={process} onValueChange={(value) => setProcess(value as ProcessKind)}>
               <SelectTrigger className="h-9 text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ekb_privatization">Privatizim EKB</SelectItem>
-                <SelectItem value="expropriation">Shpronësim</SelectItem>
+                <SelectItem value="expropriation">Shpronesim</SelectItem>
                 <SelectItem value="property_registration">Regjistrim prone biznesi</SelectItem>
               </SelectContent>
             </Select>
@@ -410,7 +297,7 @@ function NewDossierDialog({ onCreated }: { onCreated: () => void }) {
             <Field label="NIPT" value={applicantNipt} setValue={setApplicantNipt} />
           ) : null}
           <Field label="Zona" value={zone} setValue={setZone} />
-          <Field label="Përshkrim i pasurisë" value={propertyDescription} setValue={setProp} />
+          <Field label="Pershkrim i pasurise" value={propertyDescription} setValue={setProp} />
         </div>
         <DialogFooter>
           <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
@@ -466,7 +353,11 @@ function Field({
   return (
     <div className="space-y-1.5">
       <Label className="text-xs">{label}</Label>
-      <Input value={value} onChange={(e) => setValue(e.target.value)} className="h-9 text-sm" />
+      <Input
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        className="h-9 text-sm"
+      />
     </div>
   );
 }

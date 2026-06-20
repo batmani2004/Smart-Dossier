@@ -812,30 +812,56 @@ function EkbValuationAssistant({
     typeof data?.finalValueAll === "number" ? data.finalValueAll : dossier.finalValueAll;
   const missingInputs =
     dossier.property.familyIncomeAll === undefined || dossier.property.marketPriceAll === undefined;
+  const auditActor = dossier.assignedOperatorName ?? dossier.assignedOperatorId ?? "Asistent AI";
 
   return (
-    <Card className="overflow-hidden border-primary/25 bg-primary/5">
-      <div className="border-b bg-white/70 px-4 py-3">
+    <Card className="overflow-hidden border-primary/30 bg-primary/5 shadow-soft">
+      <div className="border-b bg-white px-4 py-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
               <Sparkles className="size-4" />
-              AI Akt Vleresimi
+              AI llogarit Akt Vleresimi
             </div>
-            <h2 className="mt-1 text-base font-semibold">Llogaritje VKM 179/2020 + VKM 898/2020</h2>
+            <h2 className="mt-1 text-lg font-semibold">
+              Nga dokumentet te akti final, me audit te plote
+            </h2>
             <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-              Merr te ardhurat familjare, siperfaqen, cmimin e tregut dhe truallin nga dosja;
-              aplikon formulen Vp = Vb + Vt - Vsh - Vg; ruan rezultatin ne audit.
+              AI merr te ardhurat familjare, siperfaqen, cmimin e tregut dhe truallin; aplikon VKM
+              179/2020 + VKM 898/2020 hap pas hapi; gjeneron dokumentin "Akt Vleresimi".
             </p>
           </div>
-          <Button size="sm" onClick={onCalculate} disabled={loading || missingInputs}>
+          <Button
+            size="sm"
+            onClick={onCalculate}
+            disabled={loading || missingInputs}
+            className="h-10"
+          >
             {loading ? (
               <Loader2 className="mr-1.5 size-4 animate-spin" />
             ) : (
               <Scale className="mr-1.5 size-4" />
             )}
-            Llogarit dhe gjenero aktin
+            Llogarit me AI dhe krijo Aktin
           </Button>
+        </div>
+
+        <div className="mt-4 grid gap-2 md:grid-cols-3">
+          <ValuationStage
+            number="1"
+            title="Te dhenat e nxjerra"
+            body="AI perdor fushat e verifikuara nga dokumentet e dosjes."
+          />
+          <ValuationStage
+            number="2"
+            title="Formula VKM"
+            body="Vp = Vb + Vt - Vsh - Vg, me referenca ne cdo hap."
+          />
+          <ValuationStage
+            number="3"
+            title="Akt + audit"
+            body={`Regjistrohet kush e llogariti: ${auditActor}.`}
+          />
         </div>
       </div>
 
@@ -849,6 +875,24 @@ function EkbValuationAssistant({
           <MiniFact label="Cmimi i tregut" value={fmtAll(dossier.property.marketPriceAll)} />
           <MiniFact label="Vlera e truallit" value={fmtAll(dossier.property.landPriceAll ?? 0)} />
           <MiniFact label="Vlera finale" value={fmtAll(finalValue)} strong />
+          <div className="rounded-md border border-primary/25 bg-white px-3 py-2">
+            <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              Dokumenti qe krijohet
+            </div>
+            <div className="mt-0.5 text-sm font-semibold text-primary">Akt Vleresimi</div>
+            <div className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+              Ruhet ne dokumente dhe lidhet me historikun e auditimit.
+            </div>
+          </div>
+          <div className="rounded-md border border-primary/25 bg-white px-3 py-2">
+            <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              Audit trail
+            </div>
+            <div className="mt-0.5 text-sm font-semibold">{auditActor}</div>
+            <div className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+              Formula, vlera finale, dokumenti dhe koha ruhen automatikisht.
+            </div>
+          </div>
         </div>
 
         <div className="rounded-md border bg-white p-3">
@@ -861,10 +905,15 @@ function EkbValuationAssistant({
             ) : null}
           </div>
           {missingInputs ? (
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              Mungojne te ardhurat familjare ose cmimi i tregut. Ngarko dokumentet dhe perdor
-              nxjerrjen AI para llogaritjes.
-            </p>
+            <div className="rounded-md border border-warning/35 bg-warning/10 p-3">
+              <div className="text-sm font-semibold text-warning-foreground">
+                Mungojne fusha te domosdoshme
+              </div>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Mungojne te ardhurat familjare ose cmimi i tregut. Ngarko dokumentet dhe perdor
+                nxjerrjen AI para llogaritjes.
+              </p>
+            </div>
           ) : steps.length ? (
             <ol className="space-y-2">
               {steps.map((step, index) => {
@@ -899,13 +948,31 @@ function EkbValuationAssistant({
               })}
             </ol>
           ) : (
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              Kliko llogaritjen per te krijuar hapat, vleren finale dhe dokumentin "Akt Vleresimi".
-            </p>
+            <div className="rounded-md border border-primary/25 bg-primary/5 p-3">
+              <div className="text-sm font-semibold">Gati per llogaritje</div>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Kliko butonin per te krijuar hapat, vleren finale, dokumentin "Akt Vleresimi" dhe
+                ngjarjen ne audit trail.
+              </p>
+            </div>
           )}
         </div>
       </div>
     </Card>
+  );
+}
+
+function ValuationStage({ number, title, body }: { number: string; title: string; body: string }) {
+  return (
+    <div className="flex items-start gap-2 rounded-md border bg-primary/5 p-2.5">
+      <span className="grid size-6 shrink-0 place-items-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
+        {number}
+      </span>
+      <div className="min-w-0">
+        <div className="text-xs font-semibold">{title}</div>
+        <div className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{body}</div>
+      </div>
+    </div>
   );
 }
 

@@ -89,8 +89,7 @@ export function AppShell({
   const applicationDocsActive = path.startsWith("/aplikim/dokumentacion");
   const applicationPortalActive = path === "/aplikim";
   const faqActive = path.startsWith("/faq");
-  const showCitizenAgent =
-    ((role === "citizen" || role === "business") && !citizenPortalActive) || faqActive;
+  const aiAgentAudience = role === "citizen" || role === "business" ? "public" : "staff";
 
   const isActive = (item: { to: string; exact?: boolean }) =>
     item.to === "/dosjet"
@@ -304,7 +303,7 @@ export function AppShell({
         )}
       </nav>
 
-      {showCitizenAgent ? <CitizenVirtualAgent /> : null}
+      <CitizenVirtualAgent audience={aiAgentAudience} />
     </div>
   );
 }
