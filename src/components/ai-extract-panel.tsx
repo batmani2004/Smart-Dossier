@@ -41,14 +41,15 @@ export function AiExtractPanel({ dossier }: Props) {
 
   const disabled = !aiStatus.data?.enabled;
 
-  async function run() {
-    if (!file) return;
+  async function run(fileOverride?: File) {
+    const f = fileOverride ?? file;
+    if (!f) return;
     setStep("reading");
     setProgress(15);
     setResult(null);
     setErrorMsg(null);
     try {
-      const local = await extractTextFromFile(file);
+      const local = await extractTextFromFile(f);
       setRawText(local.text);
       setProgress(55);
       setStep("extracting");
@@ -148,7 +149,11 @@ export function AiExtractPanel({ dossier }: Props) {
               <Input
                 type="file"
                 accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md,.csv,.json,application/pdf,image/*,text/*"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                onChange={(e) => {
+                  const f = e.target.files?.[0] ?? null;
+                  setFile(f);
+                  if (f) run(f);
+                }}
                 className="h-9 text-sm"
               />
             </div>
@@ -163,22 +168,16 @@ export function AiExtractPanel({ dossier }: Props) {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              disabled={!file || step === "reading" || step === "extracting"}
-              onClick={run}
-            >
-              {step === "reading" || step === "extracting" ? (
-                <Loader2 className="size-3.5 mr-1 animate-spin" />
-              ) : (
-                <FileSearch className="size-3.5 mr-1" />
-              )}
-              Nxirr fushat
-            </Button>
             {file ? (
               <span className="text-[11px] text-muted-foreground truncate">
                 {file.name} · {(file.size / 1024).toFixed(1)} KB
               </span>
+            ) : null}
+            {step === "error" ? (
+              <Button size="sm" variant="outline" onClick={() => run()}>
+                <FileSearch className="size-3.5 mr-1" />
+                Provo përsëri
+              </Button>
             ) : null}
           </div>
 

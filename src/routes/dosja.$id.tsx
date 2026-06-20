@@ -72,6 +72,7 @@ function DossierWorkspace() {
   const advance = useServerFn(advanceDossier);
   const qc = useQueryClient();
   const { role, profile, can } = useDemoRole();
+  const [activeTab, setActiveTab] = useState("workflow");
 
   const q = useQuery({ queryKey: ["dossier", id], queryFn: () => get({ data: { id } }) });
 
@@ -223,6 +224,55 @@ function DossierWorkspace() {
 
           <DossierProgressRail phases={proc.phases} currentPhaseId={d.currentPhaseId} />
 
+          {/* AI Critical Alerts — always visible, no tab required */}
+          {alerts.length > 0 && can("runAi") ? (
+            <div
+              className={cn(
+                "mt-3 rounded-md border p-3",
+                alerts.some((a) => a.severity === "critical")
+                  ? "border-destructive/40 bg-destructive/10"
+                  : "border-warning/40 bg-warning/10",
+              )}
+            >
+              <div className="flex items-start gap-2.5">
+                <AlertTriangle
+                  className={cn(
+                    "size-4 mt-0.5 shrink-0",
+                    alerts.some((a) => a.severity === "critical")
+                      ? "text-destructive"
+                      : "text-warning",
+                  )}
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <p className="text-sm font-semibold">
+                      AI detektoi {alerts.length} pikë kritike — veprim i nevojshëm
+                    </p>
+                    <button
+                      onClick={() => setActiveTab("ai")}
+                      className="text-[11px] font-medium text-primary hover:underline shrink-0"
+                    >
+                      Hap AI Asistentin →
+                    </button>
+                  </div>
+                  <ul className="mt-1.5 space-y-1">
+                    {alerts.slice(0, 3).map((a) => (
+                      <li key={a.id} className="flex items-start gap-2 text-xs">
+                        <SeverityBadge severity={a.severity}>{a.label}</SeverityBadge>
+                        <span className="text-muted-foreground leading-relaxed">{a.description}</span>
+                      </li>
+                    ))}
+                    {alerts.length > 3 ? (
+                      <li className="text-[11px] text-muted-foreground">
+                        +{alerts.length - 3} alarme të tjera në tab-in AI
+                      </li>
+                    ) : null}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
           {/* phase pills */}
           <div className="hidden">
             <div className="flex gap-1.5 min-w-max">
@@ -260,7 +310,7 @@ function DossierWorkspace() {
         </Card>
 
         {/* Tabs */}
-        <Tabs defaultValue="workflow">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="flex h-auto w-full justify-start overflow-x-auto rounded-md border bg-[#e6eef8] p-1">
             <TabsTrigger value="permbledhje" className="text-xs">
               <Sparkles className="size-3.5" />
