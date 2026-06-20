@@ -1,11 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   Building2,
   CheckCircle2,
   Eye,
   EyeOff,
   LockKeyhole,
+  Mail,
+  MapPin,
+  Phone,
   UserCog,
   UserRound,
 } from "lucide-react";
@@ -35,6 +38,7 @@ export const Route = createFileRoute("/login")({
 type LoginStep = "credentials" | "otp" | "done";
 type AuthMode = "login" | "register";
 type LoginRole = Exclude<DemoRole, "admin">;
+type RegisterRole = Extract<LoginRole, "citizen" | "business">;
 
 const LOGIN_ROLES: Array<{
   role: LoginRole;
@@ -74,6 +78,10 @@ const LOGIN_ROLES: Array<{
   },
 ];
 
+const REGISTER_ROLES = LOGIN_ROLES.filter(
+  (item) => item.role === "citizen" || item.role === "business",
+) as Array<(typeof LOGIN_ROLES)[number] & { role: RegisterRole }>;
+
 const DEMO_OTP = "246810";
 
 function LoginPage() {
@@ -82,10 +90,15 @@ function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<LoginRole>("citizen");
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [fullName, setFullName] = useState("Elira Kola");
+  const [representativeName, setRepresentativeName] = useState("");
+  const [email, setEmail] = useState("elira.kola@email.al");
+  const [phone, setPhone] = useState("+355 69 123 4567");
+  const [address, setAddress] = useState("Tirane");
   const [identifier, setIdentifier] = useState(LOGIN_ROLES[0].demoId);
   const [password, setPassword] = useState("demo2026");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
+  const [acceptTerms, setAcceptTerms] = useState(true);
   const [step, setStep] = useState<LoginStep>("credentials");
   const [otp, setOtp] = useState("");
 
@@ -94,11 +107,17 @@ function LoginPage() {
     [selectedRole],
   );
   const SelectedIcon = selected.icon;
+  const visibleRoles = authMode === "register" ? REGISTER_ROLES : LOGIN_ROLES;
+  const isBusinessRegistration = authMode === "register" && selectedRole === "business";
 
   function chooseRole(role: LoginRole) {
     const next = LOGIN_ROLES.find((item) => item.role === role) ?? LOGIN_ROLES[0];
     setSelectedRole(next.role);
     setFullName(DEMO_ROLES[next.role].displayName);
+    setRepresentativeName(next.role === "business" ? "Arben Dervishi" : "");
+    setEmail(next.role === "business" ? "info@albatech.al" : "elira.kola@email.al");
+    setPhone(next.role === "business" ? "+355 69 555 0101" : "+355 69 123 4567");
+    setAddress(next.role === "business" ? "Rruga e Durresit, Tirane" : "Tirane");
     setIdentifier(next.demoId);
     setPassword("demo2026");
     setOtp("");
@@ -106,10 +125,20 @@ function LoginPage() {
   }
 
   function startRegister() {
+    const nextRole: LoginRole = selectedRole === "operator" ? "citizen" : selectedRole;
     setAuthMode("register");
+    if (nextRole !== selectedRole) {
+      chooseRole(nextRole);
+    } else {
+      setFullName(DEMO_ROLES[nextRole].displayName);
+      setRepresentativeName(nextRole === "business" ? "Arben Dervishi" : "");
+      setEmail(nextRole === "business" ? "info@albatech.al" : "elira.kola@email.al");
+      setPhone(nextRole === "business" ? "+355 69 555 0101" : "+355 69 123 4567");
+      setAddress(nextRole === "business" ? "Rruga e Durresit, Tirane" : "Tirane");
+    }
     setStep("credentials");
     setOtp("");
-    setFullName(DEMO_ROLES[selectedRole].displayName);
+    setAcceptTerms(true);
   }
 
   function startLogin() {
@@ -119,9 +148,31 @@ function LoginPage() {
   }
 
   function continueToOtp() {
-    if (authMode === "register" && !fullName.trim()) {
-      toast.error("Plotesoni emrin per te vazhduar me regjistrimin.");
-      return;
+    if (authMode === "register") {
+      if (selectedRole === "operator") {
+        toast.error("Regjistrimi lejohet vetem per qytetare dhe biznese.");
+        return;
+      }
+      if (!fullName.trim()) {
+        toast.error(
+          isBusinessRegistration
+            ? "Plotesoni emrin ligjor te biznesit."
+            : "Plotesoni emrin e plote.",
+        );
+        return;
+      }
+      if (isBusinessRegistration && !representativeName.trim()) {
+        toast.error("Plotesoni emrin e perfaqesuesit ligjor.");
+        return;
+      }
+      if (!email.trim() || !phone.trim() || !address.trim()) {
+        toast.error("Plotesoni email-in, telefonin dhe adresen.");
+        return;
+      }
+      if (!acceptTerms) {
+        toast.error("Pranoni kushtet e regjistrimit per te vazhduar.");
+        return;
+      }
     }
     if (!identifier.trim() || !password.trim()) {
       toast.error("Plotesoni te dhenat e identifikimit per te vazhduar.");
@@ -154,11 +205,11 @@ function LoginPage() {
             <img
               src="/brand/smart-dossier-logo.svg"
               alt="Smart Dossier"
-              className="h-10 w-auto max-w-[220px] shrink-0 object-contain"
+              className="h-12 w-auto max-w-[240px] shrink-0 object-contain sm:h-14 sm:max-w-[270px]"
             />
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <span className="hidden text-sm font-semibold text-foreground sm:inline">SQ</span>
+            <AlbanianLanguageFlag />
             <Button
               asChild
               variant="ghost"
@@ -195,10 +246,17 @@ function LoginPage() {
 
           <div className="mt-5">
             <div className="mb-3 text-sm font-semibold text-muted-foreground">
-              Zgjidhni profilin e hyrjes
+              {authMode === "register"
+                ? "Regjistrimi eshte vetem per qytetare dhe biznese"
+                : "Zgjidhni profilin e hyrjes"}
             </div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-              {LOGIN_ROLES.map((item) => {
+            <div
+              className={cn(
+                "grid grid-cols-1 gap-2",
+                authMode === "register" ? "sm:grid-cols-2" : "sm:grid-cols-3",
+              )}
+            >
+              {visibleRoles.map((item) => {
                 const Icon = item.icon;
                 const active = item.role === selectedRole;
                 return (
@@ -241,7 +299,7 @@ function LoginPage() {
               {step === "otp"
                 ? "Vendosni kodin e derguar per te perfunduar hyrjen."
                 : authMode === "register"
-                  ? `Krijoni profil demo si ${DEMO_ROLES[selectedRole].label} dhe konfirmojeni me OTP.`
+                  ? `Krijoni profil demo si ${DEMO_ROLES[selectedRole].label}. Regjistrimi nuk hapet per nepunes ose admin.`
                   : `Profili aktiv: ${DEMO_ROLES[selectedRole].label}. Te dhenat jane te plotesuara per demo.`}
             </p>
           </div>
@@ -249,18 +307,39 @@ function LoginPage() {
           {step === "credentials" ? (
             <div className="mt-4 space-y-4">
               {authMode === "register" ? (
+                <div className="rounded-md border border-primary/20 bg-primary/5 p-3">
+                  <div className="flex items-start gap-2">
+                    <SelectedIcon className="mt-0.5 size-4 text-primary" />
+                    <div>
+                      <div className="text-sm font-semibold">
+                        {isBusinessRegistration
+                          ? "Formular regjistrimi per biznes"
+                          : "Formular regjistrimi per qytetar"}
+                      </div>
+                      <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
+                        {isBusinessRegistration
+                          ? "Perdor NIPT-in dhe te dhenat e perfaqesuesit ligjor per te krijuar profilin e biznesit."
+                          : "Perdor NID-in dhe te dhenat personale per te krijuar profilin qytetar."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              {authMode === "register" ? (
                 <div className="space-y-1.5">
                   <Label className="text-sm font-semibold text-foreground">
-                    Emri i plote <span className="text-primary">*</span>
+                    {isBusinessRegistration ? "Emri ligjor i biznesit" : "Emri i plote"}{" "}
+                    <span className="text-primary">*</span>
                   </Label>
-                  <div className="flex items-center gap-3 rounded-md border bg-card px-3">
-                    <UserRound className="size-5 text-primary" />
+                  <FieldShell icon={isBusinessRegistration ? Building2 : UserRound}>
                     <Input
                       value={fullName}
                       onChange={(event) => setFullName(event.target.value)}
+                      placeholder={isBusinessRegistration ? "AlbaTech sh.p.k." : "Elira Kola"}
                       className="h-11 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
                     />
-                  </div>
+                  </FieldShell>
                 </div>
               ) : null}
 
@@ -268,16 +347,76 @@ function LoginPage() {
                 <Label className="text-sm font-semibold text-foreground">
                   {selected.idLabel} <span className="text-primary">*</span>
                 </Label>
-                <div className="flex items-center gap-3 rounded-md border bg-card px-3">
-                  <SelectedIcon className="size-5 text-primary" />
+                <FieldShell icon={SelectedIcon}>
                   <Input
                     value={identifier}
                     onChange={(event) => setIdentifier(event.target.value)}
                     placeholder={selected.idPlaceholder}
                     className="h-11 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
                   />
-                </div>
+                </FieldShell>
               </div>
+
+              {isBusinessRegistration ? (
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-semibold text-foreground">
+                    Perfaqesuesi ligjor <span className="text-primary">*</span>
+                  </Label>
+                  <FieldShell icon={UserRound}>
+                    <Input
+                      value={representativeName}
+                      onChange={(event) => setRepresentativeName(event.target.value)}
+                      placeholder="Arben Dervishi"
+                      className="h-11 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
+                    />
+                  </FieldShell>
+                </div>
+              ) : null}
+
+              {authMode === "register" ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-semibold text-foreground">
+                      Email <span className="text-primary">*</span>
+                    </Label>
+                    <FieldShell icon={Mail}>
+                      <Input
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        type="email"
+                        placeholder={isBusinessRegistration ? "info@biznes.al" : "emri@email.al"}
+                        className="h-11 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
+                      />
+                    </FieldShell>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-semibold text-foreground">
+                      Telefon <span className="text-primary">*</span>
+                    </Label>
+                    <FieldShell icon={Phone}>
+                      <Input
+                        value={phone}
+                        onChange={(event) => setPhone(event.target.value)}
+                        placeholder="+355 69 000 0000"
+                        className="h-11 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
+                      />
+                    </FieldShell>
+                  </div>
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label className="text-sm font-semibold text-foreground">
+                      Adresa <span className="text-primary">*</span>
+                    </Label>
+                    <FieldShell icon={MapPin}>
+                      <Input
+                        value={address}
+                        onChange={(event) => setAddress(event.target.value)}
+                        placeholder="Qyteti, rruga ose njesia administrative"
+                        className="h-11 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
+                      />
+                    </FieldShell>
+                  </div>
+                </div>
+              ) : null}
 
               <div className="space-y-1.5">
                 <Label className="text-sm font-semibold text-foreground">
@@ -300,18 +439,33 @@ function LoginPage() {
                     {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
                   </button>
                 </div>
-                <button type="button" className="text-sm font-medium text-primary">
-                  Keni harruar fjalekalimin?
-                </button>
+                {authMode === "login" ? (
+                  <button type="button" className="text-sm font-medium text-primary">
+                    Keni harruar fjalekalimin?
+                  </button>
+                ) : null}
               </div>
 
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox
-                  checked={remember}
-                  onCheckedChange={(value) => setRemember(Boolean(value))}
-                />
-                Me mbaj mend
-              </label>
+              {authMode === "register" ? (
+                <label className="flex items-start gap-2 text-sm leading-5">
+                  <Checkbox
+                    checked={acceptTerms}
+                    onCheckedChange={(value) => setAcceptTerms(Boolean(value))}
+                    className="mt-0.5"
+                  />
+                  <span>
+                    Konfirmoj qe te dhenat jane te sakta dhe pranoj verifikimin elektronik me OTP.
+                  </span>
+                </label>
+              ) : (
+                <label className="flex items-center gap-2 text-sm">
+                  <Checkbox
+                    checked={remember}
+                    onCheckedChange={(value) => setRemember(Boolean(value))}
+                  />
+                  Me mbaj mend
+                </label>
+              )}
 
               <div className="space-y-2 pt-1">
                 {authMode === "register" ? (
@@ -321,7 +475,7 @@ function LoginPage() {
                       onClick={continueToOtp}
                       className="h-11 w-full text-base font-semibold"
                     >
-                      Regjistrohu
+                      {isBusinessRegistration ? "Krijo profil biznesi" : "Krijo profil qytetar"}
                     </Button>
                     <Button
                       type="button"
@@ -414,5 +568,41 @@ function LoginPage() {
         </Card>
       </main>
     </div>
+  );
+}
+
+function FieldShell({ icon: Icon, children }: { icon: typeof UserRound; children: ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 rounded-md border bg-card px-3">
+      <Icon className="size-5 shrink-0 text-primary" />
+      {children}
+    </div>
+  );
+}
+
+function AlbanianLanguageFlag() {
+  return (
+    <span
+      className="hidden h-8 w-10 items-center justify-center rounded-md border bg-white shadow-soft sm:inline-flex"
+      role="img"
+      aria-label="Gjuha shqip"
+      title="Gjuha shqip"
+    >
+      <svg
+        width="26"
+        height="18"
+        viewBox="0 0 26 18"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <rect width="26" height="18" rx="2" fill="#E41E20" />
+        <path
+          d="M13 4.2c-.7.9-1.1 1.6-1.1 2.3 0 .4.2.8.4 1.1-.7-.3-1.4-.7-2-1.2-.7-.5-1.4-.8-2.2-.8.6.6.8 1.2.7 1.9-.8-.3-1.6-.3-2.4.1.8.4 1.3.9 1.6 1.6-.7.1-1.3.5-1.8 1.1.8 0 1.5.2 2.1.6-.4.5-.5 1.1-.4 1.8.8-.5 1.7-.8 2.6-.8.8 0 1.5.3 2.1.9v1.4h-1.4v1h3.6v-1h-1.4v-1.4c.6-.6 1.3-.9 2.1-.9.9 0 1.8.3 2.6.8.1-.7 0-1.3-.4-1.8.6-.4 1.3-.6 2.1-.6-.5-.6-1.1-1-1.8-1.1.3-.7.8-1.2 1.6-1.6-.8-.4-1.6-.4-2.4-.1-.1-.7.1-1.3.7-1.9-.8 0-1.5.3-2.2.8-.6.5-1.3.9-2 1.2.2-.3.4-.7.4-1.1 0-.7-.4-1.4-1.1-2.3Z"
+          fill="#111111"
+        />
+        <path d="M11.2 4.5 9.8 3.1h2.1L13 2l1.1 1.1h2.1l-1.4 1.4H11.2Z" fill="#111111" />
+      </svg>
+    </span>
   );
 }

@@ -9,30 +9,52 @@
 >
   <title id="smartDossierMarkTitle">Smart Dossier Mark</title>
   <desc id="smartDossierMarkDesc">
-    Geometric dossier logo with layered blue documents and red highlights.
+    Clear digital dossier mark with document and electronic seal.
   </desc>
   <defs>
-    <linearGradient id="sdBlueOuter" x1="20" y1="16" x2="84" y2="96" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#2D8EE8" />
-      <stop offset="1" stop-color="#1F62B5" />
+    <linearGradient
+      id="sdMarkBlueIcon"
+      x1="24"
+      y1="22"
+      x2="102"
+      y2="104"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#2F80D8" />
+      <stop offset="1" stop-color="#174B92" />
     </linearGradient>
-    <linearGradient id="sdBlueInner" x1="35" y1="28" x2="79" y2="74" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#53ABFF" />
-      <stop offset="1" stop-color="#2D8EE8" />
+    <linearGradient
+      id="sdPaperIcon"
+      x1="40"
+      y1="30"
+      x2="86"
+      y2="100"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#FFFFFF" />
+      <stop offset="1" stop-color="#E9F2FF" />
     </linearGradient>
-    <linearGradient id="sdRed" x1="60" y1="78" x2="106" y2="114" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#F14A63" />
-      <stop offset="1" stop-color="#EC334F" />
+    <linearGradient
+      id="sdSealIcon"
+      x1="78"
+      y1="76"
+      x2="108"
+      y2="108"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#F45A6B" />
+      <stop offset="1" stop-color="#C91F3B" />
     </linearGradient>
   </defs>
 
-  <rect x="2" y="2" width="124" height="124" rx="26" fill="#011B45" />
-  <rect x="2" y="2" width="124" height="4" rx="2" fill="#F3CF2B" />
-
-  <rect x="20" y="16" width="80" height="80" rx="8" fill="url(#sdBlueOuter)" />
-  <rect x="35" y="28" width="65" height="64" rx="7" fill="url(#sdBlueInner)" />
-  <circle cx="83" cy="55" r="2.8" fill="#EC334F" />
-  <rect x="60" y="78" width="46" height="36" rx="6" fill="url(#sdRed)" />
-
-  <rect x="2" y="122" width="124" height="4" rx="2" fill="#F07A8B" />
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="#0F2F57" />
+  <rect x="16" y="16" width="88" height="88" rx="20" fill="url(#sdMarkBlueIcon)" />
+  <rect x="36" y="26" width="52" height="70" rx="10" fill="url(#sdPaperIcon)" />
+  <path d="M72 26H78C83.5 26 88 30.5 88 36V42L72 26Z" fill="#CFE3FF" />
+  <rect x="44" y="46" width="31" height="7" rx="3.5" fill="#1E5AA8" />
+  <rect x="44" y="61" width="26" height="7" rx="3.5" fill="#80B8F2" />
+  <rect x="78" y="78" width="28" height="28" rx="7" fill="url(#sdSealIcon)" />
+  <rect x="84" y="86" width="16" height="5" rx="2.5" fill="#FFFFFF" opacity="0.9" />
+  <rect x="84" y="96" width="12" height="5" rx="2.5" fill="#FFFFFF" opacity="0.75" />
+  <rect x="4" y="118" width="120" height="5" rx="2.5" fill="#D7193F" />
 </svg>
