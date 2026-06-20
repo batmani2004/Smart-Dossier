@@ -742,8 +742,8 @@ function ApplicationPortalHome() {
                   />
                   <Step
                     number="3"
-                    title="Kontroll GIS"
-                    body="Operatori verifikon kufijte dhe siperfaqen."
+                    title="Kontroll AI GIS"
+                    body="Operatori verifikon kufijte, siperfaqen dhe sinjalin AI GIS."
                   />
                   <Step
                     number="4"

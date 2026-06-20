@@ -499,7 +499,7 @@ function tplExpCompensationProposal(d: Dossier, process: ProcessDefinition): Gen
       heading: "Metodologjia e vlerësimit",
       paragraphs: [
         "Vlerësimi është kryer mbi bazën e të dhënave të ASHK, zonës kadastrale dhe çmimeve referuese të tregut, sipas akteve nënligjore në fuqi.",
-        "Janë konsultuar e-Harta / AKPT (vetëm lexim) për konfirmimin e të dhënave hapësinore.",
+        "Jane konsultuar e-Harta / AKPT (vetem lexim) dhe sinjali AI GIS per konfirmimin e te dhenave hapesinore.",
       ],
     },
   ];

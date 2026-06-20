@@ -62,16 +62,17 @@ export const expropriationProcess: ProcessDefinition = {
     {
       id: "exp-p3",
       order: 3,
-      title: "Vlerësimi",
+      title: "Vleresimi me AI GIS",
       description:
-        "Vlerësimi nga ASHSh / komisioni i rivlerësimit; konsultim me AKPT / e-Harta (vetëm lexim).",
+        "Vleresimi nga ASHSh / komisioni i rivleresimit; konsultim AI me AKPT / e-Harta (vetem lexim).",
       institutions: ["ASHSh", "AKPT"],
       steps: [
         {
           id: "exp-s3",
           order: 1,
-          title: "Vlerësim nga ASHSh",
-          description: "ASHSh ose komisioni i rivlerësimit nxjerr vlerën e kompensimit.",
+          title: "Vleresim nga ASHSh me sinjal AI GIS",
+          description:
+            "ASHSh ose komisioni i rivleresimit nxjerr vleren e kompensimit duke perdorur sinjalin GIS si evidence pune.",
           institution: "ASHSh",
           requiredDocuments: ["valuation_report"],
           slaDays: 30,

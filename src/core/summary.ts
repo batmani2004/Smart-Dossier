@@ -1,4 +1,5 @@
 import { getCriticalAlerts, getDeadlineState, getNextStep } from "./engine";
+import { buildAiGisAssessment, type AiGisRiskLevel } from "./gis";
 import type { Dossier, ProcessDefinition } from "./types";
 
 export interface DossierSummaryFacts {
@@ -19,6 +20,18 @@ export interface DossierSummaryFacts {
   overdueDeadlines: number;
   finalValueAll?: number;
   legalBasis: string[];
+  gisAssessment: {
+    provider: string;
+    sourceLabel: string;
+    locationLabel: string;
+    zoning: string;
+    landCategory: string;
+    aiRiskLevel: AiGisRiskLevel;
+    aiSignal: string;
+    aiUse: string;
+    parcelPoints: number;
+    accuracyLabel: string;
+  };
 }
 
 /** Compact, AI-friendly fact bag derived from a dossier + its process. */
@@ -33,6 +46,7 @@ export function buildDossierSummaryFacts(
   const alerts = getCriticalAlerts(dossier, process, now);
   const ds = getDeadlineState(dossier, process, now);
   const applicant = dossier.parties.find((p) => p.role === "applicant");
+  const gis = buildAiGisAssessment(dossier);
 
   return {
     trackingCode: dossier.trackingCode,
@@ -54,5 +68,17 @@ export function buildDossierSummaryFacts(
     overdueDeadlines: ds.overdueCount,
     finalValueAll: dossier.finalValueAll,
     legalBasis: process.legalBasis.map((l) => l.reference),
+    gisAssessment: {
+      provider: gis.provider,
+      sourceLabel: gis.sourceLabel,
+      locationLabel: gis.place.label,
+      zoning: gis.zoning,
+      landCategory: gis.landCategory,
+      aiRiskLevel: gis.aiRiskLevel,
+      aiSignal: gis.aiSignal,
+      aiUse: gis.aiUse,
+      parcelPoints: gis.place.parcelPolygon.length,
+      accuracyLabel: gis.place.accuracyLabel,
+    },
   };
 }

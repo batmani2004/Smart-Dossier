@@ -3,6 +3,7 @@ import { z } from "zod";
 import { allDossiers, getById, getByTrackingCode, nextId, resetStore, upsert } from "./store";
 import {
   PROCESSES,
+  buildAiGisAssessment,
   buildDossierSummaryFacts,
   getCriticalAlerts,
   getDeadlineState,
@@ -1432,25 +1433,26 @@ export function buildTrackingPayload(code: string) {
         reviewedAt: null,
         reviewNote: null,
       };
-  const mapPreview =
-    d.process === "expropriation"
-      ? (() => {
-          const facts = akptGisFacts(d);
-          return {
-            provider: "OpenStreetMap",
-            label: facts.place.label,
-            lat: facts.place.lat,
-            lon: facts.place.lon,
-            zoom: facts.place.zoom,
-            accuracyLabel: facts.place.accuracyLabel,
-            embedUrl: facts.embedUrl,
-            url: facts.realMapUrl,
-            zoning: facts.zoning,
-            landCategory: facts.landCategory,
-            parcelPolygon: facts.place.parcelPolygon,
-          };
-        })()
-      : null;
+  const mapPreview = (() => {
+    const facts = buildAiGisAssessment(d);
+    return {
+      provider: facts.provider,
+      sourceLabel: facts.sourceLabel,
+      label: facts.place.label,
+      lat: facts.place.lat,
+      lon: facts.place.lon,
+      zoom: facts.place.zoom,
+      accuracyLabel: facts.place.accuracyLabel,
+      embedUrl: facts.embedUrl,
+      url: facts.realMapUrl,
+      zoning: facts.zoning,
+      landCategory: facts.landCategory,
+      aiRiskLevel: facts.aiRiskLevel,
+      aiSignal: facts.aiSignal,
+      aiUse: facts.aiUse,
+      parcelPolygon: facts.place.parcelPolygon,
+    };
+  })();
 
   const compensation =
     d.process === "expropriation"
@@ -1753,6 +1755,68 @@ function buildSimplePdf(content: string): Uint8Array {
   return new TextEncoder().encode(pdf);
 }
 
+function pdfAshkStampCommands(x: number, y: number, size = 116) {
+  const cx = x + size / 2;
+  const cy = y + size / 2;
+  const r = size / 2;
+  const k = 0.5522847498;
+  const c = r * k;
+  const inner = r * 0.76;
+  const ic = inner * k;
+  const roofTop = y + size * 0.82;
+  const roofLeft = x + size * 0.18;
+  const roofRight = x + size * 0.82;
+  const roofBase = y + size * 0.63;
+  const text = {
+    ashkSize: Math.max(20, size * 0.24),
+    smallSize: Math.max(5.5, size * 0.058),
+    sealSize: Math.max(7, size * 0.07),
+  };
+
+  return [
+    "q",
+    "1 1 1 rg",
+    `${x - 4} ${y - 4} ${size + 8} ${size + 8} re f`,
+    "0.90 0.08 0.08 RG",
+    "0.90 0.08 0.08 rg",
+    "2.2 w",
+    `${cx} ${cy + r} m`,
+    `${cx + c} ${cy + r} ${cx + r} ${cy + c} ${cx + r} ${cy} c`,
+    `${cx + r} ${cy - c} ${cx + c} ${cy - r} ${cx} ${cy - r} c`,
+    `${cx - c} ${cy - r} ${cx - r} ${cy - c} ${cx - r} ${cy} c`,
+    `${cx - r} ${cy + c} ${cx - c} ${cy + r} ${cx} ${cy + r} c S`,
+    "1 w",
+    `${cx} ${cy + inner} m`,
+    `${cx + ic} ${cy + inner} ${cx + inner} ${cy + ic} ${cx + inner} ${cy} c`,
+    `${cx + inner} ${cy - ic} ${cx + ic} ${cy - inner} ${cx} ${cy - inner} c`,
+    `${cx - ic} ${cy - inner} ${cx - inner} ${cy - ic} ${cx - inner} ${cy} c`,
+    `${cx - inner} ${cy + ic} ${cx - ic} ${cy + inner} ${cx} ${cy + inner} c S`,
+    "0.95 0.30 0.02 RG",
+    "0.95 0.30 0.02 rg",
+    "5 w",
+    `${roofLeft} ${roofBase} m ${cx} ${roofTop} l ${roofRight} ${roofBase} l S`,
+    "0.02 0.02 0.02 rg",
+    "BT",
+    `/F1 ${text.ashkSize} Tf`,
+    `1 0 0 1 ${x + size * 0.24} ${y + size * 0.47} Tm`,
+    "(ASHK) Tj",
+    `/F1 ${text.smallSize} Tf`,
+    `1 0 0 1 ${x + size * 0.19} ${y + size * 0.39} Tm`,
+    "(AGJENCIA SHTETERORE E KADASTRES) Tj",
+    "ET",
+    "0.90 0.08 0.08 rg",
+    "BT",
+    `/F1 ${text.sealSize} Tf`,
+    `1 0 0 1 ${x + size * 0.19} ${y + size * 0.19} Tm`,
+    "(SMART DOSSIER DEMO) Tj",
+    `/F1 ${text.smallSize} Tf`,
+    `1 0 0 1 ${x + size * 0.25} ${y + size * 0.11} Tm`,
+    "(VULE ELEKTRONIKE) Tj",
+    "ET",
+    "Q",
+  ].join("\n");
+}
+
 function mapPlaceForZone(zone: string) {
   const q = zone.toLowerCase();
   if (q.includes("durres") || q.includes("durr")) {
@@ -1886,42 +1950,19 @@ function osmEmbedUrl(place: { lat: number; lon: number }) {
 }
 
 function akptGisFacts(d: Dossier) {
-  const description = d.property.description.toLowerCase();
-  const zone = d.property.zone.toLowerCase();
-  const isAgricultural =
-    description.includes("bujq") ||
-    description.includes("agric") ||
-    description.includes("toke") ||
-    description.includes("tok");
-  const zoning = zone.includes("tiran")
-    ? "Zone periurbane / verifikim me harte"
-    : isAgricultural
-      ? "Zone rurale"
-      : "Zone urbane";
-  const landCategory = isAgricultural
-    ? "Toke bujqesore"
-    : description.includes("ndertes")
-      ? "Truall + ndertese"
-      : "Pasuri e paluajtshme";
-  const place = propertyMapLocation(d);
-  return {
-    zoning,
-    landCategory,
-    place,
-    realMapUrl: osmViewUrl(place),
-    embedUrl: osmEmbedUrl(place),
-  };
+  return buildAiGisAssessment(d);
 }
 
 function buildAkptMapPdf(d: Dossier): Uint8Array {
   const process = PROCESSES[d.process];
   const applicant = d.parties.find((p) => p.role === "applicant") ?? d.parties[0];
-  const { zoning, landCategory, place, realMapUrl } = akptGisFacts(d);
+  const facts = akptGisFacts(d);
+  const { zoning, landCategory, place, realMapUrl } = facts;
   const generatedAt = new Date().toLocaleString("sq-AL");
   const lines = [
     "SMART DOSSIER",
-    "PRINTIM GIS - VENDODHJA E PRONES",
-    "AKPT / e-Harta GIS - burim vizual OpenStreetMap",
+    "PRINTIM AI GIS - VENDODHJA E PRONES",
+    "AKPT / e-Harta GIS - konsultim read-only i perdorur nga AI",
     "",
     `Kodi i gjurmimit: ${d.trackingCode}`,
     `Link qytetari: /track/${d.trackingCode}`,
@@ -1934,6 +1975,8 @@ function buildAkptMapPdf(d: Dossier): Uint8Array {
     `Poligoni i parceles: ${place.parcelPolygon.length} pika - ${parcelPolygonLabel(place.parcelPolygon).slice(0, 88)}`,
     `Zonimi GIS: ${zoning}`,
     `Kategoria ligjore e tokes: ${landCategory}`,
+    `Sinjali AI: ${facts.aiSignal}`,
+    `Perdorimi ne proces: ${facts.aiUse}`,
     `Harta reale: ${realMapUrl}`,
     `Gjeneruar: ${generatedAt}`,
     "",
@@ -2050,6 +2093,7 @@ function buildAkptMapPdf(d: Dossier): Uint8Array {
     "2 w",
     "365 111 m 377 111 l S",
     "Q",
+    pdfAshkStampCommands(392, 188, 122),
   ].join("\n");
 
   return buildSimplePdf(content);
@@ -2092,6 +2136,8 @@ export function buildAkptMapPrintPage(code: string): { body: string; fileName: s
     ["Poligoni i parceles", parcelPolygonLabel(facts.place.parcelPolygon)],
     ["Zonimi GIS", facts.zoning],
     ["Kategoria e tokes", facts.landCategory],
+    ["Sinjali AI", facts.aiSignal],
+    ["Perdorimi ne proces", facts.aiUse],
     ["Gjeneruar", generatedAt],
   ];
   const mapPayload = JSON.stringify({
@@ -2121,6 +2167,7 @@ export function buildAkptMapPrintPage(code: string): { body: string; fileName: s
     .map-controls { position: absolute; top: 10px; right: 10px; display: grid; overflow: hidden; border: 1px solid #d7e0e5; border-radius: 6px; background: #fff; box-shadow: 0 2px 8px rgba(16, 32, 51, .14); }
     .map-controls button { width: 32px; height: 32px; padding: 0; border-radius: 0; border-bottom: 1px solid #e5edf1; background: #fff; color: #102033; font-size: 16px; }
     .map-controls button:last-child { border-bottom: 0; }
+    .map-stamp { position: absolute; right: 16px; bottom: 18px; width: 128px; height: 128px; object-fit: contain; mix-blend-mode: multiply; opacity: .92; filter: drop-shadow(0 2px 4px rgba(16, 32, 51, .12)); pointer-events: none; }
     .osm-credit { position: absolute; right: 4px; bottom: 4px; border-radius: 4px; background: rgba(255, 255, 255, .86); padding: 2px 5px; font-size: 10px; color: #5b6975; }
     .osm-credit a { color: inherit; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
@@ -2143,10 +2190,10 @@ export function buildAkptMapPrintPage(code: string): { body: string; fileName: s
   <main class="sheet">
     <section class="top">
       <div>
-        <h1>Printim GIS - vendodhja e prones</h1>
-        <div class="sub">AKPT / e-Harta GIS demo me baze OpenStreetMap</div>
+        <h1>Printim AI GIS - vendodhja e prones</h1>
+        <div class="sub">AKPT / e-Harta GIS demo me baze OpenStreetMap, i perdorur nga AI</div>
       </div>
-      <div class="badge">read-only / evidence pune</div>
+      <div class="badge">AI GIS / evidence pune</div>
     </section>
     <section class="map" id="gis-map">
       <div class="tile-layer" aria-hidden="true"></div>
@@ -2160,6 +2207,7 @@ export function buildAkptMapPrintPage(code: string): { body: string; fileName: s
         <button type="button" data-map-action="zoom-out" aria-label="Zvogelo">-</button>
         <button type="button" data-map-action="reset" aria-label="Kthe te parcela">⌖</button>
       </div>
+      <img class="map-stamp" src="/stamps/ashk-demo-stamp.png" alt="Vule demo ASHK" />
       <div class="osm-credit">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a></div>
     </section>
     <section class="grid">
@@ -2172,6 +2220,7 @@ export function buildAkptMapPrintPage(code: string): { body: string; fileName: s
     </section>
     <div class="note">
       ${escapeHtml(facts.place.accuracyLabel)}
+      <br />${escapeHtml(facts.aiUse)}
       <br />Harta reale: ${escapeHtml(facts.realMapUrl)}
     </div>
     <div class="actions">

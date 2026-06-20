@@ -76,16 +76,17 @@ export const propertyRegistrationProcess: ProcessDefinition = {
     {
       id: "biz-p3",
       order: 3,
-      title: "Kontroll kadastral dhe GIS",
-      description: "Kryhet kontrolli i parceles, mbivendosjeve, kufijve dhe te dhenave ne harte.",
+      title: "Kontroll kadastral dhe AI GIS",
+      description:
+        "Kryhet kontrolli i parceles, mbivendosjeve, kufijve dhe te dhenave ne harte me sinjalizim AI.",
       institutions: ["ASHK", "ASIG"],
       steps: [
         {
           id: "biz-s3",
           order: 1,
-          title: "Kontroll i prones dhe zones kadastrale",
+          title: "Kontroll AI i prones dhe zones kadastrale",
           description:
-            "Operatori verifikon koordinatat, planin dhe perputhjen me regjistrin kadastral.",
+            "Operatori verifikon koordinatat, planin dhe perputhjen me regjistrin kadastral duke perdorur sinjalin AI GIS.",
           institution: "ASHK",
           requiredDocuments: ["property_plan", "cadastral_map_extract"],
           slaDays: 10,

@@ -55,7 +55,7 @@ import {
   updateRequesterVerification,
   uploadDocument,
 } from "@/lib/api/dossiers.functions";
-import { PROCESSES } from "@/core";
+import { PROCESSES, buildAiGisAssessment } from "@/core";
 import type { Dossier, PhaseDefinition } from "@/core/types";
 import { useDemoRole } from "@/lib/demo-access";
 import { toast } from "sonner";
@@ -75,8 +75,29 @@ function DossierWorkspace() {
   const [activeTab, setActiveTab] = useState("permbledhje");
   const [aiSummaryText, setAiSummaryText] = useState<string | null>(null);
   const [aiSummaryLoading, setAiSummaryLoading] = useState(false);
+  const [aiSummaryRequestId, setAiSummaryRequestId] = useState<string | null>(null);
 
   const q = useQuery({ queryKey: ["dossier", id], queryFn: () => get({ data: { id } }) });
+  const canRunAi = can("runAi");
+
+  // Auto-generate AI manager summary when dossier opens (civil servant only)
+  useEffect(() => {
+    if (!canRunAi || !q.data || aiSummaryRequestId === id) return;
+    setAiSummaryRequestId(id);
+    setAiSummaryText(null);
+    setAiSummaryLoading(true);
+    fetch("/api/ai/summary", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    })
+      .then((r) => r.json())
+      .then((r: { ok: boolean; summary?: string }) => {
+        if (r.ok && r.summary) setAiSummaryText(r.summary);
+      })
+      .catch(() => null)
+      .finally(() => setAiSummaryLoading(false));
+  }, [id, canRunAi, q.data, aiSummaryRequestId]);
 
   if (q.isLoading) {
     return (
@@ -101,25 +122,10 @@ function DossierWorkspace() {
   const { dossier: d, summary, alerts, deadline, nextStep } = q.data;
   const proc = PROCESSES[d.process];
 
-  // Auto-generate AI manager summary when dossier opens (civil servant only)
-  useEffect(() => {
-    if (!can("runAi") || aiSummaryText || aiSummaryLoading) return;
-    setAiSummaryLoading(true);
-    fetch("/api/ai/summary", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    })
-      .then((r) => r.json())
-      .then((r: { ok: boolean; summary?: string }) => {
-        if (r.ok && r.summary) setAiSummaryText(r.summary);
-      })
-      .catch(() => null)
-      .finally(() => setAiSummaryLoading(false));
-  }, [id, can("runAi")]);
   const currentPhase = proc.phases.find((p) => p.id === d.currentPhaseId);
   const currentStep = currentPhase?.steps.find((s) => s.id === d.currentStepId);
   const currentPhaseDuration = currentPhase ? phaseDurationDays(currentPhase) : undefined;
+  const gisAssessment = buildAiGisAssessment(d);
 
   if (role === "citizen") {
     return (
@@ -278,7 +284,9 @@ function DossierWorkspace() {
                     {alerts.slice(0, 3).map((a) => (
                       <li key={a.id} className="flex items-start gap-2 text-xs">
                         <SeverityBadge severity={a.severity}>{a.label}</SeverityBadge>
-                        <span className="text-muted-foreground leading-relaxed">{a.description}</span>
+                        <span className="text-muted-foreground leading-relaxed">
+                          {a.description}
+                        </span>
                       </li>
                     ))}
                     {alerts.length > 3 ? (
@@ -371,6 +379,10 @@ function DossierWorkspace() {
               <ClipboardCheck className="size-3.5" />
               Workflow
             </TabsTrigger>
+            <TabsTrigger value="gis" className="text-xs">
+              <MapPinned className="size-3.5" />
+              AI GIS
+            </TabsTrigger>
             {can("runAi") ? (
               <TabsTrigger value="ai" className="text-xs">
                 <Sparkles className="size-3.5" />
@@ -408,10 +420,16 @@ function DossierWorkspace() {
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">{aiSummaryText}</p>
                 ) : (
                   <ul className="text-xs space-y-1 text-foreground/90">
-                    <li><strong>Procesi:</strong> {summary.process}</li>
-                    <li><strong>Faza aktuale:</strong> {summary.currentPhase} — {summary.currentStep}</li>
+                    <li>
+                      <strong>Procesi:</strong> {summary.process}
+                    </li>
+                    <li>
+                      <strong>Faza aktuale:</strong> {summary.currentPhase} — {summary.currentStep}
+                    </li>
                     {summary.nextStep ? (
-                      <li><strong>Hapi tjetër:</strong> {summary.nextStep}</li>
+                      <li>
+                        <strong>Hapi tjetër:</strong> {summary.nextStep}
+                      </li>
                     ) : null}
                     <li>
                       <strong>Dokumente:</strong> {summary.documentsUploaded} të ngarkuara,{" "}
@@ -429,7 +447,9 @@ function DossierWorkspace() {
                         {currentStep?.slaDays ? ` (hapi aktual ${currentStep.slaDays} ditë)` : ""}
                       </li>
                     ) : null}
-                    <li><strong>Bazë ligjore:</strong> {summary.legalBasis.join(", ")}</li>
+                    <li>
+                      <strong>Bazë ligjore:</strong> {summary.legalBasis.join(", ")}
+                    </li>
                   </ul>
                 )}
               </Card>
@@ -463,7 +483,33 @@ function DossierWorkspace() {
                 <p className="text-xs text-muted-foreground">Pa alarme.</p>
               )}
             </Card>
-            {d.process === "expropriation" ? <AkptGisDemoCard dossier={d} /> : null}
+            <Card className="border-emerald-200 bg-emerald-50/70 p-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex min-w-0 items-start gap-2">
+                  <div className="grid size-8 shrink-0 place-items-center rounded-md border border-emerald-200 bg-emerald-100 text-emerald-800">
+                    <MapPinned className="size-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-semibold text-emerald-950">AI GIS aktiv</h2>
+                    <p className="mt-0.5 text-xs leading-relaxed text-emerald-800">
+                      {gisAssessment.aiUse}
+                    </p>
+                    <p className="mt-1 text-xs font-medium text-emerald-950">
+                      {gisAssessment.zoning} - {gisAssessment.landCategory}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 shrink-0 border-emerald-300 bg-white"
+                  onClick={() => setActiveTab("gis")}
+                >
+                  <MapPinned className="mr-1.5 size-3.5" />
+                  Hap AI GIS
+                </Button>
+              </div>
+            </Card>
           </TabsContent>
 
           {/* Dokumentet */}
@@ -651,6 +697,11 @@ function DossierWorkspace() {
                 )}
               </ol>
             </Card>
+          </TabsContent>
+
+          {/* AI GIS */}
+          <TabsContent value="gis" className="space-y-3">
+            <AkptGisDemoCard dossier={d} />
           </TabsContent>
 
           {/* AI Assistant */}
@@ -1470,27 +1521,16 @@ function osmViewUrl(place: { lat: number; lon: number; zoom: number }) {
 }
 
 function AkptGisDemoCard({ dossier }: { dossier: Dossier }) {
-  const description = dossier.property.description.toLowerCase();
-  const isAgricultural =
-    description.includes("bujq") ||
-    description.includes("agric") ||
-    description.includes("toke") ||
-    description.includes("tokë");
-  const zoning = dossier.property.zone.toLowerCase().includes("tiran")
-    ? "Zonë periurbane / verifikim me hartë"
-    : isAgricultural
-      ? "Zonë rurale"
-      : "Zonë urbane";
-  const landCategory = isAgricultural
-    ? "Tokë bujqësore"
-    : dossier.property.description.includes("ndërtes")
-      ? "Truall + ndërtesë"
-      : "Pasuri e paluajtshme";
-
+  const gis = buildAiGisAssessment(dossier);
   const mapPdfUrl = `/api/public/track/${encodeURIComponent(dossier.trackingCode)}?mapPdf=1`;
-  const place = propertyMapLocation(dossier);
-  const realMapUrl = osmViewUrl(place);
+  const place = gis.place;
   const mapPrintUrl = `/api/public/track/${encodeURIComponent(dossier.trackingCode)}?mapPrint=1`;
+  const riskLabel =
+    gis.aiRiskLevel === "high"
+      ? "rrezik i larte"
+      : gis.aiRiskLevel === "medium"
+        ? "rrezik mesatar"
+        : "rrezik i ulet";
 
   return (
     <Card className="overflow-hidden border-emerald-200 bg-emerald-50/70">
@@ -1500,15 +1540,13 @@ function AkptGisDemoCard({ dossier }: { dossier: Dossier }) {
             <MapPinned className="size-4" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-emerald-950">AKPT · e-Harta GIS</h2>
-            <p className="text-xs text-emerald-800 mt-0.5">
-              Konsultohet për zonimin urban/rural dhe kategorinë ligjore të tokës.
-            </p>
+            <h2 className="text-sm font-semibold text-emerald-950">AI GIS · AKPT / e-Harta</h2>
+            <p className="text-xs text-emerald-800 mt-0.5">{gis.aiUse}</p>
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
           <span className="rounded-md border border-amber-300 bg-amber-50 px-2 py-1 text-[11px] font-medium text-amber-800">
-            vetëm read-only
+            AI · {riskLabel}
           </span>
           <Button asChild size="sm" variant="outline" className="h-8 border-emerald-300 bg-white">
             <a href={mapPdfUrl} download>
@@ -1525,11 +1563,12 @@ function AkptGisDemoCard({ dossier }: { dossier: Dossier }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 p-3 md:grid-cols-4">
+      <div className="grid grid-cols-1 gap-2 p-3 md:grid-cols-3 xl:grid-cols-5">
         <AkptFact label="Zona e verifikuar" value={dossier.property.zone} />
         <AkptFact label="Poligoni i parceles" value={`${place.parcelPolygon.length} pika`} />
-        <AkptFact label="Zonimi GIS" value={zoning} />
-        <AkptFact label="Kategoria e tokës" value={landCategory} />
+        <AkptFact label="Zonimi GIS" value={gis.zoning} />
+        <AkptFact label="Kategoria e tokes" value={gis.landCategory} />
+        <AkptFact label="Sinjali AI" value={gis.aiSignal} />
       </div>
 
       <div className="mx-3 mb-3 overflow-hidden rounded-md border border-emerald-200 bg-white">
@@ -1541,7 +1580,7 @@ function AkptGisDemoCard({ dossier }: { dossier: Dossier }) {
             Vendodhja e prones - {place.lat.toFixed(4)}, {place.lon.toFixed(4)}
           </span>
           <a
-            href={realMapUrl}
+            href={gis.realMapUrl}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1 font-medium text-emerald-800 hover:underline"
@@ -1553,10 +1592,10 @@ function AkptGisDemoCard({ dossier }: { dossier: Dossier }) {
       </div>
 
       <div className="mx-3 mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-        <div className="font-medium">Pa integrim aktiv me ASHK</div>
+        <div className="font-medium">Konsultim read-only i perdorur nga AI</div>
         <p className="mt-0.5 text-amber-800">
-          Demo regjistron konsultimin si evidencë pune, por nuk shkruan të dhëna në sistemet
-          shtetërore. AI e përdor si sinjal për vlerësimin dhe rrezikun e vonesës.
+          Demo regjistron konsultimin si evidence pune, por nuk shkruan te dhena ne sistemet
+          shteterore. {gis.aiSignal}
         </p>
         <p className="mt-1 text-amber-800">{place.accuracyLabel}</p>
       </div>

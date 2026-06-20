@@ -94,6 +94,7 @@ export function buildChunks(dossier: Dossier, process: ProcessDefinition): RagCh
               : ""
           }; të kaluara: ${facts.overdueDeadlines}.`
         : "Pa afate aktive.",
+      `AI GIS/AKPT: ${facts.gisAssessment.zoning}; ${facts.gisAssessment.landCategory}; sinjali ${facts.gisAssessment.aiRiskLevel}: ${facts.gisAssessment.aiSignal} ${facts.gisAssessment.aiUse}`,
       facts.finalValueAll !== undefined ? `Vlera përfundimtare: ${facts.finalValueAll} ALL.` : "",
     ]
       .filter(Boolean)

@@ -324,8 +324,8 @@ function BusinessPortal() {
               />
               <Step
                 number="3"
-                title="Kontroll GIS"
-                body="Verifikohet zona, siperfaqja dhe mbivendosjet e mundshme."
+                title="Kontroll AI GIS"
+                body="Verifikohet zona, siperfaqja, mbivendosjet e mundshme dhe sinjali AI GIS."
               />
               <Step
                 number="4"

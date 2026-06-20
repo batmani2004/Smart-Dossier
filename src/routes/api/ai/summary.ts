@@ -34,10 +34,11 @@ export const Route = createFileRoute("/api/ai/summary")({
         };
 
         const system =
-          "Je analist i një ekipi shërbimi civil shqiptar. Jep një përmbledhje për menaxherin, " +
-          "3-5 fjali, në shqip, EKSKLUZIVISHT bazuar te konteksti. " +
-          "Mbulo: (1) ku ndodhet dosja, (2) çfarë mungon, (3) rreziku më i madh i vonesës, " +
-          "(4) veprimi i rekomanduar tjetër. Mos shpik fakte ose hapa jashtë procesit.";
+          "Je analist i nje ekipi sherbimi civil shqiptar. Jep nje permbledhje per menaxherin, " +
+          "3-5 fjali, ne shqip, EKSKLUZIVISHT bazuar te konteksti. " +
+          "Mbulo: (1) ku ndodhet dosja, (2) cfare mungon, (3) rreziku me i madh i voneses, " +
+          "(4) si perdoret sinjali AI GIS/AKPT kur eshte relevant, (5) veprimi i rekomanduar tjeter. " +
+          "Mos shpik fakte ose hapa jashte procesit.";
         const user = `KONTEKSTI (JSON):\n${JSON.stringify(context, null, 2)}`;
 
         const r = await callOpenAi({ system, user, temperature: 0.2 });
@@ -51,7 +52,7 @@ export const Route = createFileRoute("/api/ai/summary")({
             phaseId: d.currentPhaseId,
             stepId: d.currentStepId,
           },
-          auditAction: "Përmbledhje AI",
+          auditAction: "Permbledhje AI",
           auditDetails: `model=${r.model}`,
         });
 

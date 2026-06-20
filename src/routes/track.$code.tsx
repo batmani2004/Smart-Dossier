@@ -154,6 +154,10 @@ type TrackPayload = {
     url: string;
     zoning: string;
     landCategory: string;
+    sourceLabel: string;
+    aiRiskLevel: "low" | "medium" | "high";
+    aiSignal: string;
+    aiUse: string;
     parcelPolygon: ParcelPoint[];
   } | null;
   compensation: {
@@ -777,7 +781,7 @@ function TrackPage() {
               </Card>
             ) : null}
 
-            {data.processKind === "expropriation" && data.mapPreview ? (
+            {data.mapPreview ? (
               <Card className="overflow-hidden border-emerald-200 bg-emerald-50/70">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-2 p-4 pr-0">
@@ -785,9 +789,11 @@ function TrackPage() {
                       <MapPinned className="size-4" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-sm font-semibold text-emerald-950">Harta GIS</div>
+                      <div className="text-sm font-semibold text-emerald-950">
+                        AI GIS / AKPT e-Harta
+                      </div>
                       <p className="mt-0.5 text-xs leading-relaxed text-emerald-800">
-                        {data.mapPreview.zoning} - {data.mapPreview.landCategory}
+                        {data.mapPreview.aiUse}
                       </p>
                     </div>
                   </div>
@@ -824,6 +830,9 @@ function TrackPage() {
                     {data.mapPreview.lon.toFixed(4)} - {data.mapPreview.provider}
                     <div className="mt-1 font-medium text-emerald-950">
                       Poligoni i parceles: {data.mapPreview.parcelPolygon.length} pika
+                    </div>
+                    <div className="mt-1 font-medium text-emerald-950">
+                      Sinjali AI: {data.mapPreview.aiSignal}
                     </div>
                     <div className="mt-1 text-emerald-800">{data.mapPreview.accuracyLabel}</div>
                   </div>
