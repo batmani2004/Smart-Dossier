@@ -24,6 +24,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { DossierBrowser } from "@/components/dossier-browser";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -257,6 +258,8 @@ function DashboardPage() {
             </div>
           </div>
 
+          <RoleGuidePanel role={role} />
+
           <div className="grid gap-3 md:grid-cols-2">
             <Card className="flex flex-col justify-between gap-3 border-primary/25 bg-primary/5 p-4">
               <div className="flex min-w-0 items-start gap-3">
@@ -380,6 +383,8 @@ function DashboardPage() {
             ) : null}
           </div>
         </div>
+
+        <RoleGuidePanel role={role} />
 
         <AiWorkConsole
           data={dashQ.data}
@@ -724,109 +729,123 @@ function DashboardPage() {
           </Card>
         </div>
 
-        {/* Dossier table */}
-        <Card className="p-0 overflow-hidden">
-          <div className="px-4 py-3 border-b flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <FileText className="size-4 shrink-0 text-muted-foreground" />
-              <h2 className="text-sm font-semibold truncate">Dosjet</h2>
+        <DossierBrowser
+          items={listQ.data?.items ?? []}
+          total={listQ.data?.total}
+          loading={listQ.isLoading}
+          title="Dosjet kryesore"
+          description="E njejta kategorizim si radha e dosjeve, ne pamje kompakte per dashboard."
+          initialView="compact"
+          initialGroupBy="priority"
+          maxItems={12}
+        />
+
+        {false && (
+          <Card className="p-0 overflow-hidden">
+            <div className="px-4 py-3 border-b flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <FileText className="size-4 shrink-0 text-muted-foreground" />
+                <h2 className="text-sm font-semibold truncate">Dosjet</h2>
+              </div>
+              <span className="text-xs text-muted-foreground">
+                {listQ.data?.total ?? 0} rekorde
+              </span>
             </div>
-            <span className="text-xs text-muted-foreground">{listQ.data?.total ?? 0} rekorde</span>
-          </div>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-xs">Kodi</TableHead>
-                  <TableHead className="text-xs">Faza</TableHead>
-                  <TableHead className="text-xs">Qytetari / Pronari</TableHead>
-                  <TableHead className="text-xs hidden md:table-cell">Institucioni</TableHead>
-                  <TableHead className="text-xs hidden lg:table-cell">Status</TableHead>
-                  <TableHead className="text-xs">Sinjale</TableHead>
-                  <TableHead className="text-xs">Prioriteti</TableHead>
-                  <TableHead className="text-xs text-right">Veprim</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {listQ.data?.items.slice(0, 12).map((d) => {
-                  const proc = PROCESSES[d.process];
-                  const phase = proc.phases.find((p) => p.id === d.currentPhaseId);
-                  return (
-                    <TableRow key={d.id}>
-                      <TableCell className="font-mono text-xs">{d.trackingCode}</TableCell>
-                      <TableCell className="text-xs">
-                        <span className="font-medium">Faza {phase?.order}</span>{" "}
-                        <span className="text-muted-foreground">— {phase?.title}</span>
-                      </TableCell>
-                      <TableCell className="text-xs truncate max-w-[180px]">
-                        {d.parties[0]?.fullName ?? "—"}
-                      </TableCell>
-                      <TableCell className="text-xs hidden md:table-cell">
-                        {phase?.institutions[0] ?? "—"}
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell">
-                        <StatusBadge status={d.status} />
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          {d.criticalCount > 0 && (
-                            <SeverityBadge severity="critical">{d.criticalCount}</SeverityBadge>
-                          )}
-                          {d.warningCount > 0 && (
-                            <SeverityBadge severity="warning">{d.warningCount}</SeverityBadge>
-                          )}
-                          {d.deadlineState === "overdue" && (
-                            <SeverityBadge severity="critical">vonesë</SeverityBadge>
-                          )}
-                          {d.deadlineState === "due_soon" && (
-                            <SeverityBadge severity="warning">afat</SeverityBadge>
-                          )}
-                          {d.criticalCount + d.warningCount === 0 &&
-                            d.deadlineState !== "overdue" &&
-                            d.deadlineState !== "due_soon" && (
-                              <span className="text-xs text-muted-foreground">—</span>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs">Kodi</TableHead>
+                    <TableHead className="text-xs">Faza</TableHead>
+                    <TableHead className="text-xs">Qytetari / Pronari</TableHead>
+                    <TableHead className="text-xs hidden md:table-cell">Institucioni</TableHead>
+                    <TableHead className="text-xs hidden lg:table-cell">Status</TableHead>
+                    <TableHead className="text-xs">Sinjale</TableHead>
+                    <TableHead className="text-xs">Prioriteti</TableHead>
+                    <TableHead className="text-xs text-right">Veprim</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {listQ.data?.items.slice(0, 12).map((d) => {
+                    const proc = PROCESSES[d.process];
+                    const phase = proc.phases.find((p) => p.id === d.currentPhaseId);
+                    return (
+                      <TableRow key={d.id}>
+                        <TableCell className="font-mono text-xs">{d.trackingCode}</TableCell>
+                        <TableCell className="text-xs">
+                          <span className="font-medium">Faza {phase?.order}</span>{" "}
+                          <span className="text-muted-foreground">— {phase?.title}</span>
+                        </TableCell>
+                        <TableCell className="text-xs truncate max-w-[180px]">
+                          {d.parties[0]?.fullName ?? "—"}
+                        </TableCell>
+                        <TableCell className="text-xs hidden md:table-cell">
+                          {phase?.institutions[0] ?? "—"}
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          <StatusBadge status={d.status} />
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            {d.criticalCount > 0 && (
+                              <SeverityBadge severity="critical">{d.criticalCount}</SeverityBadge>
                             )}
+                            {d.warningCount > 0 && (
+                              <SeverityBadge severity="warning">{d.warningCount}</SeverityBadge>
+                            )}
+                            {d.deadlineState === "overdue" && (
+                              <SeverityBadge severity="critical">vonesë</SeverityBadge>
+                            )}
+                            {d.deadlineState === "due_soon" && (
+                              <SeverityBadge severity="warning">afat</SeverityBadge>
+                            )}
+                            {d.criticalCount + d.warningCount === 0 &&
+                              d.deadlineState !== "overdue" &&
+                              d.deadlineState !== "due_soon" && (
+                                <span className="text-xs text-muted-foreground">—</span>
+                              )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <PriorityBadge priority={d.priority} />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button size="sm" variant="ghost" asChild>
+                            <Link to="/dosja/$id" params={{ id: d.id }}>
+                              Hap
+                            </Link>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                  {listQ.isLoading &&
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <TableRow key={`sk-${i}`} data-testid="dossier-row-skeleton">
+                        <TableCell colSpan={8}>
+                          <Skeleton className="h-5 w-full" />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  {!listQ.isLoading && !listQ.data?.items.length && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={8}
+                        className="text-center text-sm text-muted-foreground py-10"
+                      >
+                        <div className="flex flex-col items-center gap-1">
+                          <FolderKanban className="size-6 text-muted-foreground/60" />
+                          <div>Pa dosje për këto filtra.</div>
+                          <div className="text-xs">Pastro filtrat ose krijo një dosje të re.</div>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <PriorityBadge priority={d.priority} />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button size="sm" variant="ghost" asChild>
-                          <Link to="/dosja/$id" params={{ id: d.id }}>
-                            Hap
-                          </Link>
-                        </Button>
-                      </TableCell>
                     </TableRow>
-                  );
-                })}
-                {listQ.isLoading &&
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={`sk-${i}`} data-testid="dossier-row-skeleton">
-                      <TableCell colSpan={8}>
-                        <Skeleton className="h-5 w-full" />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                {!listQ.isLoading && !listQ.data?.items.length && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={8}
-                      className="text-center text-sm text-muted-foreground py-10"
-                    >
-                      <div className="flex flex-col items-center gap-1">
-                        <FolderKanban className="size-6 text-muted-foreground/60" />
-                        <div>Pa dosje për këto filtra.</div>
-                        <div className="text-xs">Pastro filtrat ose krijo një dosje të re.</div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </Card>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </Card>
+        )}
 
         {/* Recent AI extractions */}
         {dashQ.data?.recentExtractions.length ? (
@@ -926,6 +945,160 @@ function DashboardPage() {
         </DialogContent>
       </Dialog>
     </AppShell>
+  );
+}
+
+function RoleGuidePanel({ role }: { role: "admin" | "operator" | "citizen" | "business" }) {
+  const isCitizen = role === "citizen";
+  const isBusiness = role === "business";
+  const isAdmin = role === "admin";
+
+  const title = isCitizen
+    ? "Qytetar: cfare mund te besh ketu"
+    : isBusiness
+      ? "Biznes: cfare mund te besh ketu"
+      : isAdmin
+        ? "Admin: kontrollo platformen"
+        : "Operator: puno dosjen pa humbur kohe";
+
+  const subtitle = isCitizen
+    ? "Tre hapa te thjeshte: apliko, ruaj kodin dhe ndiq statusin."
+    : isBusiness
+      ? "Regjistro kerkesen me NIPT, ngarko dokumentet dhe ndiq shqyrtimin."
+      : isAdmin
+        ? "Shiko raportet, balanco operatoret dhe kontrollo sinjalet AI."
+        : "AI pergatit informacionin; operatori kontrollon dhe konfirmon.";
+
+  const items = isCitizen
+    ? [
+        {
+          icon: Scale,
+          title: "1. Nis aplikimin",
+          body: "Zgjidh procesin, ploteso te dhenat dhe ngarko dokumentet baze.",
+          href: "/aplikim",
+          action: "Apliko",
+        },
+        {
+          icon: Link2,
+          title: "2. Ruaj kodin",
+          body: "Kodi i gjurmimit hap statusin, fazat, afatet dhe dokumentet.",
+          href: "/track/EKB-2026-000014",
+          action: "Gjurmo",
+        },
+        {
+          icon: Sparkles,
+          title: "3. Pyet Ada",
+          body: "Asistentja AI shpjegon dokumentet, afatet, ankesen dhe pershpejtimin.",
+          href: "/faq",
+          action: "Ndihme",
+        },
+      ]
+    : isBusiness
+      ? [
+          {
+            icon: Building2,
+            title: "1. Identifikohu me NIPT",
+            body: "Profili biznes perdor NIPT-in dhe te dhenat e perfaqesuesit ligjor.",
+            href: "/biznes",
+            action: "Regjistro",
+          },
+          {
+            icon: FileText,
+            title: "2. Ngarko dokumentet",
+            body: "Shto aktin e pronesise, planin dhe autorizimet qe kerkon procesi.",
+            href: "/aplikim/dokumentacion",
+            action: "Dokumente",
+          },
+          {
+            icon: Link2,
+            title: "3. Ndiq linkun",
+            body: "Linku BIZ tregon statusin dhe dokumentet qe leshohen nga sistemi.",
+            href: "/track/BIZ-2026-000901",
+            action: "Gjurmo",
+          },
+        ]
+      : isAdmin
+        ? [
+            {
+              icon: ShieldAlert,
+              title: "1. Shiko riskun",
+              body: "AI Risk Brief tregon fazat me bllokime, vonesa dhe alarmet kryesore.",
+              href: "/raporte",
+              action: "Raporte",
+            },
+            {
+              icon: UserCheck,
+              title: "2. Balanco operatoret",
+              body: "Shto, hiq ose cakto operatore sipas ngarkeses se dosjeve.",
+              href: "/",
+              action: "Operatorët",
+            },
+            {
+              icon: Sparkles,
+              title: "3. Kontrollo AI",
+              body: "Shiko sa pune ka pergatitur AI: ekstraktime, permbledhje dhe Akt Vleresimi.",
+              href: "/raporte",
+              action: "AI",
+            },
+          ]
+        : [
+            {
+              icon: FolderKanban,
+              title: "1. Hap dosjet me prioritet",
+              body: "Filloni nga dosjet me alarm, afat te afert ose dokumente qe mungojne.",
+              href: "/dosjet",
+              action: "Dosjet",
+            },
+            {
+              icon: Sparkles,
+              title: "2. Perdorni tab-in AI",
+              body: "AI ben permbledhje, sugjeron hapin tjeter dhe nxjerr fusha nga dokumentet.",
+              href: "/dosjet",
+              action: "AI",
+            },
+            {
+              icon: FileText,
+              title: "3. Gjenero dhe vulos",
+              body: "Pas verifikimit krijo dokumentet, vulosi dhe ruaji ne audit.",
+              href: "/dosjet",
+              action: "Dokumente",
+            },
+          ];
+
+  return (
+    <Card className="overflow-hidden border-primary/20">
+      <div className="border-b bg-primary/5 px-4 py-3">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+          <Sparkles className="size-4" />
+          Udhezues i thjeshte
+        </div>
+        <h2 className="mt-1 text-base font-semibold">{title}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+      </div>
+      <div className="grid gap-3 p-4 md:grid-cols-3">
+        {items.map((item) => {
+          const Icon = item.icon;
+          return (
+            <div key={item.title} className="rounded-md border bg-background p-3">
+              <div className="flex items-start gap-2">
+                <div className="grid size-8 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
+                  <Icon className="size-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold">{item.title}</div>
+                  <p className="mt-1 min-h-12 text-xs leading-relaxed text-muted-foreground">
+                    {item.body}
+                  </p>
+                </div>
+              </div>
+              <Button asChild size="sm" variant="outline" className="mt-3 h-8">
+                <a href={item.href}>{item.action}</a>
+              </Button>
+            </div>
+          );
+        })}
+      </div>
+    </Card>
   );
 }
 

@@ -51,6 +51,7 @@ type TrackingContext = {
 
 type CitizenVirtualAgentProps = {
   defaultTrackingCode?: string;
+  audience?: "public" | "staff";
 };
 
 async function askFaq(question: string, trackingCode?: string) {
@@ -110,6 +111,7 @@ function trackingSummary(data: TrackingContext) {
 
 export function CitizenVirtualAgent({
   defaultTrackingCode = "EKB-2026-000014",
+  audience = "public",
 }: CitizenVirtualAgentProps) {
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
@@ -121,29 +123,53 @@ export function CitizenVirtualAgent({
   const [trackingLoading, setTrackingLoading] = useState(false);
 
   const activeCode = trackingContext?.trackingCode ?? trackingCode;
-  const agentActions = [
-    {
-      label: "Statusi",
-      icon: Activity,
-      action: () =>
-        trackingContext ? submit("Cili eshte statusi i dosjes time?") : lookupTracking(),
-    },
-    {
-      label: "Dokumentet",
-      icon: FileText,
-      action: () => submit("Cfare dokumentesh mungojne dhe kur i shoh dokumentet e vulosura?"),
-    },
-    {
-      label: "Pershpejtim",
-      icon: Zap,
-      action: () => submit("Si mund te kerkoj procedure te pershpejtuar?"),
-    },
-    {
-      label: "Ankesa",
-      icon: LifeBuoy,
-      action: () => submit("Si dergoj ankese per dosjen time?"),
-    },
-  ];
+  const isStaff = audience === "staff";
+  const agentActions = isStaff
+    ? [
+        {
+          label: "Hapi i pare",
+          icon: Activity,
+          action: () => submit("Cfare duhet te beje nje operator i ri ne Smart Dossier?"),
+        },
+        {
+          label: "Akt Vleresimi",
+          icon: FileText,
+          action: () => submit("Si funksionon AI Akt Vleresimi?"),
+        },
+        {
+          label: "Raportet",
+          icon: ClipboardList,
+          action: () => submit("Si perdoren raportet nga drejtuesit?"),
+        },
+        {
+          label: "Vulosja",
+          icon: ShieldCheck,
+          action: () => submit("Si vulosen dokumentet elektronikisht?"),
+        },
+      ]
+    : [
+        {
+          label: "Statusi",
+          icon: Activity,
+          action: () =>
+            trackingContext ? submit("Cili eshte statusi i dosjes time?") : lookupTracking(),
+        },
+        {
+          label: "Dokumentet",
+          icon: FileText,
+          action: () => submit("Cfare dokumentesh mungojne dhe kur i shoh dokumentet e vulosura?"),
+        },
+        {
+          label: "Pershpejtim",
+          icon: Zap,
+          action: () => submit("Si mund te kerkoj procedure te pershpejtuar?"),
+        },
+        {
+          label: "Ankesa",
+          icon: LifeBuoy,
+          action: () => submit("Si dergoj ankese per dosjen time?"),
+        },
+      ];
 
   async function submit(text: string) {
     const trimmed = text.trim();
@@ -214,7 +240,7 @@ export function CitizenVirtualAgent({
             <span className="absolute bottom-1 right-0 size-3 rounded-full border-2 border-background bg-success" />
           </span>
           <span className="hidden sm:flex flex-col items-start leading-tight">
-            <span>Pyet Ada</span>
+            <span>{isStaff ? "Pyet AI" : "Pyet Ada"}</span>
             <span className="text-[10px] font-medium text-muted-foreground">Asistente AI</span>
           </span>
         </button>
@@ -238,9 +264,13 @@ export function CitizenVirtualAgent({
                     <Sparkles className="size-3" />
                     Agjent virtual
                   </div>
-                  <h2 className="text-base font-semibold leading-tight">Ada per qytetarin</h2>
+                  <h2 className="text-base font-semibold leading-tight">
+                    {isStaff ? "Ada per ekipin" : "Ada per qytetarin"}
+                  </h2>
                   <p className="mt-1 text-xs leading-relaxed text-white/75">
-                    Pyet per statusin, dokumentet, afatet, pershpejtimin ose ankesen.
+                    {isStaff
+                      ? "Pyet per AI, raportet, Akt Vleresimi, vulosjen ose hapat e punes."
+                      : "Pyet per statusin, dokumentet, afatet, pershpejtimin ose ankesen."}
                   </p>
                 </div>
               </div>
@@ -257,44 +287,56 @@ export function CitizenVirtualAgent({
             </div>
 
             <div className="mt-3 rounded-md border border-white/15 bg-white/10 p-2">
-              <div className="flex gap-2">
-                <Input
-                  value={trackingCode}
-                  onChange={(event) => setTrackingCode(event.target.value)}
-                  placeholder="Kodi i gjurmimit"
-                  className="h-9 border-white/15 bg-white text-sm text-foreground"
-                />
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="secondary"
-                  onClick={lookupTracking}
-                  disabled={trackingLoading || !trackingCode.trim()}
-                  className="h-9 shrink-0"
-                >
-                  {trackingLoading ? (
-                    <Loader2 className="size-3.5 animate-spin" />
-                  ) : (
-                    <ClipboardList className="size-3.5" />
-                  )}
-                  <span className="ml-1 hidden sm:inline">Kontrollo</span>
-                </Button>
-              </div>
-              <div className="mt-2 flex items-center gap-2 text-[11px] text-white/75">
-                {trackingContext ? (
-                  <>
-                    <CheckCircle2 className="size-3.5 text-success" />
-                    <span className="min-w-0 truncate">
-                      {trackingContext.trackingCode} - {trackingContext.currentPhase.title}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck className="size-3.5 text-accent" />
-                    <span className="min-w-0 truncate">Kodi personalizon pergjigjet.</span>
-                  </>
-                )}
-              </div>
+              {isStaff ? (
+                <div className="flex items-start gap-2 text-xs leading-relaxed text-white/80">
+                  <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-accent" />
+                  <span>
+                    Ada shpjegon funksionet ne fjale te thjeshta. Per pyetje mbi nje dosje konkrete,
+                    hapni dosjen dhe perdorni tab-in AI.
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <div className="flex gap-2">
+                    <Input
+                      value={trackingCode}
+                      onChange={(event) => setTrackingCode(event.target.value)}
+                      placeholder="Kodi i gjurmimit"
+                      className="h-9 border-white/15 bg-white text-sm text-foreground"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      onClick={lookupTracking}
+                      disabled={trackingLoading || !trackingCode.trim()}
+                      className="h-9 shrink-0"
+                    >
+                      {trackingLoading ? (
+                        <Loader2 className="size-3.5 animate-spin" />
+                      ) : (
+                        <ClipboardList className="size-3.5" />
+                      )}
+                      <span className="ml-1 hidden sm:inline">Kontrollo</span>
+                    </Button>
+                  </div>
+                  <div className="mt-2 flex items-center gap-2 text-[11px] text-white/75">
+                    {trackingContext ? (
+                      <>
+                        <CheckCircle2 className="size-3.5 text-success" />
+                        <span className="min-w-0 truncate">
+                          {trackingContext.trackingCode} - {trackingContext.currentPhase.title}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck className="size-3.5 text-accent" />
+                        <span className="min-w-0 truncate">Kodi personalizon pergjigjet.</span>
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -339,7 +381,9 @@ export function CitizenVirtualAgent({
                 </div>
                 <div className="mt-3 text-sm font-semibold">Si mund t'ju ndihmoj?</div>
                 <p className="mt-1 max-w-xs text-xs leading-relaxed text-muted-foreground">
-                  Shkruani pyetjen ose perdorni veprimet e shpejta.
+                  {isStaff
+                    ? "Zgjidhni nje teme pune ose pyesni me fjale te thjeshta."
+                    : "Shkruani pyetjen ose perdorni veprimet e shpejta."}
                 </p>
               </div>
             ) : (

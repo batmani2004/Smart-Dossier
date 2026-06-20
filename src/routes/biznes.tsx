@@ -150,7 +150,7 @@ function BusinessPortal() {
           {role !== "business" ? (
             <AccessNotice
               title="Pamje demo biznesi"
-              body="Kjo faqe simulon vetesherbimin e subjektit privat. Profili aktiv ndryshohet nga hyrja me OTP."
+              body="Kjo faqe simulon vetesherbimin e subjektit privat. Profili aktiv ndryshohet nga faqja e hyrjes."
             />
           ) : null}
 
