@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -72,7 +72,9 @@ function DossierWorkspace() {
   const advance = useServerFn(advanceDossier);
   const qc = useQueryClient();
   const { role, profile, can } = useDemoRole();
-  const [activeTab, setActiveTab] = useState("workflow");
+  const [activeTab, setActiveTab] = useState("permbledhje");
+  const [aiSummaryText, setAiSummaryText] = useState<string | null>(null);
+  const [aiSummaryLoading, setAiSummaryLoading] = useState(false);
 
   const q = useQuery({ queryKey: ["dossier", id], queryFn: () => get({ data: { id } }) });
 
@@ -98,6 +100,23 @@ function DossierWorkspace() {
 
   const { dossier: d, summary, alerts, deadline, nextStep } = q.data;
   const proc = PROCESSES[d.process];
+
+  // Auto-generate AI manager summary when dossier opens (civil servant only)
+  useEffect(() => {
+    if (!can("runAi") || aiSummaryText || aiSummaryLoading) return;
+    setAiSummaryLoading(true);
+    fetch("/api/ai/summary", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    })
+      .then((r) => r.json())
+      .then((r: { ok: boolean; summary?: string }) => {
+        if (r.ok && r.summary) setAiSummaryText(r.summary);
+      })
+      .catch(() => null)
+      .finally(() => setAiSummaryLoading(false));
+  }, [id, can("runAi")]);
   const currentPhase = proc.phases.find((p) => p.id === d.currentPhaseId);
   const currentStep = currentPhase?.steps.find((s) => s.id === d.currentStepId);
   const currentPhaseDuration = currentPhase ? phaseDurationDays(currentPhase) : undefined;
@@ -378,40 +397,41 @@ function DossierWorkspace() {
               <Card className="p-3 md:col-span-2">
                 <div className="flex items-center gap-2 mb-1.5">
                   <Sparkles className="size-3.5 text-info" />
-                  <h2 className="text-sm font-semibold">AI përmbledhje</h2>
+                  <h2 className="text-sm font-semibold">AI përmbledhje për menaxherin</h2>
+                  {aiSummaryLoading && (
+                    <span className="text-[10px] text-muted-foreground animate-pulse">
+                      Duke analizuar…
+                    </span>
+                  )}
                 </div>
-                <ul className="text-xs space-y-1 text-foreground/90">
-                  <li>
-                    <strong>Procesi:</strong> {summary.process}
-                  </li>
-                  <li>
-                    <strong>Faza aktuale:</strong> {summary.currentPhase} — {summary.currentStep}
-                  </li>
-                  {summary.nextStep ? (
+                {aiSummaryText ? (
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{aiSummaryText}</p>
+                ) : (
+                  <ul className="text-xs space-y-1 text-foreground/90">
+                    <li><strong>Procesi:</strong> {summary.process}</li>
+                    <li><strong>Faza aktuale:</strong> {summary.currentPhase} — {summary.currentStep}</li>
+                    {summary.nextStep ? (
+                      <li><strong>Hapi tjetër:</strong> {summary.nextStep}</li>
+                    ) : null}
                     <li>
-                      <strong>Hapi tjetër:</strong> {summary.nextStep}
+                      <strong>Dokumente:</strong> {summary.documentsUploaded} të ngarkuara,{" "}
+                      {summary.documentsMissing.length} mungojnë
                     </li>
-                  ) : null}
-                  <li>
-                    <strong>Dokumente:</strong> {summary.documentsUploaded} të ngarkuara,{" "}
-                    {summary.documentsMissing.length} mungojnë
-                  </li>
-                  <li>
-                    <strong>Afati:</strong> {summary.deadlineState}
-                    {summary.daysToNearestDeadline !== undefined
-                      ? ` (${summary.daysToNearestDeadline} ditë)`
-                      : ""}
-                  </li>
-                  {currentPhaseDuration ? (
                     <li>
-                      <strong>Kohëzgjatja e fazës:</strong> {currentPhaseDuration} ditë
-                      {currentStep?.slaDays ? ` (hapi aktual ${currentStep.slaDays} ditë)` : ""}
+                      <strong>Afati:</strong> {summary.deadlineState}
+                      {summary.daysToNearestDeadline !== undefined
+                        ? ` (${summary.daysToNearestDeadline} ditë)`
+                        : ""}
                     </li>
-                  ) : null}
-                  <li>
-                    <strong>Bazë ligjore:</strong> {summary.legalBasis.join(", ")}
-                  </li>
-                </ul>
+                    {currentPhaseDuration ? (
+                      <li>
+                        <strong>Kohëzgjatja e fazës:</strong> {currentPhaseDuration} ditë
+                        {currentStep?.slaDays ? ` (hapi aktual ${currentStep.slaDays} ditë)` : ""}
+                      </li>
+                    ) : null}
+                    <li><strong>Bazë ligjore:</strong> {summary.legalBasis.join(", ")}</li>
+                  </ul>
+                )}
               </Card>
               <Card className="p-3">
                 <h2 className="text-sm font-semibold mb-1.5">Fushat që mungojnë</h2>
