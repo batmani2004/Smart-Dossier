@@ -38,7 +38,7 @@ const roleIcons = {
 } as const;
 
 const primaryNav = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/", label: "Faqja Kryesore", icon: LayoutDashboard, exact: true },
   { to: "/dosjet", label: "Dosjet", icon: FolderKanban, badge: "4" },
 ] satisfies {
   to: string;
@@ -62,7 +62,7 @@ function pageLabel(path: string) {
   if (path.startsWith("/aplikim")) return "Aplikim i ri";
   if (path.startsWith("/biznes")) return "Regjistrim prone";
   if (path.startsWith("/track/")) return "Gjurmim qytetar";
-  return "Dashboard";
+  return "Faqja Kryesore";
 }
 
 type ShellNotification = {
