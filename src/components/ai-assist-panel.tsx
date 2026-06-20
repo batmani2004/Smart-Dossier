@@ -89,7 +89,9 @@ export function AiAssistPanel({ dossier }: Props) {
       if (summaryRes.status === "fulfilled") setSummary(summaryRes.value.summary);
       if (nextStepRes.status === "fulfilled") {
         setNextStep(nextStepRes.value.result);
-        setNextStepSource(nextStepRes.value.source ?? nextStepRes.value.result.legalOrProcessSource);
+        setNextStepSource(
+          nextStepRes.value.source ?? nextStepRes.value.result.legalOrProcessSource,
+        );
       }
 
       if (summaryRes.status === "fulfilled" || nextStepRes.status === "fulfilled") {

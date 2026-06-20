@@ -49,7 +49,11 @@ async def smoke(page: Page) -> list[str]:
     await page.goto(f"{BASE}/", wait_until="domcontentloaded")
     try:
         # Depending on active demo role, "/" may be civil-servant dashboard or citizen view.
-        await expect_any_text(page, ["Paneli operacional", "Pamje qytetari"], timeout=10000)
+        await expect_any_text(
+            page,
+            ["Paneli operacional", "Pamje qytetari", "PORTAL QYTETARI"],
+            timeout=10000,
+        )
         await page.screenshot(path=str(SCREENSHOTS / "1_dashboard.png"))
     except Exception as e:
         failures.append(f"dashboard: {e}")

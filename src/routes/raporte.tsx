@@ -78,7 +78,9 @@ function ReportsPage() {
   const bottlenecks = dashQ.data?.bottlenecks ?? [];
   const workloads = dashQ.data?.assignment.operatorWorkloads ?? [];
 
-  const activeCount = items.filter((d) => d.status !== "completed" && d.status !== "rejected").length;
+  const activeCount = items.filter(
+    (d) => d.status !== "completed" && d.status !== "rejected",
+  ).length;
   const blockedCount = (statusCounts.blocked ?? 0) + (statusCounts.awaiting_external ?? 0);
   const overdueCount = expiringDeadlines.filter((d) => d.state === "overdue").length;
   const dueSoonCount = expiringDeadlines.filter((d) => d.state === "due_soon").length;
@@ -261,7 +263,13 @@ function ReportsPage() {
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={statusData} dataKey="value" nameKey="name" innerRadius={48} outerRadius={80}>
+                  <Pie
+                    data={statusData}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={48}
+                    outerRadius={80}
+                  >
                     {statusData.map((entry) => (
                       <Cell key={entry.name} fill={entry.color} />
                     ))}
@@ -518,7 +526,10 @@ function Legend({ items }: { items: { name: string; color: string; value: number
   return (
     <div className="mt-2 flex flex-wrap gap-2">
       {items.map((item) => (
-        <div key={item.name} className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <div
+          key={item.name}
+          className="flex items-center gap-1.5 text-[11px] text-muted-foreground"
+        >
           <span className="size-2 rounded-full" style={{ backgroundColor: item.color }} />
           <span>{item.name}</span>
           <span className="font-medium text-foreground">{item.value}</span>
