@@ -5,6 +5,7 @@ import {
   Bell,
   Building2,
   ChevronRight,
+  ChevronsUpDown,
   FileUp,
   FolderKanban,
   HelpCircle,
@@ -13,14 +14,13 @@ import {
   LogOut,
   Plus,
   Scale,
-  Settings,
   ShieldCheck,
   UserCog,
   UserRound,
 } from "lucide-react";
 import { CitizenVirtualAgent } from "@/components/citizen-virtual-agent";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useDemoRole } from "@/lib/demo-access";
+import { type DemoRole, useDemoRole } from "@/lib/demo-access";
 import { cn } from "@/lib/utils";
 
 const roleIcons = {
@@ -162,48 +162,14 @@ export function AppShell({
           </div>
         )}
 
-        {/* User widget */}
+        {/* User widget — popup menu */}
         <div className="px-3 pb-4 pt-3 mt-auto">
-          <div
-            className="rounded-2xl p-3 space-y-3"
-            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
-          >
-            {/* Avatar + info */}
-            <div className="flex items-center gap-3">
-              <div className="relative shrink-0">
-                <div className="size-10 rounded-full flex items-center justify-center bg-gradient-to-br from-accent/60 to-accent/30 ring-2 ring-accent/30">
-                  <RoleIcon className="size-5 text-white" />
-                </div>
-                <span className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full bg-success border-2 border-[#101827]" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold text-white truncate leading-tight">{profile.displayName}</div>
-                <div className="text-[11px] text-white/50 truncate mt-0.5">{profile.credentialLabel}</div>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="border-t border-white/[0.08]" />
-
-            {/* Action buttons */}
-            <div className="grid grid-cols-2 gap-1.5">
-              <Link
-                to="/login"
-                className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-[11px] font-semibold text-white/60 hover:text-white transition-all duration-150 hover:bg-white/[0.08] group"
-              >
-                <Settings className="size-3.5 group-hover:rotate-45 transition-transform duration-300" />
-                Cilësimet
-              </Link>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-[11px] font-semibold text-white/60 hover:text-destructive hover:bg-destructive/10 transition-all duration-150 group"
-              >
-                <LogOut className="size-3.5 group-hover:translate-x-0.5 transition-transform duration-150" />
-                Dil
-              </button>
-            </div>
-          </div>
+          <UserMenuPopover
+            role={role}
+            profile={profile}
+            RoleIcon={RoleIcon}
+            onLogout={handleLogout}
+          />
         </div>
       </aside>
 
@@ -386,6 +352,116 @@ function NotificationsPopover({ notifications }: { notifications: ShellNotificat
             Njoftimet e dosjes shfaqen këtu kur të ketë përditësime.
           </div>
         )}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+const ROLE_LABELS: Record<DemoRole, { label: string; icon: typeof UserRound; color: string }> = {
+  admin:    { label: "Admin",    icon: ShieldCheck, color: "text-destructive" },
+  operator: { label: "Operator", icon: UserCog,     color: "text-accent" },
+  citizen:  { label: "Qytetar",  icon: UserRound,   color: "text-success" },
+  business: { label: "Biznes",   icon: Building2,   color: "text-warning" },
+};
+
+function UserMenuPopover({
+  role,
+  profile,
+  RoleIcon,
+  onLogout,
+}: {
+  role: DemoRole;
+  profile: { displayName: string; credentialLabel: string };
+  RoleIcon: typeof UserRound;
+  onLogout: () => void;
+}) {
+  const { setRole } = useDemoRole();
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all duration-150 hover:bg-white/[0.07] group"
+          style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)" }}
+        >
+          <div className="relative shrink-0">
+            <div className="size-9 rounded-full flex items-center justify-center bg-gradient-to-br from-accent/60 to-accent/30 ring-2 ring-accent/20">
+              <RoleIcon className="size-4 text-white" />
+            </div>
+            <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-success border-2 border-[#101827]" />
+          </div>
+          <div className="min-w-0 flex-1 text-left">
+            <div className="text-sm font-semibold text-white truncate leading-tight">{profile.displayName}</div>
+            <div className="text-[11px] text-white/45 truncate">{profile.credentialLabel}</div>
+          </div>
+          <ChevronsUpDown className="size-3.5 text-white/30 group-hover:text-white/60 transition-colors shrink-0" />
+        </button>
+      </PopoverTrigger>
+
+      <PopoverContent
+        side="top"
+        align="start"
+        sideOffset={8}
+        className="w-64 p-0 overflow-hidden"
+        style={{ background: "#1a2540", border: "1px solid rgba(255,255,255,0.10)" }}
+      >
+        {/* Header */}
+        <div className="px-4 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <div className="flex items-center gap-3">
+            <div className="size-9 rounded-full flex items-center justify-center bg-gradient-to-br from-accent/60 to-accent/30 shrink-0">
+              <RoleIcon className="size-4 text-white" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-sm font-semibold text-white truncate">{profile.displayName}</div>
+              <div className="text-[11px] text-white/50">{profile.credentialLabel}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Role switcher */}
+        <div className="px-2 py-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <div className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-white/30">
+            Ndrysho rolin
+          </div>
+          {(Object.entries(ROLE_LABELS) as [DemoRole, typeof ROLE_LABELS[DemoRole]][]).map(([r, meta]) => {
+            const Icon = meta.icon;
+            const isActive = r === role;
+            return (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setRole(r)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all duration-150 text-left",
+                  isActive
+                    ? "bg-accent/20 text-white font-semibold"
+                    : "text-white/60 hover:text-white hover:bg-white/[0.07]",
+                )}
+              >
+                <Icon className={cn("size-4 shrink-0", isActive ? "text-accent" : meta.color)} />
+                <span>{meta.label}</span>
+                {isActive && (
+                  <span className="ml-auto text-[10px] font-bold text-accent/80 bg-accent/15 px-1.5 py-0.5 rounded-full">
+                    aktiv
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Logout */}
+        <div className="px-2 py-2">
+          <button
+            type="button"
+            onClick={onLogout}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-white/60 hover:text-white hover:bg-destructive/15 transition-all duration-150 group"
+          >
+            <LogOut className="size-4 shrink-0 text-destructive/70 group-hover:text-destructive group-hover:translate-x-0.5 transition-all duration-150" />
+            <span>Dil nga llogaria</span>
+          </button>
+        </div>
       </PopoverContent>
     </Popover>
   );
