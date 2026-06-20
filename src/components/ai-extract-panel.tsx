@@ -342,6 +342,7 @@ function buildRows(d: Dossier, r: ExtractionResult): Row[] {
   const c = r.common ?? {};
   const ekb = r.ekb ?? {};
   const exp = r.expropriation ?? {};
+  const biz = r.propertyRegistration ?? {};
   const p0 = d.parties[0];
   const rows: Row[] = [];
 
@@ -396,6 +397,14 @@ function buildRows(d: Dossier, r: ExtractionResult): Row[] {
     push("certificateNumber", "Nr. çertifikate", ekb.certificateNumber, undefined);
     push("qualifiesForPrivatization", "Kualifikohet", ekb.qualifiesForPrivatization, undefined);
     push("suggestedPriceCategory", "Kategoria e çmimit", ekb.suggestedPriceCategory, undefined);
+  } else if (d.process === "property_registration") {
+    push("businessName", "Biznesi", biz.businessName, p0?.fullName);
+    push("nipt", "NIPT", biz.nipt, p0?.businessNipt);
+    push("representativeName", "Perfaqesuesi", biz.representativeName, undefined);
+    push("ownershipActNumber", "Nr. akti pronesie", biz.ownershipActNumber, undefined);
+    push("registrationReason", "Arsye regjistrimi", biz.registrationReason, undefined);
+    push("planReference", "Referenca e planit", biz.planReference, undefined);
+    push("hasLegalRepresentation", "Ka perfaqesim ligjor", biz.hasLegalRepresentation, undefined);
   } else {
     push("ownerName", "Pronari", exp.ownerName, p0?.fullName);
     push("projectName", "Projekti", exp.projectName, undefined);

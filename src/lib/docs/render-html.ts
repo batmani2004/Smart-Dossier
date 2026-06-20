@@ -21,6 +21,12 @@ function fmtDate(iso: string): string {
  * which produces a clean A4 PDF without external dependencies.
  */
 export function renderDocHtml(doc: GeneratedDoc): string {
+  const stampHtml = `
+    <section class="stamp-block" aria-label="Vula digjitale e institucionit">
+      <img src="/stamps/ashk-demo-stamp.png" alt="Vule demo ASHK" />
+      <div class="stamp-caption">Vule demo nga sistemi Smart Dossier</div>
+    </section>`;
+
   const sectionsHtml = doc.sections
     .map(
       (s) => `
@@ -149,6 +155,25 @@ export function renderDocHtml(doc: GeneratedDoc): string {
   .sig-line { border-top: 1px solid #111; margin-bottom: 2mm; height: 12mm; }
   .sig-role { font-weight: 700; }
   .sig-inst { color: #3f3f46; }
+  .stamp-block {
+    width: 52mm;
+    margin: 8mm 0 0 auto;
+    text-align: center;
+    break-inside: avoid;
+  }
+  .stamp-block img {
+    display: block;
+    width: 52mm;
+    height: 52mm;
+    object-fit: contain;
+    margin: 0 auto;
+  }
+  .stamp-caption {
+    margin-top: 1mm;
+    font-size: 7.5pt;
+    color: #71717a;
+    font-style: italic;
+  }
   .footer {
     margin-top: 14mm;
     border-top: 1px dotted #a1a1aa;
@@ -198,6 +223,7 @@ export function renderDocHtml(doc: GeneratedDoc): string {
     </div>
 
     ${sigHtml}
+    ${stampHtml}
 
     ${doc.footer ? `<div class="footer">${escape(doc.footer)}</div>` : ""}
   </div>

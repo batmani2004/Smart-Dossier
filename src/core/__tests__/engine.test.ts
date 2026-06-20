@@ -189,13 +189,15 @@ describe("calculateEkbPrivatizationValue", () => {
 });
 
 describe("seed fixtures", () => {
-  it("ships at least 8 EKB and 5 expropriation dossiers", () => {
+  it("ships at least 8 EKB, 5 expropriation, and 1 business registration dossier", () => {
     const ekb = SEED_CORE_DOSSIERS.filter((d) => d.process === "ekb_privatization");
     const exp = SEED_CORE_DOSSIERS.filter((d) => d.process === "expropriation");
+    const biz = SEED_CORE_DOSSIERS.filter((d) => d.process === "property_registration");
     expect(ekb.length).toBeGreaterThanOrEqual(8);
     expect(exp.length).toBeGreaterThanOrEqual(5);
+    expect(biz.length).toBeGreaterThanOrEqual(1);
     for (const d of SEED_CORE_DOSSIERS) {
-      expect(d.trackingCode).toMatch(/^(EKB|EXP)-2026-\d{6}$/);
+      expect(d.trackingCode).toMatch(/^(EKB|EXP|BIZ)-2026-\d{6}$/);
     }
   });
 });

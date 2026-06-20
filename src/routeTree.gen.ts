@@ -10,10 +10,15 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RaporteRouteImport } from './routes/raporte'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DosjetRouteImport } from './routes/dosjet'
+import { Route as BiznesRouteImport } from './routes/biznes'
+import { Route as AplikimRouteImport } from './routes/aplikim'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TrackCodeRouteImport } from './routes/track.$code'
 import { Route as DosjaIdRouteImport } from './routes/dosja.$id'
+import { Route as ApiPublicFaqAssistRouteImport } from './routes/api/public/faq-assist'
 import { Route as ApiPublicExtractRouteImport } from './routes/api/public/extract'
 import { Route as ApiPublicDossiersRouteImport } from './routes/api/public/dossiers'
 import { Route as ApiPublicDashboardRouteImport } from './routes/api/public/dashboard'
@@ -28,9 +33,29 @@ const RaporteRoute = RaporteRouteImport.update({
   path: '/raporte',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DosjetRoute = DosjetRouteImport.update({
   id: '/dosjet',
   path: '/dosjet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BiznesRoute = BiznesRouteImport.update({
+  id: '/biznes',
+  path: '/biznes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AplikimRoute = AplikimRouteImport.update({
+  id: '/aplikim',
+  path: '/aplikim',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -46,6 +71,11 @@ const TrackCodeRoute = TrackCodeRouteImport.update({
 const DosjaIdRoute = DosjaIdRouteImport.update({
   id: '/dosja/$id',
   path: '/dosja/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicFaqAssistRoute = ApiPublicFaqAssistRouteImport.update({
+  id: '/api/public/faq-assist',
+  path: '/api/public/faq-assist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicExtractRoute = ApiPublicExtractRouteImport.update({
@@ -91,7 +121,11 @@ const ApiPublicDossiersIdRoute = ApiPublicDossiersIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aplikim': typeof AplikimRoute
+  '/biznes': typeof BiznesRoute
   '/dosjet': typeof DosjetRoute
+  '/faq': typeof FaqRoute
+  '/login': typeof LoginRoute
   '/raporte': typeof RaporteRoute
   '/dosja/$id': typeof DosjaIdRoute
   '/track/$code': typeof TrackCodeRoute
@@ -101,12 +135,17 @@ export interface FileRoutesByFullPath {
   '/api/public/dashboard': typeof ApiPublicDashboardRoute
   '/api/public/dossiers': typeof ApiPublicDossiersRouteWithChildren
   '/api/public/extract': typeof ApiPublicExtractRoute
+  '/api/public/faq-assist': typeof ApiPublicFaqAssistRoute
   '/api/public/dossiers/$id': typeof ApiPublicDossiersIdRoute
   '/api/public/track/$code': typeof ApiPublicTrackCodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aplikim': typeof AplikimRoute
+  '/biznes': typeof BiznesRoute
   '/dosjet': typeof DosjetRoute
+  '/faq': typeof FaqRoute
+  '/login': typeof LoginRoute
   '/raporte': typeof RaporteRoute
   '/dosja/$id': typeof DosjaIdRoute
   '/track/$code': typeof TrackCodeRoute
@@ -116,13 +155,18 @@ export interface FileRoutesByTo {
   '/api/public/dashboard': typeof ApiPublicDashboardRoute
   '/api/public/dossiers': typeof ApiPublicDossiersRouteWithChildren
   '/api/public/extract': typeof ApiPublicExtractRoute
+  '/api/public/faq-assist': typeof ApiPublicFaqAssistRoute
   '/api/public/dossiers/$id': typeof ApiPublicDossiersIdRoute
   '/api/public/track/$code': typeof ApiPublicTrackCodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aplikim': typeof AplikimRoute
+  '/biznes': typeof BiznesRoute
   '/dosjet': typeof DosjetRoute
+  '/faq': typeof FaqRoute
+  '/login': typeof LoginRoute
   '/raporte': typeof RaporteRoute
   '/dosja/$id': typeof DosjaIdRoute
   '/track/$code': typeof TrackCodeRoute
@@ -132,6 +176,7 @@ export interface FileRoutesById {
   '/api/public/dashboard': typeof ApiPublicDashboardRoute
   '/api/public/dossiers': typeof ApiPublicDossiersRouteWithChildren
   '/api/public/extract': typeof ApiPublicExtractRoute
+  '/api/public/faq-assist': typeof ApiPublicFaqAssistRoute
   '/api/public/dossiers/$id': typeof ApiPublicDossiersIdRoute
   '/api/public/track/$code': typeof ApiPublicTrackCodeRoute
 }
@@ -139,7 +184,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/aplikim'
+    | '/biznes'
     | '/dosjet'
+    | '/faq'
+    | '/login'
     | '/raporte'
     | '/dosja/$id'
     | '/track/$code'
@@ -149,12 +198,17 @@ export interface FileRouteTypes {
     | '/api/public/dashboard'
     | '/api/public/dossiers'
     | '/api/public/extract'
+    | '/api/public/faq-assist'
     | '/api/public/dossiers/$id'
     | '/api/public/track/$code'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/aplikim'
+    | '/biznes'
     | '/dosjet'
+    | '/faq'
+    | '/login'
     | '/raporte'
     | '/dosja/$id'
     | '/track/$code'
@@ -164,12 +218,17 @@ export interface FileRouteTypes {
     | '/api/public/dashboard'
     | '/api/public/dossiers'
     | '/api/public/extract'
+    | '/api/public/faq-assist'
     | '/api/public/dossiers/$id'
     | '/api/public/track/$code'
   id:
     | '__root__'
     | '/'
+    | '/aplikim'
+    | '/biznes'
     | '/dosjet'
+    | '/faq'
+    | '/login'
     | '/raporte'
     | '/dosja/$id'
     | '/track/$code'
@@ -179,13 +238,18 @@ export interface FileRouteTypes {
     | '/api/public/dashboard'
     | '/api/public/dossiers'
     | '/api/public/extract'
+    | '/api/public/faq-assist'
     | '/api/public/dossiers/$id'
     | '/api/public/track/$code'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AplikimRoute: typeof AplikimRoute
+  BiznesRoute: typeof BiznesRoute
   DosjetRoute: typeof DosjetRoute
+  FaqRoute: typeof FaqRoute
+  LoginRoute: typeof LoginRoute
   RaporteRoute: typeof RaporteRoute
   DosjaIdRoute: typeof DosjaIdRoute
   TrackCodeRoute: typeof TrackCodeRoute
@@ -195,6 +259,7 @@ export interface RootRouteChildren {
   ApiPublicDashboardRoute: typeof ApiPublicDashboardRoute
   ApiPublicDossiersRoute: typeof ApiPublicDossiersRouteWithChildren
   ApiPublicExtractRoute: typeof ApiPublicExtractRoute
+  ApiPublicFaqAssistRoute: typeof ApiPublicFaqAssistRoute
   ApiPublicTrackCodeRoute: typeof ApiPublicTrackCodeRoute
 }
 
@@ -207,11 +272,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RaporteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dosjet': {
       id: '/dosjet'
       path: '/dosjet'
       fullPath: '/dosjet'
       preLoaderRoute: typeof DosjetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/biznes': {
+      id: '/biznes'
+      path: '/biznes'
+      fullPath: '/biznes'
+      preLoaderRoute: typeof BiznesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aplikim': {
+      id: '/aplikim'
+      path: '/aplikim'
+      fullPath: '/aplikim'
+      preLoaderRoute: typeof AplikimRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -233,6 +326,13 @@ declare module '@tanstack/react-router' {
       path: '/dosja/$id'
       fullPath: '/dosja/$id'
       preLoaderRoute: typeof DosjaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/faq-assist': {
+      id: '/api/public/faq-assist'
+      path: '/api/public/faq-assist'
+      fullPath: '/api/public/faq-assist'
+      preLoaderRoute: typeof ApiPublicFaqAssistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/extract': {
@@ -307,7 +407,11 @@ const ApiPublicDossiersRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AplikimRoute: AplikimRoute,
+  BiznesRoute: BiznesRoute,
   DosjetRoute: DosjetRoute,
+  FaqRoute: FaqRoute,
+  LoginRoute: LoginRoute,
   RaporteRoute: RaporteRoute,
   DosjaIdRoute: DosjaIdRoute,
   TrackCodeRoute: TrackCodeRoute,
@@ -317,6 +421,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicDashboardRoute: ApiPublicDashboardRoute,
   ApiPublicDossiersRoute: ApiPublicDossiersRouteWithChildren,
   ApiPublicExtractRoute: ApiPublicExtractRoute,
+  ApiPublicFaqAssistRoute: ApiPublicFaqAssistRoute,
   ApiPublicTrackCodeRoute: ApiPublicTrackCodeRoute,
 }
 export const routeTree = rootRouteImport

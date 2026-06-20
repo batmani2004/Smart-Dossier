@@ -1,7 +1,7 @@
 // Smart Dossier — shared domain types.
 // Self-contained: this module has no runtime deps on the rest of the app.
 
-export type ProcessKind = "ekb_privatization" | "expropriation";
+export type ProcessKind = "ekb_privatization" | "expropriation" | "property_registration";
 
 export type DossierStatus =
   | "draft"
@@ -78,6 +78,8 @@ export interface DossierParty {
   fullName: string;
   /** Masked national ID, e.g. "I85******G". */
   nationalIdMasked?: string;
+  /** Business tax identifier (NIPT), used for business applicants. */
+  businessNipt?: string;
   contact?: { email?: string; phone?: string; address?: string };
   fatherName?: string;
 }
@@ -92,6 +94,10 @@ export interface DossierDocument {
   status: DocumentStatus;
   uploadedAt?: string; // ISO
   uploadedBy?: string;
+  mimeType?: string;
+  sizeBytes?: number;
+  /** Base64 demo storage for citizen-uploaded files. */
+  contentBase64?: string;
   /** Phase/step where the document is required. */
   requiredAtStepId?: string;
   notes?: string;
@@ -105,6 +111,63 @@ export interface AuditEvent {
   phaseId?: string;
   stepId?: string;
   details?: string;
+}
+
+export type CitizenComplaintStage = "phase_review" | "final_review";
+export type CitizenComplaintStatus = "new" | "in_review" | "resolved";
+export type AssignmentMode = "manual" | "auto";
+export type RequesterClaimType = "owner" | "legal_representative";
+export type RequesterVerificationStatus = "pending" | "verified" | "needs_documents" | "rejected";
+export type ExpeditedProcedureStatus = "not_requested" | "submitted" | "approved" | "rejected";
+export type ExpeditedProcedureReason = "health" | "deadline" | "court" | "social" | "other";
+
+export interface CitizenComplaint {
+  id: string;
+  createdAt: string;
+  stage: CitizenComplaintStage;
+  subject: string;
+  message: string;
+  contact?: string;
+  status: CitizenComplaintStatus;
+  phaseId?: string;
+  phaseTitle?: string;
+  stepId?: string;
+  stepTitle?: string;
+  routedTo: string;
+  routedToLabel: string;
+  resolvedAt?: string;
+  resolutionNote?: string;
+}
+
+export interface RequesterVerification {
+  claimType: RequesterClaimType;
+  /** Person whose name must match the cadastral/property record. */
+  cadastralSubjectName?: string;
+  status: RequesterVerificationStatus;
+  requiredDocumentTypes: string[];
+  verifiedAt?: string;
+  verifiedBy?: string;
+  notes?: string;
+}
+
+export interface ExpeditedProcedureRequest {
+  id: string;
+  requestedAt: string;
+  status: ExpeditedProcedureStatus;
+  reason: ExpeditedProcedureReason;
+  reasonLabel: string;
+  justification: string;
+  requestPdfName: string;
+  requestPdfDocumentId?: string;
+  supportingDocumentName: string;
+  supportingDocumentId?: string;
+  paymentRequired: boolean;
+  paymentAmountAll?: number;
+  paymentReceiptName?: string;
+  paymentReceiptDocumentId?: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  reviewNote?: string;
 }
 
 export type DeadlineKind =
@@ -180,6 +243,15 @@ export interface Dossier {
   deadlines: Deadline[];
   audit: AuditEvent[];
   insights: AiInsight[];
+  citizenComplaints?: CitizenComplaint[];
+  requesterVerification?: RequesterVerification;
+  expeditedProcedure?: ExpeditedProcedureRequest;
+  assignedOperatorId?: string;
+  assignedOperatorName?: string;
+  assignedAt?: string;
+  assignmentMode?: AssignmentMode;
+  assignmentDueAt?: string;
+  submittedFrom?: "citizen_portal" | "business_portal" | "admin";
   createdAt: string;
   updatedAt: string;
   /** Final dossier value once computed (EKB) or compensation (expropriation). */

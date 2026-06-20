@@ -4,7 +4,7 @@ import { runExtraction } from "@/lib/ai/extract.functions";
 import { corsJson, corsOptions } from "@/lib/api/public-helpers";
 
 const inputSchema = z.object({
-  processKind: z.enum(["ekb_privatization", "expropriation"]),
+  processKind: z.enum(["ekb_privatization", "expropriation", "property_registration"]),
   documentType: z.string().min(1),
   text: z.string().min(1).max(200_000),
   fileName: z.string().optional(),

@@ -11,6 +11,7 @@ const TEMPLATE_KEYS = [
   "ekb_missing_docs_notice",
   "ekb_refusal_decision",
   "ekb_value_calculation",
+  "ekb_citizen_invoice",
   "ekb_contract_draft",
   "exp_owner_notification",
   "exp_compensation_proposal",
@@ -105,9 +106,10 @@ export const generateDocument = createServerFn({ method: "POST" })
       }));
     }
 
+    const documentType = data.template === "ekb_citizen_invoice" ? "citizen_invoice" : data.template;
     const record: DossierDocument = {
       id: `gen-${d.documents.length + 1}-${Date.now().toString(36)}`,
-      type: data.template,
+      type: documentType,
       name: `${doc.title} — ${doc.number}`,
       status: "uploaded",
       uploadedAt: new Date().toISOString(),
@@ -115,6 +117,7 @@ export const generateDocument = createServerFn({ method: "POST" })
       notes: `Generated (${data.format})${data.improvedSections ? " + AI-improved wording" : ""}`,
     };
     d.documents = [...d.documents, record];
+    d.missingDocumentTypes = d.missingDocumentTypes.filter((t) => t !== documentType);
     audit(d, {
       actor: "ai_assistant",
       action: "Dokument i gjeneruar",

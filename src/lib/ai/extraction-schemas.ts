@@ -54,6 +54,17 @@ export const expropriationFieldsSchema = z.object({
   acceptanceStatus: fieldSchema(z.enum(["pending", "accepted", "rejected", "unknown"])),
 });
 
+// --------------- Business property registration-specific ---------------
+export const propertyRegistrationFieldsSchema = z.object({
+  businessName: str,
+  nipt: str,
+  representativeName: str,
+  ownershipActNumber: str,
+  registrationReason: str,
+  planReference: str,
+  hasLegalRepresentation: fieldSchema(z.boolean()),
+});
+
 // --------------- Top-level extraction envelope ---------------
 export const extractionResultSchema = z.object({
   documentType: z.string().min(1),
@@ -61,6 +72,7 @@ export const extractionResultSchema = z.object({
   common: commonFieldsSchema.partial(),
   ekb: ekbFieldsSchema.partial().optional(),
   expropriation: expropriationFieldsSchema.partial().optional(),
+  propertyRegistration: propertyRegistrationFieldsSchema.partial().optional(),
   missingFields: z.array(z.string()).default([]),
   warnings: z.array(z.string()).default([]),
   overallConfidence: z.number().min(0).max(1),
@@ -74,11 +86,15 @@ export type FieldValue<T = unknown> = {
 };
 
 /** Build the JSON schema description text used in the LLM system prompt. */
-export function buildSchemaDescription(processKind: "ekb_privatization" | "expropriation") {
+export function buildSchemaDescription(
+  processKind: "ekb_privatization" | "expropriation" | "property_registration",
+) {
   const common = `common: { applicantName, nidMasked, address, phone, email, documentDate, institution, propertyId, cadastralZone, propertyAreaM2, municipality } — each as { "value": <typed-or-null>, "confidence": 0..1, "sourceEvidence"?: "<short snippet>" }`;
   const ekb = `ekb: { familyMembers, familyIncomeAll, marketPriceAll, landPriceAll, housingNorm, certificateNumber, qualifiesForPrivatization (boolean), suggestedPriceCategory ("subsidized"|"market"|"mixed"|"unknown") }`;
   const exp = `expropriation: { ownerName, projectName, publicInterestReason, compensationAmountAll, valuationMethod, appealDeadline, acceptanceStatus ("pending"|"accepted"|"rejected"|"unknown") }`;
-  const specific = processKind === "ekb_privatization" ? ekb : exp;
+  const biz = `propertyRegistration: { businessName, nipt, representativeName, ownershipActNumber, registrationReason, planReference, hasLegalRepresentation (boolean) }`;
+  const specific =
+    processKind === "ekb_privatization" ? ekb : processKind === "property_registration" ? biz : exp;
   return `Return JSON ONLY matching:
 {
   "documentType": string,

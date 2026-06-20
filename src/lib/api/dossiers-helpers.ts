@@ -23,6 +23,7 @@ export function notFound(): never {
 export type Priority = "low" | "normal" | "high";
 
 export function inferPriority(d: Dossier): Priority {
+  if (d.expeditedProcedure?.status === "approved") return "high";
   const ds = getDeadlineState(d, PROCESSES[d.process]);
   if (ds.state === "overdue") return "high";
   const crit = getCriticalAlerts(d, PROCESSES[d.process]).filter(

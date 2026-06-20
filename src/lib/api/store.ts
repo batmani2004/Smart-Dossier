@@ -19,9 +19,21 @@ function fresh(): StoreState {
   };
 }
 
+function syncSeedDossiers(state: StoreState): StoreState {
+  const existingTrackingCodes = new Set(
+    Array.from(state.dossiers.values()).map((d) => d.trackingCode),
+  );
+  for (const seed of SEED_CORE_DOSSIERS) {
+    if (state.dossiers.has(seed.id) || existingTrackingCodes.has(seed.trackingCode)) continue;
+    state.dossiers.set(seed.id, structuredClone(seed));
+    existingTrackingCodes.add(seed.trackingCode);
+  }
+  return state;
+}
+
 export function store(): StoreState {
   if (!g.__smartDossierStore) g.__smartDossierStore = fresh();
-  return g.__smartDossierStore;
+  return syncSeedDossiers(g.__smartDossierStore);
 }
 
 export function resetStore(): { dossiers: number } {

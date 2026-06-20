@@ -6,6 +6,7 @@ export const TEMPLATE_LABELS: Record<DocTemplateKey, string> = {
   ekb_missing_docs_notice: "EKB — Njoftim për dokumente që mungojnë",
   ekb_refusal_decision: "EKB — Vendim refuzimi me arsye",
   ekb_value_calculation: "EKB — Fletë llogaritjeje e vlerës",
+  ekb_citizen_invoice: "EKB - Fature qytetari / mandat pagese",
   ekb_contract_draft: "EKB — Draft kontrate privatizimi",
   exp_owner_notification: "Shpronësim — Njoftim pronari (afat 30 ditë)",
   exp_compensation_proposal: "Shpronësim — Propozim kompensimi / akt rivlerësimi",
@@ -16,9 +17,11 @@ export const TEMPLATES_FOR_PROCESS: Record<Dossier["process"], DocTemplateKey[]>
     "ekb_missing_docs_notice",
     "ekb_refusal_decision",
     "ekb_value_calculation",
+    "ekb_citizen_invoice",
     "ekb_contract_draft",
   ],
   expropriation: ["exp_owner_notification", "exp_compensation_proposal"],
+  property_registration: [],
 };
 
 // ---------- helpers ----------
@@ -288,7 +291,77 @@ function tplEkbValueCalc(d: Dossier, process: ProcessDefinition): GeneratedDoc {
   };
 }
 
-// ---------- 4. EKB contract draft ----------
+// ---------- 4. EKB citizen invoice ----------
+
+function tplEkbCitizenInvoice(d: Dossier, process: ProcessDefinition): GeneratedDoc {
+  const p = d.property ?? {};
+  const income = p.familyIncomeAll ?? 0;
+  const market = p.marketPriceAll ?? 0;
+  const land = p.landPriceAll ?? 0;
+  const total =
+    d.finalValueAll ??
+    (() => {
+      try {
+        return calculateEkbPrivatizationValue({
+          familyIncomeAll: income,
+          marketPriceAll: market,
+          landPriceAll: land,
+        }).totalPayableAll;
+      } catch {
+        return 0;
+      }
+    })();
+  const due = addDays(new Date().toISOString(), 30);
+  const reference = `${d.trackingCode}-FAT-${String(d.documents.length + 1).padStart(2, "0")}`;
+
+  const sections: DocSection[] = [
+    {
+      heading: "Lënda",
+      paragraphs: [`Gjenerim fature / mandat pagese për dosjen e privatizimit ${d.trackingCode}.`],
+    },
+    {
+      heading: "Detyrimi për pagesë",
+      paragraphs: [
+        `I/E nderuar ${addressee(d).name}, në bazë të llogaritjes së vlerës së privatizimit, shuma për t'u paguar është ${fmtAll(total)}.`,
+        "Kjo faturë shërben si dokument pune për pagesën para lidhjes së kontratës së privatizimit.",
+      ],
+    },
+    {
+      heading: "Afati dhe referenca",
+      paragraphs: [
+        `Afati i pagesës: 30 ditë kalendarike, deri më ${fmtDate(due)}.`,
+        `Numri i referencës: ${reference}.`,
+      ],
+    },
+  ];
+
+  return {
+    ...commonHeader(d, process, "ekb_citizen_invoice", "Faturë qytetari / mandat pagese", "FAT"),
+    sections,
+    table: {
+      heading: "Përmbledhje pagese",
+      columns: ["Zëri", "Vlera"],
+      rows: [
+        ["Kodi i dosjes", d.trackingCode],
+        ["Aplikanti", addressee(d).name],
+        ["Pasuria", p.description ?? "—"],
+        ["Zona", p.zone ?? "—"],
+        ["Shuma për pagesë", fmtAll(total)],
+        ["Afati i pagesës", fmtDate(due)],
+        ["Referenca", reference],
+      ],
+    },
+    deadlineLine: `Afati i pagesës: 30 ditë kalendarike (deri më ${fmtDate(due)}).`,
+    signatures: [
+      { role: "Specialist finance", institution: "Financa EKB" },
+      { role: "Përgjegjës dosjeje", institution: institutionForPhase(d, process) },
+    ],
+    footer:
+      "Fatura është gjeneruar automatikisht nga Smart Dossier pas llogaritjes së vlerës. Gjenerimi regjistrohet në historikun e audituar të dosjes.",
+  };
+}
+
+// ---------- 5. EKB contract draft ----------
 
 function tplEkbContract(d: Dossier, process: ProcessDefinition): GeneratedDoc {
   const p = d.property ?? {};
@@ -466,6 +539,7 @@ const REGISTRY: Record<DocTemplateKey, (d: Dossier, p: ProcessDefinition) => Gen
   ekb_missing_docs_notice: tplEkbMissingDocs,
   ekb_refusal_decision: tplEkbRefusal,
   ekb_value_calculation: tplEkbValueCalc,
+  ekb_citizen_invoice: tplEkbCitizenInvoice,
   ekb_contract_draft: tplEkbContract,
   exp_owner_notification: tplExpOwnerNotification,
   exp_compensation_proposal: tplExpCompensationProposal,

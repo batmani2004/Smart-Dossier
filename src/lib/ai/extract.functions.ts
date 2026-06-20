@@ -9,7 +9,7 @@ import {
 } from "./extraction-schemas";
 
 const SYSTEM_PROMPT = `You are an extractor of structured data from Albanian property-procedure documents
-(privatization of state-owned housing "EKB" and expropriation procedures).
+(privatization of state-owned housing "EKB", expropriation procedures, and business property-registration procedures).
 
 Rules:
 - Return JSON ONLY, no prose, no markdown fences.
@@ -33,7 +33,7 @@ export const getAiStatus = createServerFn({ method: "GET" }).handler(async () =>
 });
 
 export type ExtractInput = {
-  processKind: "ekb_privatization" | "expropriation";
+  processKind: "ekb_privatization" | "expropriation" | "property_registration";
   documentType: string;
   text: string;
   fileName?: string;
@@ -103,7 +103,7 @@ export const extractFromText = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z
       .object({
-        processKind: z.enum(["ekb_privatization", "expropriation"]),
+        processKind: z.enum(["ekb_privatization", "expropriation", "property_registration"]),
         documentType: z.string().min(1),
         text: z.string().min(1).max(120_000),
         fileName: z.string().optional(),

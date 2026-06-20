@@ -175,8 +175,39 @@ export const ekbPrivatizationProcess: ProcessDefinition = {
       ],
     },
     {
-      id: "ekb-p6",
+      id: "ekb-p5-invoice",
       order: 6,
+      title: "Gjenerimi i faturës së qytetarit",
+      description:
+        "Pas llogaritjes së vlerës, sistemi gjeneron faturën/mandatin e pagesës për qytetarin dhe e regjistron në dosje.",
+      institutions: ["EKB", "Financa"],
+      steps: [
+        {
+          id: "ekb-s5-invoice",
+          order: 1,
+          title: "Gjenerimi i faturës për pagesë",
+          description:
+            "Nga vlera e miratuar krijohet fatura e qytetarit me afat pagese, numër reference dhe shumën për t'u arkëtuar.",
+          institution: "Financa EKB",
+          requiredDocuments: ["citizen_invoice"],
+          slaDays: 3,
+          manual: false,
+          criticalPoints: [
+            {
+              id: "invoice-before-contract",
+              label: "Faturë para kontratës",
+              description:
+                "Kontrata nuk duhet të kalojë për firmosje pa faturë/mandat pagese të gjeneruar dhe të audituar.",
+              severity: "warning",
+              tags: ["billing", "audit-trail"],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "ekb-p6",
+      order: 7,
       title: "Lidhja e kontratës",
       description:
         "Kontrata EKB–qytetar duhet të lidhet brenda 2 vjetëve nga njoftimi. Word/print, firmosje fizike.",
@@ -205,7 +236,7 @@ export const ekbPrivatizationProcess: ProcessDefinition = {
     },
     {
       id: "ekb-p7",
-      order: 7,
+      order: 8,
       title: "Dërgimi i dosjes në ASHK",
       description: "Dorëzim fizik i dosjes në ASHK. Rrezik humbjeje, 4–8 javë vonesë.",
       institutions: ["EKB", "ASHK"],
@@ -241,7 +272,7 @@ export const ekbPrivatizationProcess: ProcessDefinition = {
     },
     {
       id: "ekb-p8",
-      order: 8,
+      order: 9,
       title: "Regjistrimi përfundimtar në ASHK",
       description: "ASHK lëshon certifikatën përfundimtare. Radhë institucionale, 4–8 javë.",
       institutions: ["ASHK"],

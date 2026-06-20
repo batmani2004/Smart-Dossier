@@ -1,4 +1,5 @@
-import type { Dossier, ProcessKind } from "./types";
+import type { Dossier, DossierDocument, ProcessKind } from "./types";
+import { DEMO_OPERATORS } from "@/lib/demo-operators";
 
 // Helpers ---------------------------------------------------------------
 const DAY = 24 * 60 * 60 * 1000;
@@ -6,8 +7,45 @@ function iso(offsetDays: number, base = Date.now()): string {
   return new Date(base + offsetDays * DAY).toISOString();
 }
 function code(kind: ProcessKind, n: number): string {
-  const prefix = kind === "ekb_privatization" ? "EKB" : "EXP";
+  const prefix =
+    kind === "ekb_privatization" ? "EKB" : kind === "property_registration" ? "BIZ" : "EXP";
   return `${prefix}-2026-${String(n).padStart(6, "0")}`;
+}
+type SeedClaimType = "owner" | "legal_representative";
+
+function requesterRequiredDocuments(process: ProcessKind, claimType: SeedClaimType) {
+  if (process === "property_registration") {
+    return [
+      "business_nipt_extract",
+      "legal_representative_id",
+      "property_registration_request",
+      "ownership_origin_document",
+      "property_plan",
+    ];
+  }
+  const cadastralProof = process === "expropriation" ? "ownership_extract" : "ashk_certificate";
+  const base = ["id_card_copy", cadastralProof];
+  return claimType === "legal_representative" ? [...base, "legal_authorization"] : base;
+}
+
+function seedHasDocument(docs: SeedSpec["uploadedDocs"], type: string) {
+  if (type === "ashk_certificate") {
+    return docs.some(
+      (doc) =>
+        (doc.type === "ashk_certificate" || doc.type === "ashk_certificate_final") &&
+        doc.status !== "rejected",
+    );
+  }
+  if (type === "ownership_extract") {
+    return docs.some(
+      (doc) =>
+        (doc.type === "ownership_extract" ||
+          doc.type === "ashk_certificate" ||
+          doc.type === "ashk_certificate_final") &&
+        doc.status !== "rejected",
+    );
+  }
+  return docs.some((doc) => doc.type === type && doc.status !== "rejected");
 }
 
 // Compact dossier factory to keep the file readable.
@@ -21,6 +59,7 @@ interface SeedSpec {
   applicant: string;
   fatherName?: string;
   nid?: string;
+  nipt?: string;
   zone: string;
   propertyDescription: string;
   areaSqm?: number;
@@ -29,7 +68,13 @@ interface SeedSpec {
   landPriceAll?: number;
   familyIncomeAll?: number;
   finalValueAll?: number;
-  uploadedDocs: { type: string; name: string; stepId?: string }[];
+  uploadedDocs: {
+    type: string;
+    name: string;
+    stepId?: string;
+    status?: DossierDocument["status"];
+    notes?: string;
+  }[];
   missing: string[];
   deadlines: {
     id: string;
@@ -46,14 +91,30 @@ interface SeedSpec {
     text: string;
     atDays: number;
   }[];
+  assignment?: "manual" | "unassigned";
+  requesterClaimType?: SeedClaimType;
+  cadastralSubjectName?: string;
   notes?: string;
 }
 
 function buildDossier(s: SeedSpec): Dossier {
   const createdAt = iso(-30);
   const updatedAt = iso(-1);
+  const assignedOperator = DEMO_OPERATORS[(s.n - 1) % DEMO_OPERATORS.length];
+  const requesterClaimType = s.requesterClaimType ?? "owner";
+  const requesterRequired = requesterRequiredDocuments(s.process, requesterClaimType);
+  const requesterMissing = requesterRequired.filter(
+    (type) => !seedHasDocument(s.uploadedDocs, type),
+  );
+  const requesterVerified = requesterMissing.length === 0;
   return {
-    id: `d-${s.process === "ekb_privatization" ? "ekb" : "exp"}-${String(s.n).padStart(3, "0")}`,
+    id: `d-${
+      s.process === "ekb_privatization"
+        ? "ekb"
+        : s.process === "property_registration"
+          ? "biz"
+          : "exp"
+    }-${String(s.n).padStart(3, "0")}`,
     trackingCode: code(s.process, s.n),
     process: s.process,
     title: s.title,
@@ -67,6 +128,7 @@ function buildDossier(s: SeedSpec): Dossier {
         fullName: s.applicant,
         fatherName: s.fatherName,
         nationalIdMasked: s.nid,
+        businessNipt: s.nipt,
       },
     ],
     property: {
@@ -82,12 +144,13 @@ function buildDossier(s: SeedSpec): Dossier {
       id: `doc-${i + 1}`,
       type: d.type,
       name: d.name,
-      status: "uploaded" as const,
+      status: d.status ?? ("uploaded" as const),
       uploadedAt: iso(-10 + i),
       uploadedBy: "civil_servant_demo",
       requiredAtStepId: d.stepId,
+      notes: d.notes,
     })),
-    missingDocumentTypes: s.missing,
+    missingDocumentTypes: Array.from(new Set([...s.missing, ...requesterMissing])),
     deadlines: s.deadlines.map((d) => ({
       id: d.id,
       kind: d.kind,
@@ -112,8 +175,33 @@ function buildDossier(s: SeedSpec): Dossier {
       text: i.text,
       confidence: 0.82,
     })),
+    requesterVerification: {
+      claimType: requesterClaimType,
+      cadastralSubjectName: s.cadastralSubjectName ?? s.applicant,
+      status: requesterVerified ? "verified" : "needs_documents",
+      requiredDocumentTypes: requesterRequired,
+      verifiedAt: requesterVerified ? iso(-8) : undefined,
+      verifiedBy: requesterVerified ? "civil_servant_demo" : undefined,
+      notes: requesterVerified
+        ? "Identiteti dhe lidhja me kartelen kadastrale jane verifikuar."
+        : "Duhet plotesuar prova qe kerkuesi eshte pronari ne kadaster ose perfaqesues ligjor.",
+    },
     createdAt,
     updatedAt,
+    assignedOperatorId: s.assignment === "unassigned" ? undefined : assignedOperator?.id,
+    assignedOperatorName: s.assignment === "unassigned" ? undefined : assignedOperator?.name,
+    assignedAt: s.assignment === "unassigned" ? undefined : iso(-29),
+    assignmentMode: s.assignment === "unassigned" ? undefined : "manual",
+    assignmentDueAt:
+      s.assignment === "unassigned"
+        ? new Date(Date.now() + 20 * 60 * 1000).toISOString()
+        : undefined,
+    submittedFrom:
+      s.assignment === "unassigned"
+        ? s.process === "property_registration"
+          ? "business_portal"
+          : "citizen_portal"
+        : "admin",
     finalValueAll: s.finalValueAll,
     notes: s.notes,
   };
@@ -220,8 +308,8 @@ const EKB_SEEDS: SeedSpec[] = [
     process: "ekb_privatization",
     title: "Privatizim banese — Shkodër, qendër",
     status: "in_progress",
-    currentPhaseId: "ekb-p5",
-    currentStepId: "ekb-s5",
+    currentPhaseId: "ekb-p5-invoice",
+    currentStepId: "ekb-s5-invoice",
     applicant: "Gent Marku",
     nid: "F77******D",
     zone: "Shkodër",
@@ -235,11 +323,25 @@ const EKB_SEEDS: SeedSpec[] = [
       { type: "ashk_certificate", name: "Certifikatë ASHK.pdf" },
       { type: "family_certificate", name: "Certifikatë familjare.pdf" },
     ],
-    missing: [],
+    missing: ["citizen_invoice"],
     deadlines: [
-      { id: "dl1", kind: "sla", label: "Vlerësim përfundimtar", dueInDays: 6, phaseId: "ekb-p5" },
+      {
+        id: "dl1",
+        kind: "sla",
+        label: "Gjenerimi i faturës së qytetarit",
+        dueInDays: 3,
+        phaseId: "ekb-p5-invoice",
+      },
     ],
-    audit: [{ atDays: -3, actor: "civil_servant_demo", action: "Hyrja në fazën e vlerësimit" }],
+    audit: [
+      { atDays: -3, actor: "civil_servant_demo", action: "Vlera e privatizimit u miratua" },
+      {
+        atDays: -1,
+        actor: "system",
+        action: "Kalim në fazën e faturimit",
+        stepId: "ekb-s5-invoice",
+      },
+    ],
     insights: [
       {
         kind: "summary",
@@ -391,7 +493,17 @@ const EKB_SEEDS: SeedSpec[] = [
     marketPriceAll: undefined,
     landPriceAll: undefined,
     familyIncomeAll: undefined,
-    uploadedDocs: [{ type: "id_card_copy", name: "ID Arta.pdf", stepId: "ekb-s3" }],
+    uploadedDocs: [
+      { type: "id_card_copy", name: "ID Arta.pdf", stepId: "ekb-s3" },
+      {
+        type: "dossier_pdf",
+        name: "Dosja e aplikimit - e vulosur.pdf",
+        stepId: "ekb-s3",
+        status: "verified",
+        notes:
+          "Vulosur elektronikisht nga Smart Dossier me vulen e institucionit (/stamps/ashk-demo-stamp.png).",
+      },
+    ],
     missing: ["family_certificate", "ashk_certificate"],
     deadlines: [
       {
@@ -414,6 +526,33 @@ const EKB_SEEDS: SeedSpec[] = [
     ],
     notes:
       "Dosja DEMO për prezantim. Aplikim fizik me dokumente që mungojnë; pritet ngarkim sample-documents/ekb-family-certificate.txt për ekstraktim AI.",
+  },
+  {
+    n: 15,
+    process: "ekb_privatization",
+    title: "Aplikim i ri qytetari - Kombinat, Tiranë",
+    status: "draft",
+    currentPhaseId: "ekb-p3",
+    currentStepId: "ekb-s3",
+    applicant: "Ilir Meta",
+    fatherName: "Agim",
+    nid: "J72******K",
+    zone: "Tiranë",
+    propertyDescription: "Apartament 1+1, Kombinat",
+    uploadedDocs: [],
+    missing: ["family_certificate", "ashk_certificate"],
+    deadlines: [],
+    audit: [
+      {
+        atDays: 0,
+        actor: "citizen_portal",
+        action: "Aplikim i ri nga qytetari",
+        details: "Në pritje për caktim operatori.",
+      },
+    ],
+    assignment: "unassigned",
+    notes:
+      "Aplikim hyrës demo: admini mund ta caktojë manualisht ose sistemi e cakton pas 30 minutash.",
   },
 ];
 
@@ -553,7 +692,52 @@ const EXP_SEEDS: SeedSpec[] = [
   },
 ];
 
+const BIZ_SEEDS: SeedSpec[] = [
+  {
+    n: 1,
+    process: "property_registration",
+    title: "Regjistrim prone biznesi - AlbaTech sh.p.k.",
+    status: "draft",
+    currentPhaseId: "biz-p1",
+    currentStepId: "biz-s1",
+    applicant: "AlbaTech sh.p.k.",
+    nipt: "L12345678A",
+    zone: "Tirane",
+    propertyDescription: "Njesi sherbimi dhe magazine logjistike",
+    areaSqm: 320,
+    cadastralNo: "7/188",
+    uploadedDocs: [
+      { type: "business_nipt_extract", name: "Ekstrakt-QKB-AlbaTech.pdf", status: "verified" },
+      { type: "legal_representative_id", name: "ID-administrator.pdf" },
+      { type: "property_registration_request", name: "Kerkese-regjistrimi.pdf" },
+      { type: "ownership_origin_document", name: "Kontrate-shitblerje.pdf" },
+    ],
+    missing: ["property_plan"],
+    deadlines: [
+      {
+        id: "dl1",
+        kind: "sla",
+        label: "Shqyrtim fillestar i dokumentacionit",
+        dueInDays: 2,
+        phaseId: "biz-p1",
+        stepId: "biz-s1",
+      },
+    ],
+    audit: [
+      {
+        atDays: -1,
+        actor: "business_portal",
+        action: "Aplikim i ri biznesi per regjistrim prone",
+        details: "NIPT L12345678A · mungon plan rilevimi.",
+      },
+    ],
+    assignment: "unassigned",
+    notes: "Shembull demo: biznesi aplikon me NIPT dhe operatori shqyrton dokumentacionin.",
+  },
+];
+
 export const SEED_CORE_DOSSIERS: Dossier[] = [
   ...EKB_SEEDS.map(buildDossier),
   ...EXP_SEEDS.map(buildDossier),
+  ...BIZ_SEEDS.map(buildDossier),
 ];

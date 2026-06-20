@@ -90,15 +90,21 @@ Scheme by family income:
 - 9,000–14,000 ALL → 50% market price (reduced)
 - Below 9,000 ALL → free of charge (0% land)
 
-### STEP 5 — PRIVATIZATION CONTRACT SIGNING
+### STEP 5 — CITIZEN INVOICE GENERATION
+After the value calculation, HCA/Finance generates the citizen invoice or
+payment mandate. Operational SLA: 3 days. The invoice includes the payable
+amount, payment deadline and reference number. It must be generated before the
+contract signing phase.
+
+### STEP 6 — PRIVATIZATION CONTRACT SIGNING
 HCA and citizen within 2 years. The contract is drafted in Word and printed.
 CRITICAL POINT: mandatory physical presence, wet signature + stamp + by hand.
 
-### STEP 6 — SENDING THE FILE TO SCA
+### STEP 7 — SENDING THE FILE TO SCA
 The file (contract + documents) is delivered physically. CRITICAL POINT:
 loss risk, 4–8 week delays, no API.
 
-### STEP 7 — OWNERSHIP REGISTRATION BY SCA
+### STEP 8 — OWNERSHIP REGISTRATION BY SCA
 SCA registers the contract in the cadastral registry and issues the new
 certificate. CRITICAL POINT: long queue, 4–8 more weeks.
 The family becomes the full owner.
@@ -194,20 +200,26 @@ export const EKB_FAZAT: readonly FazaShabllon[] = [
   },
   {
     numri: 5,
+    titulli: "Citizen Invoice",
+    institucion: "HCA Finance",
+    pershkrim: "Payment mandate generated for citizen",
+  },
+  {
+    numri: 6,
     titulli: "Contract Signing",
     institucion: "HCA + Citizen",
     pershkrim: "Wet signature within 2 years",
     manual: true,
   },
   {
-    numri: 6,
+    numri: 7,
     titulli: "Send to SCA",
     institucion: "HCA → SCA",
     pershkrim: "Physical file delivery",
     manual: true,
   },
   {
-    numri: 7,
+    numri: 8,
     titulli: "Final Registration",
     institucion: "SCA — IPRO",
     pershkrim: "New ownership certificate",

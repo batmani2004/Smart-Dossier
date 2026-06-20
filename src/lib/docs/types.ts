@@ -4,6 +4,7 @@ export type DocTemplateKey =
   | "ekb_missing_docs_notice"
   | "ekb_refusal_decision"
   | "ekb_value_calculation"
+  | "ekb_citizen_invoice"
   | "ekb_contract_draft"
   | "exp_owner_notification"
   | "exp_compensation_proposal";
