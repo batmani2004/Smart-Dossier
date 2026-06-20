@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { Copy, QrCode, Check, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,19 +15,36 @@ import { toast } from "sonner";
 export function ShareTracking({ code }: { code: string }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState("");
+  const [qrError, setQrError] = useState(false);
   const url =
     typeof window !== "undefined"
       ? `${window.location.origin}/track/${encodeURIComponent(code)}`
       : `/track/${encodeURIComponent(code)}`;
 
   useEffect(() => {
-    if (!open || !canvasRef.current) return;
-    QRCode.toCanvas(canvasRef.current, url, {
-      width: 220,
-      margin: 1,
+    if (!open) return;
+
+    let cancelled = false;
+    setQrDataUrl("");
+    setQrError(false);
+
+    QRCode.toDataURL(url, {
+      width: 288,
+      margin: 2,
+      errorCorrectionLevel: "M",
       color: { dark: "#0f172a", light: "#ffffff" },
-    }).catch(() => undefined);
+    })
+      .then((dataUrl) => {
+        if (!cancelled) setQrDataUrl(dataUrl);
+      })
+      .catch(() => {
+        if (!cancelled) setQrError(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [open, url]);
 
   async function copy() {
@@ -56,8 +73,18 @@ export function ShareTracking({ code }: { code: string }) {
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center gap-3">
-          <div className="rounded-lg border bg-white p-3">
-            <canvas ref={canvasRef} className="block" aria-label="QR code" />
+          <div className="flex h-72 w-full items-center justify-center rounded-lg border bg-white p-4">
+            {qrDataUrl ? (
+              <img
+                src={qrDataUrl}
+                alt={`QR code per ${code}`}
+                className="size-64 object-contain"
+              />
+            ) : (
+              <div className="text-center text-sm text-muted-foreground">
+                {qrError ? "QR nuk u gjenerua. Provoni hapjen përsëri." : "Duke gjeneruar QR..."}
+              </div>
+            )}
           </div>
           <div className="text-center">
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
