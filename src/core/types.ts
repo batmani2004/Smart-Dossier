@@ -193,7 +193,8 @@ export type AiInsightKind =
   | "next_step"
   | "missing_document"
   | "critical_alert"
-  | "extraction";
+  | "extraction"
+  | "valuation";
 
 export type JsonValue =
   | string

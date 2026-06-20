@@ -108,20 +108,22 @@ export function AppShell({
     <div className="min-h-screen bg-background">
       {/* ── Sidebar (desktop) ─────────────────────────────── */}
       <aside
-        className="hidden md:flex fixed left-0 top-0 h-full w-[280px] flex-col z-50"
+        className="hidden md:flex fixed left-0 top-0 h-full w-[248px] flex-col z-50"
         style={{ background: "linear-gradient(180deg, #141c2b 0%, #101827 100%)" }}
       >
         {/* Logo */}
-        <div className="px-5 pt-6 pb-7">
+        <div className="px-4 pt-5 pb-5">
           <Link to="/" className="flex items-center gap-3 group">
-            <img src="/brand/smart-dossier-logo.png" alt="Smart Dossier" className="size-10 object-contain shrink-0" />
+            <img
+              src="/brand/smart-dossier-logo.png"
+              alt="Smart Dossier"
+              className="size-9 object-contain shrink-0"
+            />
             <div>
               <div className="text-base font-bold text-white tracking-tight leading-tight">
                 Smart Dossier
               </div>
-              <div className="text-[11px] text-white/45 font-mono tracking-widest uppercase">
-                Dosja Inteligjente
-              </div>
+              <div className="text-[11px] text-white/45">Portal dosjesh</div>
             </div>
           </Link>
         </div>
@@ -194,7 +196,7 @@ export function AppShell({
           <div className="px-3 pt-2">
             <Link
               to="/aplikim"
-              className="flex items-center justify-center gap-2 w-full bg-accent hover:bg-accent/90 text-white py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 shadow-lg shadow-accent/20"
+              className="flex items-center justify-center gap-2 w-full bg-accent hover:bg-accent/90 text-white py-2.5 rounded-md text-sm font-semibold transition-all duration-150 shadow-lg shadow-accent/20"
             >
               <Plus className="size-4" />
               Aplikim i ri
@@ -214,7 +216,7 @@ export function AppShell({
       </aside>
 
       {/* ── Main content ──────────────────────────────────── */}
-      <div className="md:ml-[280px] flex flex-col min-h-screen">
+      <div className="md:ml-[248px] flex flex-col min-h-screen">
         {/* Desktop breadcrumb bar */}
         <div className="hidden md:flex h-11 items-center justify-between border-b border-border bg-surface/80 backdrop-blur-sm px-6 sticky top-0 z-30">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">

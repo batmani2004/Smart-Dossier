@@ -17,6 +17,7 @@ import {
   History,
   IdCard,
   ListChecks,
+  Loader2,
   MapPinned,
   MessageSquare,
   Scale,
@@ -50,6 +51,7 @@ import { AccessNotice } from "@/components/role-switcher";
 import { ShareTracking } from "@/components/share-tracking";
 import {
   advanceDossier,
+  calculateEkbValuation,
   getDossier,
   reviewExpeditedProcedure,
   updateRequesterVerification,
@@ -70,12 +72,14 @@ function DossierWorkspace() {
   const { id } = Route.useParams();
   const get = useServerFn(getDossier);
   const advance = useServerFn(advanceDossier);
+  const calculateValuation = useServerFn(calculateEkbValuation);
   const qc = useQueryClient();
   const { role, profile, can } = useDemoRole();
   const [activeTab, setActiveTab] = useState("permbledhje");
   const [aiSummaryText, setAiSummaryText] = useState<string | null>(null);
   const [aiSummaryLoading, setAiSummaryLoading] = useState(false);
   const [aiSummaryRequestId, setAiSummaryRequestId] = useState<string | null>(null);
+  const [valuationLoading, setValuationLoading] = useState(false);
 
   const q = useQuery({ queryKey: ["dossier", id], queryFn: () => get({ data: { id } }) });
   const canRunAi = can("runAi");
@@ -126,6 +130,22 @@ function DossierWorkspace() {
   const currentStep = currentPhase?.steps.find((s) => s.id === d.currentStepId);
   const currentPhaseDuration = currentPhase ? phaseDurationDays(currentPhase) : undefined;
   const gisAssessment = buildAiGisAssessment(d);
+  const latestValuation = [...d.insights].reverse().find((item) => item.kind === "valuation");
+
+  async function handleCalculateValuation() {
+    setValuationLoading(true);
+    try {
+      const result = await calculateValuation({ data: { id: d.id } });
+      toast.success(
+        `Akt Vleresimi u llogarit: ${result.valuation.finalValueAll.toLocaleString("sq-AL")} ALL`,
+      );
+      await qc.invalidateQueries({ queryKey: ["dossier", id] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Llogaritja deshtoi");
+    } finally {
+      setValuationLoading(false);
+    }
+  }
 
   if (role === "citizen") {
     return (
@@ -707,6 +727,14 @@ function DossierWorkspace() {
           {/* AI Assistant */}
           {can("runAi") ? (
             <TabsContent value="ai" className="space-y-3">
+              {d.process === "ekb_privatization" ? (
+                <EkbValuationAssistant
+                  dossier={d}
+                  loading={valuationLoading}
+                  latestValuation={latestValuation}
+                  onCalculate={handleCalculateValuation}
+                />
+              ) : null}
               <AiExtractPanel dossier={d} />
               <AiAssistPanel dossier={{ id: d.id, trackingCode: d.trackingCode }} />
             </TabsContent>
@@ -760,6 +788,144 @@ function DossierWorkspace() {
 
 function phaseDurationDays(phase: PhaseDefinition) {
   return phase.steps.reduce((total, step) => total + (step.slaDays ?? 0), 0);
+}
+
+function fmtAll(value: number | undefined | null) {
+  if (value === undefined || value === null || !Number.isFinite(value)) return "-";
+  return `${Math.round(value).toLocaleString("sq-AL")} ALL`;
+}
+
+function EkbValuationAssistant({
+  dossier,
+  loading,
+  latestValuation,
+  onCalculate,
+}: {
+  dossier: Dossier;
+  loading: boolean;
+  latestValuation: Dossier["insights"][number] | undefined;
+  onCalculate: () => void;
+}) {
+  const data = latestValuation?.data;
+  const steps = Array.isArray(data?.steps) ? data.steps : [];
+  const finalValue =
+    typeof data?.finalValueAll === "number" ? data.finalValueAll : dossier.finalValueAll;
+  const missingInputs =
+    dossier.property.familyIncomeAll === undefined || dossier.property.marketPriceAll === undefined;
+
+  return (
+    <Card className="overflow-hidden border-primary/25 bg-primary/5">
+      <div className="border-b bg-white/70 px-4 py-3">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+              <Sparkles className="size-4" />
+              AI Akt Vleresimi
+            </div>
+            <h2 className="mt-1 text-base font-semibold">Llogaritje VKM 179/2020 + VKM 898/2020</h2>
+            <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted-foreground">
+              Merr te ardhurat familjare, siperfaqen, cmimin e tregut dhe truallin nga dosja;
+              aplikon formulen Vp = Vb + Vt - Vsh - Vg; ruan rezultatin ne audit.
+            </p>
+          </div>
+          <Button size="sm" onClick={onCalculate} disabled={loading || missingInputs}>
+            {loading ? (
+              <Loader2 className="mr-1.5 size-4 animate-spin" />
+            ) : (
+              <Scale className="mr-1.5 size-4" />
+            )}
+            Llogarit dhe gjenero aktin
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid gap-3 p-4 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+          <MiniFact label="Te ardhura familjare" value={fmtAll(dossier.property.familyIncomeAll)} />
+          <MiniFact
+            label="Siperfaqe"
+            value={dossier.property.areaSqm ? `${dossier.property.areaSqm} m2` : "-"}
+          />
+          <MiniFact label="Cmimi i tregut" value={fmtAll(dossier.property.marketPriceAll)} />
+          <MiniFact label="Vlera e truallit" value={fmtAll(dossier.property.landPriceAll ?? 0)} />
+          <MiniFact label="Vlera finale" value={fmtAll(finalValue)} strong />
+        </div>
+
+        <div className="rounded-md border bg-white p-3">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="text-sm font-semibold">Hapat e llogaritjes</div>
+            {latestValuation ? (
+              <span className="text-[10px] text-muted-foreground">
+                {latestValuation.createdAt.replace("T", " ").slice(0, 16)}
+              </span>
+            ) : null}
+          </div>
+          {missingInputs ? (
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              Mungojne te ardhurat familjare ose cmimi i tregut. Ngarko dokumentet dhe perdor
+              nxjerrjen AI para llogaritjes.
+            </p>
+          ) : steps.length ? (
+            <ol className="space-y-2">
+              {steps.map((step, index) => {
+                const item = step as {
+                  title?: string;
+                  formula?: string;
+                  resultAll?: number | null;
+                  legalReference?: string;
+                };
+                return (
+                  <li
+                    key={`${item.title ?? "step"}-${index}`}
+                    className="rounded-md bg-muted/40 p-2"
+                  >
+                    <div className="flex items-start gap-2">
+                      <span className="grid size-5 shrink-0 place-items-center rounded bg-primary text-[10px] font-semibold text-primary-foreground">
+                        {index + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold">{item.title}</div>
+                        <div className="mt-0.5 text-xs text-muted-foreground">{item.formula}</div>
+                        {typeof item.resultAll === "number" ? (
+                          <div className="mt-1 text-xs font-semibold">{fmtAll(item.resultAll)}</div>
+                        ) : null}
+                        <div className="mt-1 text-[10px] text-muted-foreground">
+                          {item.legalReference}
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          ) : (
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              Kliko llogaritjen per te krijuar hapat, vleren finale dhe dokumentin "Akt Vleresimi".
+            </p>
+          )}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function MiniFact({
+  label,
+  value,
+  strong = false,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+}) {
+  return (
+    <div className="rounded-md border bg-white px-3 py-2">
+      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className={cn("mt-0.5 text-sm tabular-nums", strong && "font-semibold text-primary")}>
+        {value}
+      </div>
+    </div>
+  );
 }
 
 function ApprovalHierarchyCard({
