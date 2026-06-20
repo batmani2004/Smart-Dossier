@@ -56,36 +56,36 @@
 }
 
 :root {
-  --radius: 0.5rem;
+  --radius: 0.375rem;
 
-  --brand-navy: #063a6f;
-  --brand-navy-dark: #0b1426;
-  --brand-blue: #1f7af2;
-  --brand-blue-soft: #eaf3ff;
+  --brand-navy: #073a70;
+  --brand-navy-dark: #101827;
+  --brand-blue: #1f74ed;
+  --brand-blue-soft: #eaf2fd;
   --brand-red: #ef3f4f;
   --brand-yellow: #ffd500;
 
   /* Smart Dossier institutional palette */
-  --background: #f4f7fb;
-  --foreground: #14213d;
+  --background: #f3f7fc;
+  --foreground: #172338;
 
-  --surface: #f8fbff;
-  --surface-foreground: #14213d;
+  --surface: #eef4fb;
+  --surface-foreground: #172338;
 
   --card: #ffffff;
-  --card-foreground: #14213d;
+  --card-foreground: #172338;
 
   --popover: #ffffff;
-  --popover-foreground: #14213d;
+  --popover-foreground: #172338;
 
   --primary: var(--brand-blue);
   --primary-foreground: #ffffff;
 
-  --secondary: #eaf0f8;
+  --secondary: #e8eef7;
   --secondary-foreground: #1d2d50;
 
-  --muted: #eaf0f8;
-  --muted-foreground: #65748b;
+  --muted: #edf3fa;
+  --muted-foreground: #66758c;
 
   --accent: var(--brand-yellow);
   --accent-foreground: #1d2d50;
@@ -102,14 +102,14 @@
   --info: var(--brand-blue);
   --info-foreground: #ffffff;
 
-  --border: #d9e3f0;
-  --input: #d3deec;
+  --border: #d9e5f2;
+  --input: #ccd9e8;
   --ring: var(--brand-blue);
 
   --sidebar: var(--brand-navy-dark);
-  --sidebar-foreground: #eaf3ff;
-  --sidebar-border: #1d2b43;
-  --sidebar-accent: #112544;
+  --sidebar-foreground: #dbe7f7;
+  --sidebar-border: #1c2a3e;
+  --sidebar-accent: #17253b;
   --sidebar-accent-foreground: #ffffff;
 }
 
@@ -179,7 +179,29 @@
     background-color: var(--color-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .work-surface {
+    background:
+      linear-gradient(90deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.28)), var(--color-surface);
+    border: 1px solid color-mix(in srgb, var(--color-border) 85%, white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .console-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 1.875rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: rgb(255 255 255 / 0.72);
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-muted-foreground);
   }
 
   .scrollbar-thin::-webkit-scrollbar {

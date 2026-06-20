@@ -4,8 +4,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import {
   AlertTriangle,
+  ArrowLeft,
   ArrowRight,
   CheckCircle2,
+  ClipboardCheck,
   Circle,
   Clock,
   Download,
@@ -22,6 +24,7 @@ import {
   Sparkles,
   Upload,
   UserCheck,
+  UsersRound,
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
@@ -143,9 +146,25 @@ function DossierWorkspace() {
 
   return (
     <AppShell>
-      <div className="px-4 md:px-6 py-5 space-y-4 max-w-[1400px] mx-auto">
+      <div className="mx-auto max-w-[1400px] space-y-4 px-4 py-4 md:px-6">
         {/* Header */}
-        <Card className="p-4">
+        <Card className="work-surface p-4">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <Button asChild size="sm" variant="ghost" className="h-8 px-2 text-xs">
+              <Link to="/dosjet">
+                <ArrowLeft className="size-3.5" />
+                Kthehu
+              </Link>
+            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="console-pill">
+                <span className="font-mono">{d.trackingCode}</span>
+              </span>
+              <span className="console-pill border-warning/40 bg-warning/10 text-warning-foreground">
+                {currentStep?.title ?? currentPhase?.title ?? "Ne shqyrtim"}
+              </span>
+            </div>
+          </div>
           <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 items-start">
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
@@ -202,8 +221,10 @@ function DossierWorkspace() {
             </div>
           </div>
 
+          <DossierProgressRail phases={proc.phases} currentPhaseId={d.currentPhaseId} />
+
           {/* phase pills */}
-          <div className="mt-3 -mx-1 px-1 overflow-x-auto">
+          <div className="hidden">
             <div className="flex gap-1.5 min-w-max">
               {proc.phases.map((p) => {
                 const isCurrent = p.id === d.currentPhaseId;
@@ -239,18 +260,22 @@ function DossierWorkspace() {
         </Card>
 
         {/* Tabs */}
-        <Tabs defaultValue="permbledhje">
-          <TabsList className="flex w-full overflow-x-auto">
+        <Tabs defaultValue="workflow">
+          <TabsList className="flex h-auto w-full justify-start overflow-x-auto rounded-md border bg-[#e6eef8] p-1">
             <TabsTrigger value="permbledhje" className="text-xs">
+              <Sparkles className="size-3.5" />
               Përmbledhje
             </TabsTrigger>
             <TabsTrigger value="dokumentet" className="text-xs">
+              <FileText className="size-3.5" />
               Dokumentet
             </TabsTrigger>
             <TabsTrigger value="verifikimi" className="text-xs">
+              <UserCheck className="size-3.5" />
               Verifikimi
             </TabsTrigger>
             <TabsTrigger value="pershpejtimi" className="text-xs">
+              <Clock className="size-3.5" />
               Pershpejtimi
               {d.expeditedProcedure?.status === "submitted" ? (
                 <span className="ml-1 rounded bg-warning/20 px-1 text-[10px] text-warning-foreground">
@@ -260,6 +285,7 @@ function DossierWorkspace() {
             </TabsTrigger>
             {can("viewAudit") ? (
               <TabsTrigger value="ankesa" className="text-xs">
+                <MessageSquare className="size-3.5" />
                 Ankesa
                 {d.citizenComplaints?.length ? (
                   <span className="ml-1 rounded bg-destructive/15 px-1 text-[10px] text-destructive">
@@ -269,23 +295,28 @@ function DossierWorkspace() {
               </TabsTrigger>
             ) : null}
             <TabsTrigger value="lista" className="text-xs">
+              <ListChecks className="size-3.5" />
               Lista
             </TabsTrigger>
             <TabsTrigger value="workflow" className="text-xs">
+              <ClipboardCheck className="size-3.5" />
               Workflow
             </TabsTrigger>
             {can("runAi") ? (
               <TabsTrigger value="ai" className="text-xs">
+                <Sparkles className="size-3.5" />
                 AI
               </TabsTrigger>
             ) : null}
             {can("generateDocuments") ? (
               <TabsTrigger value="gjenero" className="text-xs">
+                <FileText className="size-3.5" />
                 Gjenero
               </TabsTrigger>
             ) : null}
             {can("viewAudit") ? (
               <TabsTrigger value="historiku" className="text-xs">
+                <History className="size-3.5" />
                 Historiku
               </TabsTrigger>
             ) : null}
@@ -501,6 +532,7 @@ function DossierWorkspace() {
 
           {/* Workflow */}
           <TabsContent value="workflow" className="space-y-3">
+            <ApprovalHierarchyCard dossier={d} currentPhase={currentPhase} />
             <Card className="p-3">
               <ol className="relative border-l ml-3 space-y-3">
                 {proc.phases.flatMap((p) =>
@@ -607,6 +639,167 @@ function DossierWorkspace() {
 
 function phaseDurationDays(phase: PhaseDefinition) {
   return phase.steps.reduce((total, step) => total + (step.slaDays ?? 0), 0);
+}
+
+function ApprovalHierarchyCard({
+  dossier,
+  currentPhase,
+}: {
+  dossier: Dossier;
+  currentPhase: PhaseDefinition | undefined;
+}) {
+  const institution = currentPhase?.institutions[0] ?? "Institucioni";
+  const steps = [
+    {
+      title: "Eksperti",
+      subtitle: dossier.assignedOperatorName ?? "Pa caktuar",
+      state: dossier.assignedOperatorName ? "Ne proces" : "Ne pritje",
+      icon: UserCheck,
+      active: true,
+    },
+    {
+      title: "Sekretari",
+      subtitle: institution,
+      state: "Ne pritje",
+      icon: FileText,
+      active: false,
+    },
+    {
+      title: "Drejtori Juridik",
+      subtitle: currentPhase?.title ?? "Verifikim",
+      state: "Refuzoi",
+      icon: Scale,
+      active: false,
+    },
+    {
+      title: "Drejtori i Pergjithshem",
+      subtitle: institution,
+      state: "Refuzoi",
+      icon: ShieldCheck,
+      active: false,
+    },
+  ];
+
+  return (
+    <Card className="work-surface p-4">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <UsersRound className="size-4 text-primary" />
+          <h2 className="text-sm font-semibold">Hierarkia e Miratimit</h2>
+        </div>
+        <span className="console-pill bg-primary/10 text-primary">
+          {dossier.status === "blocked" ? "Bllokuar" : "Ne Shqyrtim"}
+        </span>
+      </div>
+      <ol
+        className="grid gap-3 text-center md:grid-cols-4"
+        aria-label="Hierarkia e miratimit te dosjes"
+      >
+        {steps.map((step, index) => {
+          const Icon = step.icon;
+          return (
+            <li key={step.title} className="relative">
+              {index > 0 ? (
+                <span className="absolute -left-1/2 top-5 hidden h-px w-full bg-border md:block" />
+              ) : null}
+              <div
+                className={cn(
+                  "relative mx-auto grid size-11 place-items-center rounded-full border bg-card text-muted-foreground shadow-soft",
+                  step.active && "border-primary bg-primary text-primary-foreground",
+                )}
+              >
+                <Icon className="size-4" />
+              </div>
+              <div className="mt-2 text-xs font-semibold">{step.title}</div>
+              <div className="mx-auto mt-0.5 max-w-[9rem] truncate text-[11px] text-muted-foreground">
+                {step.subtitle}
+              </div>
+              <div
+                className={cn(
+                  "mt-1 text-[10px] font-semibold",
+                  step.active ? "text-primary" : "text-muted-foreground",
+                )}
+              >
+                {step.state}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </Card>
+  );
+}
+
+function DossierProgressRail({
+  phases,
+  currentPhaseId,
+}: {
+  phases: PhaseDefinition[];
+  currentPhaseId: string;
+}) {
+  const currentIndex = Math.max(
+    0,
+    phases.findIndex((phase) => phase.id === currentPhaseId),
+  );
+  const progress = phases.length > 1 ? ((currentIndex + 1) / phases.length) * 100 : 100;
+
+  return (
+    <div className="mt-4 rounded-md border border-border bg-white/70 p-4">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div>
+          <div className="text-[11px] font-semibold text-muted-foreground">Progresi</div>
+          <div className="mt-1 h-1.5 w-48 overflow-hidden rounded-full bg-primary/15">
+            <div className="h-full rounded-full bg-primary" style={{ width: `${progress}%` }} />
+          </div>
+        </div>
+        <div className="text-[11px] font-semibold text-primary">
+          {currentIndex + 1}/{phases.length} Hapa
+        </div>
+      </div>
+
+      <div className="-mx-1 overflow-x-auto px-1">
+        <ol
+          className="grid min-w-[720px] gap-0 overflow-hidden text-center md:min-w-0"
+          style={{ gridTemplateColumns: `repeat(${phases.length}, minmax(0, 1fr))` }}
+        >
+          {phases.map((phase, index) => {
+            const isCurrent = index === currentIndex;
+            const isDone = index < currentIndex;
+            return (
+              <li key={phase.id} className="relative px-1">
+                {index > 0 ? (
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "absolute left-[-50%] top-4 h-px w-full",
+                      isDone || isCurrent ? "bg-primary/45" : "bg-border",
+                    )}
+                  />
+                ) : null}
+                <div
+                  className={cn(
+                    "relative mx-auto grid size-8 place-items-center rounded-full border bg-card text-[11px] font-semibold shadow-soft",
+                    isDone && "border-success bg-success/10 text-success",
+                    isCurrent && "border-primary bg-primary text-primary-foreground",
+                  )}
+                >
+                  {isDone ? <CheckCircle2 className="size-4" /> : index + 1}
+                </div>
+                <div
+                  className={cn(
+                    "mt-2 line-clamp-2 text-[10px] leading-tight",
+                    isCurrent ? "font-semibold text-primary" : "text-muted-foreground",
+                  )}
+                >
+                  {phase.title}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </div>
+  );
 }
 
 function formatOperatorDateTime(iso: string) {

@@ -18,6 +18,7 @@ import { Route as AplikimRouteImport } from './routes/aplikim'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TrackCodeRouteImport } from './routes/track.$code'
 import { Route as DosjaIdRouteImport } from './routes/dosja.$id'
+import { Route as AplikimDokumentacionRouteImport } from './routes/aplikim.dokumentacion'
 import { Route as ApiPublicFaqAssistRouteImport } from './routes/api/public/faq-assist'
 import { Route as ApiPublicExtractRouteImport } from './routes/api/public/extract'
 import { Route as ApiPublicDossiersRouteImport } from './routes/api/public/dossiers'
@@ -73,6 +74,11 @@ const DosjaIdRoute = DosjaIdRouteImport.update({
   path: '/dosja/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AplikimDokumentacionRoute = AplikimDokumentacionRouteImport.update({
+  id: '/dokumentacion',
+  path: '/dokumentacion',
+  getParentRoute: () => AplikimRoute,
+} as any)
 const ApiPublicFaqAssistRoute = ApiPublicFaqAssistRouteImport.update({
   id: '/api/public/faq-assist',
   path: '/api/public/faq-assist',
@@ -121,12 +127,13 @@ const ApiPublicDossiersIdRoute = ApiPublicDossiersIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/aplikim': typeof AplikimRoute
+  '/aplikim': typeof AplikimRouteWithChildren
   '/biznes': typeof BiznesRoute
   '/dosjet': typeof DosjetRoute
   '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/raporte': typeof RaporteRoute
+  '/aplikim/dokumentacion': typeof AplikimDokumentacionRoute
   '/dosja/$id': typeof DosjaIdRoute
   '/track/$code': typeof TrackCodeRoute
   '/api/ai/assist': typeof ApiAiAssistRoute
@@ -141,12 +148,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/aplikim': typeof AplikimRoute
+  '/aplikim': typeof AplikimRouteWithChildren
   '/biznes': typeof BiznesRoute
   '/dosjet': typeof DosjetRoute
   '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/raporte': typeof RaporteRoute
+  '/aplikim/dokumentacion': typeof AplikimDokumentacionRoute
   '/dosja/$id': typeof DosjaIdRoute
   '/track/$code': typeof TrackCodeRoute
   '/api/ai/assist': typeof ApiAiAssistRoute
@@ -162,12 +170,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/aplikim': typeof AplikimRoute
+  '/aplikim': typeof AplikimRouteWithChildren
   '/biznes': typeof BiznesRoute
   '/dosjet': typeof DosjetRoute
   '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/raporte': typeof RaporteRoute
+  '/aplikim/dokumentacion': typeof AplikimDokumentacionRoute
   '/dosja/$id': typeof DosjaIdRoute
   '/track/$code': typeof TrackCodeRoute
   '/api/ai/assist': typeof ApiAiAssistRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/login'
     | '/raporte'
+    | '/aplikim/dokumentacion'
     | '/dosja/$id'
     | '/track/$code'
     | '/api/ai/assist'
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/login'
     | '/raporte'
+    | '/aplikim/dokumentacion'
     | '/dosja/$id'
     | '/track/$code'
     | '/api/ai/assist'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/login'
     | '/raporte'
+    | '/aplikim/dokumentacion'
     | '/dosja/$id'
     | '/track/$code'
     | '/api/ai/assist'
@@ -245,7 +257,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AplikimRoute: typeof AplikimRoute
+  AplikimRoute: typeof AplikimRouteWithChildren
   BiznesRoute: typeof BiznesRoute
   DosjetRoute: typeof DosjetRoute
   FaqRoute: typeof FaqRoute
@@ -328,6 +340,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DosjaIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/aplikim/dokumentacion': {
+      id: '/aplikim/dokumentacion'
+      path: '/dokumentacion'
+      fullPath: '/aplikim/dokumentacion'
+      preLoaderRoute: typeof AplikimDokumentacionRouteImport
+      parentRoute: typeof AplikimRoute
+    }
     '/api/public/faq-assist': {
       id: '/api/public/faq-assist'
       path: '/api/public/faq-assist'
@@ -394,6 +413,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AplikimRouteChildren {
+  AplikimDokumentacionRoute: typeof AplikimDokumentacionRoute
+}
+
+const AplikimRouteChildren: AplikimRouteChildren = {
+  AplikimDokumentacionRoute: AplikimDokumentacionRoute,
+}
+
+const AplikimRouteWithChildren =
+  AplikimRoute._addFileChildren(AplikimRouteChildren)
+
 interface ApiPublicDossiersRouteChildren {
   ApiPublicDossiersIdRoute: typeof ApiPublicDossiersIdRoute
 }
@@ -407,7 +437,7 @@ const ApiPublicDossiersRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AplikimRoute: AplikimRoute,
+  AplikimRoute: AplikimRouteWithChildren,
   BiznesRoute: BiznesRoute,
   DosjetRoute: DosjetRoute,
   FaqRoute: FaqRoute,

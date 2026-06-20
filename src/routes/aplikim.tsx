@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
@@ -8,7 +8,6 @@ import {
   Copy,
   CreditCard,
   ExternalLink,
-  FileCheck2,
   FileUp,
   Home,
   Landmark,
@@ -622,54 +621,28 @@ function ApplicationPortal() {
             </div>
           </Card>
 
-          <Card className="p-4">
-            <div className="mb-4 flex items-center gap-2">
-              <FileUp className="size-4 text-primary" />
-              <h2 className="text-sm font-semibold">Dokumentacioni per operatorin</h2>
+          <Card className="border-primary/25 bg-primary/5 p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-start gap-3">
+                <div className="grid size-9 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground">
+                  <FileUp className="size-4" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-sm font-semibold">Dokumentacioni për operatorin</h2>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    Lista e dokumenteve të kërkuara është zhvendosur në një nënfaqe të veçantë për
+                    aplikimin.
+                  </p>
+                </div>
+              </div>
+              <Button asChild size="sm" variant="outline" className="shrink-0">
+                <Link to="/aplikim/dokumentacion">
+                  Hap dokumentacionin
+                  <ExternalLink className="size-3.5" />
+                </Link>
+              </Button>
             </div>
-            <div className="space-y-2">
-              {docs.map((doc) => {
-                const uploaded = !!documentNames[doc.type]?.trim();
-                return (
-                  <div
-                    key={doc.type}
-                    className={cn(
-                      "grid gap-2 rounded-md border p-3 md:grid-cols-[minmax(0,1fr)_240px]",
-                      uploaded ? "border-success/25 bg-success/5" : "bg-muted/20",
-                    )}
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <FileCheck2
-                          className={cn(
-                            "size-4",
-                            uploaded ? "text-success" : "text-muted-foreground",
-                          )}
-                        />
-                        <div className="text-sm font-medium">{doc.label}</div>
-                      </div>
-                      <p className="mt-1 text-xs text-muted-foreground">{doc.helper}</p>
-                      {uploaded ? (
-                        <div className="mt-2 rounded-md border bg-background px-2 py-1 font-mono text-[11px] text-muted-foreground">
-                          {documentNames[doc.type]}
-                        </div>
-                      ) : null}
-                    </div>
-                    <Input
-                      type="file"
-                      accept="application/pdf,image/*"
-                      className="h-9 text-sm"
-                      onChange={(event) => {
-                        const file = event.target.files?.[0];
-                        if (!file) return;
-                        setDocumentNames((current) => ({ ...current, [doc.type]: file.name }));
-                      }}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-            <div className="mt-4 flex flex-wrap justify-end gap-2">
+            <div className="mt-4 flex flex-wrap justify-end gap-2 border-t pt-4">
               <Button type="button" variant="outline" onClick={() => setCreated(null)}>
                 Pastro njoftimin
               </Button>

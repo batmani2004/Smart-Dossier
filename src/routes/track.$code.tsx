@@ -1,8 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   AlertCircle,
-  Bell,
   Building2,
   CalendarClock,
   CheckCircle2,
@@ -21,12 +20,12 @@ import {
   MapPinned,
   MessageSquare,
   RefreshCw,
-  Rocket,
   Scale,
   Send,
   ShieldCheck,
   UserCheck,
 } from "lucide-react";
+import { AppShell } from "@/components/app-shell";
 import { CitizenVirtualAgent } from "@/components/citizen-virtual-agent";
 import { ParcelMap, type ParcelPoint } from "@/components/parcel-polygon-overlay";
 import { Card } from "@/components/ui/card";
@@ -53,7 +52,7 @@ export const Route = createFileRoute("/track/$code")({
       {
         name: "description",
         content:
-          "Gjurmoni statusin e dosjes suaj në kohë reale. Smart Dossier — portali për qytetarin.",
+          "Gjurmoni statusin e dosjes suaj ne kohe reale. Smart Dossier - portali per qytetarin.",
       },
     ],
   }),
@@ -582,68 +581,56 @@ function TrackPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="h-1.5 bg-destructive" />
-      {/* Header */}
-      <header className="sticky top-0 z-10 border-b-4 border-accent bg-[var(--brand-navy)] text-white shadow-soft">
-        <div className="mx-auto max-w-2xl px-4 py-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="size-9 shrink-0 rounded-full bg-destructive text-white grid place-items-center">
-              <Rocket className="size-4" />
-            </div>
-            <div className="min-w-0">
-              <div className="text-sm font-semibold truncate">Smart Dossier</div>
-              <div className="text-[10px] text-white/70 uppercase tracking-wider">
-                Portali për qytetarin
-              </div>
-            </div>
-          </div>
-          <div className="flex shrink-0 items-center gap-1.5">
-            <Button asChild size="sm" variant="secondary" className="h-8">
-              <a href="/aplikim">
-                <Scale className="mr-1 size-3.5" />
-                Aplikim i ri
-              </a>
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={load}
-              disabled={loading}
-              aria-label="Rifresko"
-              className="text-white hover:bg-white/10 hover:text-white"
-            >
-              <RefreshCw className={cn("size-4", loading && "animate-spin")} />
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-2xl px-4 py-5 space-y-4 pb-12">
+    <AppShell
+      notifications={(data?.notifications ?? []).map((notification, index) => ({
+        id: index,
+        title: notification.action,
+        meta: fmtDateTime(notification.at),
+      }))}
+    >
+      <main className="mx-auto max-w-3xl space-y-4 px-4 py-5 pb-12 md:px-6">
         {/* Code card */}
         <Card className="p-4">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
                 Kodi i gjurmimit
               </div>
               <div className="font-mono text-lg font-bold tracking-tight break-all">{code}</div>
             </div>
-            {data && (
-              <Badge
-                variant="secondary"
-                className={cn(
-                  "shrink-0 text-[11px]",
-                  data.status === "completed" && "bg-success/15 text-success border-success/20",
-                  data.status === "blocked" &&
-                    "bg-destructive/15 text-destructive border-destructive/20",
-                  data.status === "awaiting_external" &&
-                    "bg-warning/15 text-warning-foreground border-warning/30",
-                )}
+            <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+              {data && (
+                <Badge
+                  variant="secondary"
+                  className={cn(
+                    "shrink-0 text-[11px]",
+                    data.status === "completed" && "bg-success/15 text-success border-success/20",
+                    data.status === "blocked" &&
+                      "bg-destructive/15 text-destructive border-destructive/20",
+                    data.status === "awaiting_external" &&
+                      "bg-warning/15 text-warning-foreground border-warning/30",
+                  )}
+                >
+                  {STATUS_SQ[data.status] ?? data.status}
+                </Badge>
+              )}
+              <Button asChild size="sm" variant="outline" className="h-8">
+                <a href="/aplikim">
+                  <Scale className="size-3.5" />
+                  Aplikim i ri
+                </a>
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={load}
+                disabled={loading}
+                aria-label="Rifresko"
+                className="h-8"
               >
-                {STATUS_SQ[data.status] ?? data.status}
-              </Badge>
-            )}
+                <RefreshCw className={cn("size-4", loading && "animate-spin")} />
+              </Button>
+            </div>
           </div>
           {data && (
             <div className="mt-2 text-xs text-muted-foreground flex items-center gap-1.5">
@@ -885,10 +872,10 @@ function TrackPage() {
                 <span className="font-medium text-foreground">
                   {data.requesterVerification.claimType === "legal_representative"
                     ? "Perfaqesues ligjor"
-                    : "Personi/pronari ne kadaster"}
+                    : "Personi/pronari në kadastër"}
                 </span>
                 {data.requesterVerification.cadastralSubjectName
-                  ? ` · Emri ne kadaster: ${data.requesterVerification.cadastralSubjectName}`
+                  ? ` · Emri në kadastër: ${data.requesterVerification.cadastralSubjectName}`
                   : ""}
               </div>
 
@@ -972,7 +959,7 @@ function TrackPage() {
                       : "-"}
                     {data.expeditedProcedure.paymentRequired &&
                     data.expeditedProcedure.paymentAmountAll
-                      ? ` · Tarife demo: ${data.expeditedProcedure.paymentAmountAll.toLocaleString(
+                      ? ` · Tarifë demo: ${data.expeditedProcedure.paymentAmountAll.toLocaleString(
                           "sq-AL",
                         )} ALL`
                       : ""}
@@ -1432,31 +1419,6 @@ function TrackPage() {
               </Card>
             )}
 
-            {/* Notifications */}
-            <Card className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Bell className="size-4 text-muted-foreground" />
-                <div className="text-sm font-semibold">Njoftime</div>
-              </div>
-              {data.notifications.length === 0 ? (
-                <p className="text-xs text-muted-foreground">Ende nuk ka njoftime publike.</p>
-              ) : (
-                <ul className="space-y-2">
-                  {data.notifications.map((n, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-2 border-l-2 border-primary/30 pl-3"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm leading-snug">{n.action}</div>
-                        <div className="text-[11px] text-muted-foreground">{fmtDateTime(n.at)}</div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-
             <p className="text-[10px] text-center text-muted-foreground pt-2">
               Përditësuar së fundmi: {fmtDateTime(data.updatedAt)}
             </p>
@@ -1464,7 +1426,7 @@ function TrackPage() {
         )}
       </main>
       <CitizenVirtualAgent defaultTrackingCode={code} />
-    </div>
+    </AppShell>
   );
 }
 

@@ -2,60 +2,99 @@ import * as React from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   BarChart3,
+  Bell,
   Building2,
+  ChevronRight,
+  FileUp,
   FolderKanban,
   HelpCircle,
+  Home,
   LayoutDashboard,
+  Menu,
   Rocket,
   Scale,
   ShieldCheck,
   UserRound,
 } from "lucide-react";
 import { CitizenVirtualAgent } from "@/components/citizen-virtual-agent";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RoleSwitcher } from "@/components/role-switcher";
 import { useDemoRole } from "@/lib/demo-access";
 import { cn } from "@/lib/utils";
 
-const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
-  { to: "/", label: "Qendra punes", icon: LayoutDashboard, exact: true },
-  { to: "/dosjet", label: "Dosjet", icon: FolderKanban },
-  { to: "/raporte", label: "Raporte", icon: BarChart3 },
-  { to: "/faq", label: "FAQ", icon: HelpCircle },
-];
+const primaryNav = [
+  { to: "/", label: "Faqja kryesore", icon: LayoutDashboard, exact: true },
+  { to: "/dosjet", label: "Dosjet", icon: FolderKanban, badge: "4" },
+] satisfies {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+  badge?: string;
+}[];
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+const managementNav = [
+  { to: "/raporte", label: "Raporte", icon: BarChart3 },
+  { to: "/faq", label: "Ndihme", icon: HelpCircle },
+] satisfies { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[];
+
+function pageLabel(path: string) {
+  if (path.startsWith("/dosja/")) return "Regjenerimi Urban i Bregdetit...";
+  if (path.startsWith("/dosjet")) return "Dosjet";
+  if (path.startsWith("/raporte")) return "Raporte";
+  if (path.startsWith("/faq")) return "FAQ";
+  if (path.startsWith("/aplikim/dokumentacion")) return "Dokumentacioni për operatorin";
+  if (path.startsWith("/aplikim")) return "Aplikim i ri";
+  if (path.startsWith("/biznes")) return "Regjistrim prone";
+  if (path.startsWith("/track/")) return "Gjurmim qytetar";
+  return "Faqja kryesore";
+}
+
+type ShellNotification = {
+  id?: string | number;
+  title: string;
+  meta?: string;
+};
+
+export function AppShell({
+  children,
+  notifications = [],
+}: {
+  children: React.ReactNode;
+  notifications?: ShellNotification[];
+}) {
   const loc = useLocation();
   const { role } = useDemoRole();
   const path = loc.pathname;
-  const isActive = (item: (typeof nav)[number]) =>
+  const citizenPortalActive = path.startsWith("/track/");
+  const businessPortalActive = path.startsWith("/biznes");
+  const applicationDocsActive = path.startsWith("/aplikim/dokumentacion");
+  const applicationPortalActive = path === "/aplikim";
+  const faqActive = path.startsWith("/faq");
+  const showCitizenAgent =
+    ((role === "citizen" || role === "business") && !citizenPortalActive) || faqActive;
+
+  const isActive = (item: { to: string; exact?: boolean }) =>
     item.to === "/dosjet"
       ? path.startsWith("/dosjet") || path.startsWith("/dosja/")
       : item.exact
         ? path === item.to
         : path.startsWith(item.to);
-  const citizenPortalActive = path.startsWith("/track/");
-  const businessPortalActive = path.startsWith("/biznes");
-  const applicationPortalActive = path.startsWith("/aplikim");
-  const faqActive = path.startsWith("/faq");
-  const showCitizenAgent = role === "citizen" || role === "business" || faqActive;
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="h-1.5 bg-destructive" />
-      <div className="hidden md:flex min-h-[88px] items-center justify-between gap-4 border-b-4 border-accent bg-[var(--brand-navy)] px-8 text-white">
+      <div className="hidden min-h-[78px] items-center justify-between gap-4 border-b-4 border-accent bg-[var(--brand-navy)] px-8 text-white md:flex">
         <div className="flex min-w-0 items-center gap-4">
-          <div className="grid size-12 shrink-0 place-items-center rounded-full bg-destructive text-white shadow-soft">
+          <div className="grid size-10 shrink-0 place-items-center rounded-full bg-destructive text-white shadow-soft">
             <Rocket className="size-5" />
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] font-semibold uppercase text-accent">
-              Innovation4Albania
-            </div>
-            <div className="truncate text-xl font-semibold">
-              Smart Dossier · Menaxhimi i Dosjeve
+            <div className="text-[10px] font-bold uppercase text-accent">Materiali C</div>
+            <div className="truncate text-xl font-semibold leading-tight">
+              Smart Dossier - Menaxhimi i Dosjeve
             </div>
             <div className="mt-0.5 truncate text-xs text-white/75">
-              Portal institucional me asistence AI
+              Pamje orientuese e nje platforme per menaxhimin e dosjeve te prones.
             </div>
           </div>
         </div>
@@ -64,121 +103,119 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <div className="flex min-h-[calc(100vh-0.375rem)] md:min-h-[calc(100vh-5.875rem)]">
-        {/* Desktop sidebar */}
-        <aside className="hidden md:flex w-60 shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
-          <div className="px-4 pt-5 pb-4 border-b border-sidebar-border">
+      <div className="flex min-h-screen md:min-h-[calc(100vh-5.125rem)]">
+        <aside className="hidden w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
+          <div className="border-b border-sidebar-border px-4 pb-4 pt-4">
             <div className="flex items-center gap-2.5">
-              <div className="size-9 rounded-lg bg-primary text-primary-foreground grid place-items-center shadow-soft shrink-0">
+              <div className="grid size-9 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground shadow-soft">
                 <ShieldCheck className="size-4" />
               </div>
-              <div className="leading-tight min-w-0">
-                <div className="text-sm font-semibold tracking-tight truncate">Smart Dossier</div>
-                <div className="text-[10px] text-sidebar-foreground/60 uppercase tracking-wider truncate">
-                  I4AL · Property Nucleus
+              <div className="min-w-0 leading-tight">
+                <div className="truncate text-sm font-semibold tracking-tight text-primary">
+                  Menaxhimi i Dosjeve
+                </div>
+                <div className="truncate text-[10px] uppercase text-sidebar-foreground/60">
+                  Smart Dossier
                 </div>
               </div>
             </div>
           </div>
 
-          <nav className="flex-1 px-2 py-3 space-y-0.5">
+          <nav className="flex-1 space-y-5 px-3 py-5">
             {role === "citizen" || role === "business" ? (
-              <>
-                <Link
+              <div className="space-y-1">
+                <SidebarGroupLabel>Navigimi Kryesor</SidebarGroupLabel>
+                <SidebarLink
                   to="/aplikim"
-                  className={cn(
-                    "flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm transition-colors",
-                    applicationPortalActive
-                      ? "bg-primary text-primary-foreground font-medium shadow-soft"
-                      : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-                  )}
-                >
-                  <Scale className="size-[16px] shrink-0" />
-                  <span className="truncate">Aplikim i ri</span>
-                </Link>
+                  active={applicationPortalActive}
+                  icon={Scale}
+                  label="Aplikim i ri"
+                />
+                <SidebarLink
+                  to="/aplikim/dokumentacion"
+                  active={applicationDocsActive}
+                  icon={FileUp}
+                  label="Dokumentacioni"
+                  nested
+                />
                 {role === "business" ? (
-                  <Link
+                  <SidebarLink
                     to="/biznes"
-                    className={cn(
-                      "flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm transition-colors",
-                      businessPortalActive
-                        ? "bg-primary text-primary-foreground font-medium shadow-soft"
-                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-                    )}
-                  >
-                    <Building2 className="size-[16px] shrink-0" />
-                    <span className="truncate">Regjistrim prone</span>
-                  </Link>
+                    active={businessPortalActive}
+                    icon={Building2}
+                    label="Regjistrim prone"
+                  />
                 ) : (
-                  <Link
+                  <SidebarLink
                     to="/track/$code"
                     params={{ code: "EKB-2026-000014" }}
-                    className={cn(
-                      "flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm transition-colors",
-                      citizenPortalActive
-                        ? "bg-primary text-primary-foreground font-medium shadow-soft"
-                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-                    )}
-                  >
-                    <UserRound className="size-[16px] shrink-0" />
-                    <span className="truncate">Gjurmim qytetar</span>
-                  </Link>
+                    active={citizenPortalActive}
+                    icon={UserRound}
+                    label="Gjurmim qytetar"
+                  />
                 )}
-                <Link
-                  to="/faq"
-                  className={cn(
-                    "flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm transition-colors",
-                    faqActive
-                      ? "bg-primary text-primary-foreground font-medium shadow-soft"
-                      : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-                  )}
-                >
-                  <HelpCircle className="size-[16px] shrink-0" />
-                  <span className="truncate">FAQ dhe AI</span>
-                </Link>
-              </>
+                <SidebarLink to="/faq" active={faqActive} icon={HelpCircle} label="FAQ dhe AI" />
+              </div>
             ) : (
-              nav.map((item) => {
-                const active = isActive(item);
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className={cn(
-                      "flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm transition-colors",
-                      active
-                        ? "bg-primary text-primary-foreground font-medium shadow-soft"
-                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-                    )}
-                  >
-                    <Icon className="size-[16px] shrink-0" />
-                    <span className="truncate">{item.label}</span>
-                  </Link>
-                );
-              })
+              <>
+                <div className="space-y-1">
+                  <SidebarGroupLabel>Navigimi Kryesor</SidebarGroupLabel>
+                  {primaryNav.map((item) => (
+                    <SidebarLink
+                      key={item.to}
+                      to={item.to}
+                      active={isActive(item)}
+                      icon={item.icon}
+                      label={item.label}
+                      badge={item.badge}
+                    />
+                  ))}
+                </div>
+                <div className="space-y-1">
+                  <SidebarGroupLabel>Menaxhimi</SidebarGroupLabel>
+                  {managementNav.map((item) => (
+                    <SidebarLink
+                      key={item.to}
+                      to={item.to}
+                      active={isActive(item)}
+                      icon={item.icon}
+                      label={item.label}
+                    />
+                  ))}
+                </div>
+              </>
             )}
           </nav>
 
-          <div className="m-2 p-2.5 rounded-md bg-sidebar-accent/40 border border-sidebar-border">
-            <div className="text-[10px] uppercase tracking-wider text-sidebar-foreground/60 mb-1">
-              Bazë ligjore
-            </div>
-            <p className="text-[11px] leading-snug text-sidebar-foreground/80">
-              Ligj 8561/1999 — Shpronësimi
-              <br />
-              VKM 179/2020 + 898/2020 — EKB
-            </p>
+          <div className="m-3">
+            <RoleSwitcher compact variant="sidebar" />
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 pb-16 md:pb-0 bg-background">
-          {/* Mobile top bar */}
-          <div className="md:hidden flex items-center gap-2 px-4 py-2.5 border-b-4 border-accent bg-[var(--brand-navy)] text-white">
+        <main className="min-w-0 flex-1 bg-background pb-16 md:pb-0">
+          <div className="hidden h-12 items-center justify-between border-b border-border bg-[#e8eef7] px-5 text-xs text-muted-foreground md:flex">
+            <div className="flex min-w-0 items-center gap-3">
+              <button
+                type="button"
+                className="grid size-7 place-items-center rounded-md text-foreground/65 hover:bg-white/60"
+                aria-label="Menu"
+              >
+                <Menu className="size-4" />
+              </button>
+              <Home className="size-3.5" />
+              <ChevronRight className="size-3" />
+              <span>Dosjet</span>
+              <ChevronRight className="size-3" />
+              <span className="truncate font-semibold text-foreground">{pageLabel(path)}</span>
+            </div>
+            <NotificationsPopover notifications={notifications} />
+          </div>
+
+          <div className="flex items-center gap-2 border-b-4 border-accent bg-[var(--brand-navy)] px-4 py-2.5 text-white md:hidden">
             <div className="grid size-8 shrink-0 place-items-center rounded-full bg-destructive">
               <Rocket className="size-4" />
             </div>
-            <span className="font-semibold text-sm min-w-0 flex-1 truncate">Smart Dossier</span>
+            <span className="min-w-0 flex-1 truncate text-sm font-semibold">Smart Dossier</span>
             <div className="w-[190px] shrink-0">
               <RoleSwitcher compact variant="header" />
             </div>
@@ -186,85 +223,177 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {children}
         </main>
 
-        {/* Mobile bottom nav */}
-        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-sidebar text-sidebar-foreground border-t border-sidebar-border grid grid-cols-3">
+        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-sidebar-border bg-sidebar text-sidebar-foreground md:hidden">
           {role === "citizen" || role === "business" ? (
             <>
-              <Link
+              <MobileLink
                 to="/aplikim"
-                className={cn(
-                  "flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] transition-colors",
-                  applicationPortalActive
-                    ? "text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/70",
-                )}
-              >
-                <Scale
-                  className={cn("size-[18px]", applicationPortalActive && "text-accent")}
-                />
-                <span className="truncate max-w-full px-1">Aplikim</span>
-              </Link>
+                active={applicationPortalActive || applicationDocsActive}
+                icon={Scale}
+                label="Aplikim"
+              />
               {role === "business" ? (
-                <Link
+                <MobileLink
                   to="/biznes"
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] transition-colors",
-                    businessPortalActive
-                      ? "text-sidebar-accent-foreground"
-                      : "text-sidebar-foreground/70",
-                  )}
-                >
-                  <Building2 className={cn("size-[18px]", businessPortalActive && "text-accent")} />
-                  <span className="truncate max-w-full px-1">Regjistrim</span>
-                </Link>
+                  active={businessPortalActive}
+                  icon={Building2}
+                  label="Regjistrim"
+                />
               ) : (
-                <Link
+                <MobileLink
                   to="/track/$code"
                   params={{ code: "EKB-2026-000014" }}
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] transition-colors",
-                    citizenPortalActive
-                      ? "text-sidebar-accent-foreground"
-                      : "text-sidebar-foreground/70",
-                  )}
-                >
-                  <UserRound className={cn("size-[18px]", citizenPortalActive && "text-accent")} />
-                  <span className="truncate max-w-full px-1">Gjurmim</span>
-                </Link>
+                  active={citizenPortalActive}
+                  icon={UserRound}
+                  label="Gjurmim"
+                />
               )}
-              <Link
-                to="/faq"
-                className={cn(
-                  "flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] transition-colors",
-                  faqActive ? "text-sidebar-accent-foreground" : "text-sidebar-foreground/70",
-                )}
-              >
-                <HelpCircle className={cn("size-[18px]", faqActive && "text-accent")} />
-                <span className="truncate max-w-full px-1">FAQ</span>
-              </Link>
+              <MobileLink to="/faq" active={faqActive} icon={HelpCircle} label="FAQ" />
             </>
           ) : (
-            nav.map((item) => {
-              const active = isActive(item);
-              const Icon = item.icon;
-              return (
-                <Link
+            <>
+              {[...primaryNav, managementNav[0]].map((item) => (
+                <MobileLink
                   key={item.to}
                   to={item.to}
-                  className={cn(
-                    "flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] transition-colors",
-                    active ? "text-sidebar-accent-foreground" : "text-sidebar-foreground/70",
-                  )}
-                >
-                  <Icon className={cn("size-[18px]", active && "text-accent")} />
-                  <span className="truncate max-w-full px-1">{item.label}</span>
-                </Link>
-              );
-            })
+                  active={isActive(item)}
+                  icon={item.icon}
+                  label={item.label}
+                />
+              ))}
+            </>
           )}
         </nav>
       </div>
       {showCitizenAgent ? <CitizenVirtualAgent /> : null}
     </div>
+  );
+}
+
+function NotificationsPopover({ notifications }: { notifications: ShellNotification[] }) {
+  const count = notifications.length;
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="console-pill border-accent/40 bg-accent/15 text-accent-foreground"
+          aria-label="Hap njoftimet"
+        >
+          <Bell className="size-3.5" />
+          Njoftime
+          <span className="grid size-4 place-items-center rounded-full bg-accent text-[10px] font-bold">
+            {count}
+          </span>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-80 p-0">
+        <div className="border-b px-3 py-2">
+          <div className="text-sm font-semibold">Njoftime</div>
+          <div className="text-[11px] text-muted-foreground">
+            {count ? `${count} njoftime publike` : "Nuk ka njoftime te reja"}
+          </div>
+        </div>
+        {count ? (
+          <ul className="max-h-80 overflow-y-auto p-2">
+            {notifications.map((notification, index) => (
+              <li
+                key={notification.id ?? index}
+                className="rounded-md border-l-2 border-primary/35 px-2 py-2 text-xs hover:bg-muted/60"
+              >
+                <div className="leading-snug text-foreground">{notification.title}</div>
+                {notification.meta ? (
+                  <div className="mt-1 text-[11px] text-muted-foreground">{notification.meta}</div>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="p-3 text-xs text-muted-foreground">
+            Njoftimet e dosjes do te shfaqen ketu kur te kete perditesime.
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function SidebarGroupLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="px-2 pb-2 text-[10px] font-semibold text-sidebar-foreground/55">{children}</div>
+  );
+}
+
+function SidebarLink({
+  to,
+  params,
+  active,
+  icon: Icon,
+  label,
+  badge,
+  nested = false,
+}: {
+  to: string;
+  params?: Record<string, string>;
+  active: boolean;
+  icon: typeof LayoutDashboard;
+  label: string;
+  badge?: string;
+  nested?: boolean;
+}) {
+  return (
+    <Link
+      to={to}
+      params={params}
+      className={cn(
+        "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
+        nested && "ml-6 py-1.5 text-xs",
+        active
+          ? "bg-primary text-primary-foreground font-semibold shadow-soft"
+          : "text-sidebar-foreground/75 hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
+      )}
+    >
+      <Icon className="size-[16px] shrink-0" />
+      <span className="truncate">{label}</span>
+      {badge ? (
+        <span
+          className={cn(
+            "ml-auto grid size-5 place-items-center rounded-full text-[10px] font-bold",
+            active ? "bg-white/20 text-white" : "bg-destructive text-destructive-foreground",
+          )}
+        >
+          {badge}
+        </span>
+      ) : null}
+    </Link>
+  );
+}
+
+function MobileLink({
+  to,
+  params,
+  active,
+  icon: Icon,
+  label,
+}: {
+  to: string;
+  params?: Record<string, string>;
+  active: boolean;
+  icon: typeof LayoutDashboard;
+  label: string;
+}) {
+  return (
+    <Link
+      to={to}
+      params={params}
+      className={cn(
+        "flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] transition-colors",
+        active ? "text-sidebar-accent-foreground" : "text-sidebar-foreground/70",
+      )}
+    >
+      <Icon className={cn("size-[18px]", active && "text-accent")} />
+      <span className="max-w-full truncate px-1">{label}</span>
+    </Link>
   );
 }
