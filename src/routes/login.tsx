@@ -6,7 +6,6 @@ import {
   Eye,
   EyeOff,
   LockKeyhole,
-  ShieldCheck,
   UserCog,
   UserRound,
 } from "lucide-react";
@@ -148,17 +147,15 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f7fb] text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-6">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="grid size-10 shrink-0 place-items-center rounded-md bg-[#0b3d76] text-white">
-              <ShieldCheck className="size-5" />
-            </div>
-            <div className="min-w-0">
-              <div className="truncate text-lg font-semibold tracking-tight">Smart Dossier</div>
-              <div className="truncate text-xs text-muted-foreground">Hyrje e sigurt ne portal</div>
-            </div>
+            <img
+              src="/brand/smart-dossier-logo.svg"
+              alt="Smart Dossier"
+              className="h-10 w-auto max-w-[220px] shrink-0 object-contain"
+            />
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <span className="hidden text-sm font-semibold text-foreground sm:inline">SQ</span>
@@ -187,7 +184,7 @@ function LoginPage() {
             <div className="mb-2 inline-flex rounded-md bg-[var(--brand-blue-soft)] px-2.5 py-1 text-xs font-semibold text-primary">
               Portal sherbimesh
             </div>
-            <h1 className="max-w-2xl text-3xl font-semibold tracking-tight text-[#172338] md:text-4xl">
+            <h1 className="max-w-2xl text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
               Identifikohuni dhe vazhdoni me dosjen tuaj.
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">

@@ -1,0 +1,38 @@
+<svg
+  width="128"
+  height="128"
+  viewBox="0 0 128 128"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-labelledby="smartDossierMarkTitle smartDossierMarkDesc"
+>
+  <title id="smartDossierMarkTitle">Smart Dossier Mark</title>
+  <desc id="smartDossierMarkDesc">
+    Geometric dossier logo with layered blue documents and red highlights.
+  </desc>
+  <defs>
+    <linearGradient id="sdBlueOuter" x1="20" y1="16" x2="84" y2="96" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2D8EE8" />
+      <stop offset="1" stop-color="#1F62B5" />
+    </linearGradient>
+    <linearGradient id="sdBlueInner" x1="35" y1="28" x2="79" y2="74" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#53ABFF" />
+      <stop offset="1" stop-color="#2D8EE8" />
+    </linearGradient>
+    <linearGradient id="sdRed" x1="60" y1="78" x2="106" y2="114" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F14A63" />
+      <stop offset="1" stop-color="#EC334F" />
+    </linearGradient>
+  </defs>
+
+  <rect x="2" y="2" width="124" height="124" rx="26" fill="#011B45" />
+  <rect x="2" y="2" width="124" height="4" rx="2" fill="#F3CF2B" />
+
+  <rect x="20" y="16" width="80" height="80" rx="8" fill="url(#sdBlueOuter)" />
+  <rect x="35" y="28" width="65" height="64" rx="7" fill="url(#sdBlueInner)" />
+  <circle cx="83" cy="55" r="2.8" fill="#EC334F" />
+  <rect x="60" y="78" width="46" height="36" rx="6" fill="url(#sdRed)" />
+
+  <rect x="2" y="122" width="124" height="4" rx="2" fill="#F07A8B" />
+</svg>

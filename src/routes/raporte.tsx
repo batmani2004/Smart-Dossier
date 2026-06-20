@@ -25,14 +25,14 @@ export const Route = createFileRoute("/raporte")({
 });
 
 const COLORS = [
-  "#2563eb",
-  "#16a34a",
-  "#d97706",
-  "#dc2626",
-  "#7c3aed",
-  "#0891b2",
-  "#65a30d",
-  "#db2777",
+  "#2f8de7",
+  "#1f63ba",
+  "#ec334f",
+  "#f3cf2b",
+  "#6faef0",
+  "#2b4f86",
+  "#ff667d",
+  "#8cbdf5",
 ];
 
 function ReportsPage() {
@@ -92,7 +92,7 @@ function ReportsPage() {
                   />
                   <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
                   <Tooltip />
-                  <Bar dataKey="count" fill="#2563eb" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="count" fill="#2f8de7" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -130,7 +130,7 @@ function ReportsPage() {
                   <XAxis type="number" tick={{ fontSize: 10 }} allowDecimals={false} />
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} />
                   <Tooltip />
-                  <Bar dataKey="value" fill="#16a34a" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="value" fill="#1f63ba" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

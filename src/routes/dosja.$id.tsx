@@ -338,7 +338,7 @@ function DossierWorkspace() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="flex h-auto w-full justify-start overflow-x-auto rounded-md border bg-[#e6eef8] p-1">
+          <TabsList className="flex h-auto w-full justify-start overflow-x-auto rounded-md border bg-secondary/85 p-1">
             <TabsTrigger value="permbledhje" className="text-xs">
               <Sparkles className="size-3.5" />
               Përmbledhje

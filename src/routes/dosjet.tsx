@@ -2,7 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { AlertTriangle, CheckCircle2, Copy, ExternalLink, Plus, Search, Sparkles } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Copy,
+  ExternalLink,
+  Plus,
+  Search,
+  Sparkles,
+} from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -70,16 +78,17 @@ function DosjetPage() {
 
   // group by phase for column view
   const grouped = useMemo(() => {
+    const dossierItems = listQ.data?.items ?? [];
     const map = new Map<
       string,
       {
         phaseTitle: string;
         order: number;
         procKind: ProcessKind;
-        items: NonNullable<typeof listQ.data>["items"];
+        items: typeof dossierItems;
       }
     >();
-    for (const d of listQ.data?.items ?? []) {
+    for (const d of dossierItems) {
       const proc = PROCESSES[d.process];
       const phase = proc.phases.find((p) => p.id === d.currentPhaseId);
       const key = `${d.process}:${d.currentPhaseId}`;
@@ -96,7 +105,7 @@ function DosjetPage() {
     return Array.from(map.values()).sort((a, b) =>
       a.procKind === b.procKind ? a.order - b.order : a.procKind.localeCompare(b.procKind),
     );
-  }, [listQ.data]);
+  }, [listQ]);
 
   if (role === "citizen" || role === "business") {
     return (

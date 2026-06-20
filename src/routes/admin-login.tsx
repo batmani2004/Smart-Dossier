@@ -66,7 +66,7 @@ function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#eef3f9] text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 md:px-8">
           <Link
@@ -78,7 +78,7 @@ function AdminLoginPage() {
           </Link>
           <div className="flex items-center gap-2 text-sm font-semibold text-primary">
             <img
-              src="/brand/smart-dossier-logo.png"
+              src="/brand/smart-dossier-logo-mark.svg"
               alt="Smart Dossier"
               className="h-10 w-12 object-contain"
             />
@@ -92,7 +92,7 @@ function AdminLoginPage() {
           <div className="mb-4 inline-flex rounded-md bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary shadow-soft">
             Hyrje e veçantë
           </div>
-          <h1 className="text-4xl font-semibold tracking-tight text-[#172338] md:text-5xl">
+          <h1 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
             Paneli i administratorit
           </h1>
           <p className="mt-4 text-base leading-7 text-muted-foreground">

@@ -109,12 +109,18 @@ export function AppShell({
       {/* ── Sidebar (desktop) ─────────────────────────────── */}
       <aside
         className="hidden md:flex fixed left-0 top-0 h-full w-[280px] flex-col z-50"
-        style={{ background: "linear-gradient(180deg, #141c2b 0%, #101827 100%)" }}
+        style={{
+          background: "linear-gradient(180deg, var(--brand-navy) 0%, var(--brand-navy-dark) 100%)",
+        }}
       >
         {/* Logo */}
         <div className="px-5 pt-6 pb-7">
           <Link to="/" className="flex items-center gap-3 group">
-            <img src="/brand/smart-dossier-logo.png" alt="Smart Dossier" className="size-10 object-contain shrink-0" />
+            <img
+              src="/brand/smart-dossier-logo-mark.svg"
+              alt="Smart Dossier"
+              className="size-10 object-contain shrink-0"
+            />
             <div>
               <div className="text-base font-bold text-white tracking-tight leading-tight">
                 Smart Dossier
@@ -230,7 +236,9 @@ export function AppShell({
         {/* Mobile header */}
         <div
           className="flex items-center gap-3 px-4 py-3 text-white md:hidden"
-          style={{ background: "linear-gradient(90deg, #141c2b, #101827)" }}
+          style={{
+            background: "linear-gradient(90deg, var(--brand-navy), var(--brand-navy-dark))",
+          }}
         >
           <div className="grid size-7 shrink-0 place-items-center rounded-lg bg-accent/25 text-white">
             <ShieldCheck className="size-4" />
@@ -253,7 +261,7 @@ export function AppShell({
         className="fixed inset-x-0 bottom-0 z-40 grid border-t md:hidden"
         style={{
           gridTemplateColumns: "repeat(3, 1fr)",
-          background: "#101827",
+          background: "var(--brand-navy-dark)",
           borderColor: "rgba(255,255,255,0.08)",
         }}
       >
@@ -535,7 +543,7 @@ function UserMenuPopover({
               <div className="size-9 rounded-full flex items-center justify-center bg-gradient-to-br from-accent/60 to-accent/30 ring-2 ring-accent/20">
                 <RoleIcon className="size-4 text-white" />
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-success border-2 border-[#101827]" />
+              <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full border-2 border-sidebar bg-success" />
             </div>
             <div className="min-w-0 flex-1 text-left">
               <div className="text-sm font-semibold text-white truncate leading-tight">

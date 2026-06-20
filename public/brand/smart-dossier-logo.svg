@@ -1,0 +1,54 @@
+<svg
+  width="420"
+  height="120"
+  viewBox="0 0 420 120"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-labelledby="smartDossierLogoTitle smartDossierLogoDesc"
+>
+  <title id="smartDossierLogoTitle">Smart Dossier Logo</title>
+  <desc id="smartDossierLogoDesc">Smart Dossier wordmark with custom geometric dossier mark.</desc>
+
+  <defs>
+    <linearGradient id="sdBlueOuterWide" x1="18" y1="14" x2="74" y2="76" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2D8EE8" />
+      <stop offset="1" stop-color="#1F62B5" />
+    </linearGradient>
+    <linearGradient id="sdBlueInnerWide" x1="28" y1="24" x2="72" y2="65" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#53ABFF" />
+      <stop offset="1" stop-color="#2D8EE8" />
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="88" height="88" rx="18" fill="#011B45" />
+  <rect x="0" y="0" width="88" height="3" rx="1.5" fill="#F3CF2B" />
+  <rect x="14" y="11" width="56" height="56" rx="7" fill="url(#sdBlueOuterWide)" />
+  <rect x="27" y="20" width="43" height="43" rx="6" fill="url(#sdBlueInnerWide)" />
+  <circle cx="57" cy="38" r="2.2" fill="#EC334F" />
+  <rect x="40" y="54" width="34" height="27" rx="5" fill="#EC334F" />
+  <rect x="0" y="85" width="88" height="3" rx="1.5" fill="#F07A8B" />
+
+  <text
+    x="106"
+    y="40"
+    fill="#0F2C5A"
+    font-family="Inter, Arial, sans-serif"
+    font-size="32"
+    font-weight="700"
+    letter-spacing="0.2"
+  >
+    Smart Dossier
+  </text>
+  <text
+    x="106"
+    y="66"
+    fill="#4F6689"
+    font-family="Inter, Arial, sans-serif"
+    font-size="14"
+    font-weight="600"
+    letter-spacing="0.8"
+  >
+    MENAXHIM I DOSJEVE DIGJITALE
+  </text>
+</svg>
