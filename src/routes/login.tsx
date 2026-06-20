@@ -5,11 +5,7 @@ import {
   CheckCircle2,
   Eye,
   EyeOff,
-  FileCheck2,
-  HelpCircle,
-  Landmark,
   LockKeyhole,
-  Search,
   ShieldCheck,
   UserCog,
   UserRound,
@@ -27,7 +23,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Hyrje me OTP - Smart Dossier" },
+      { title: "Hyrje - Smart Dossier" },
       {
         name: "description",
         content: "Hyrje institucionale demo per Admin, Operator, Qytetar dhe Biznes me OTP.",
@@ -53,7 +49,7 @@ const LOGIN_ROLES: Array<{
   {
     role: "citizen",
     title: "Qytetar",
-    hint: "Shërbime publike me NID",
+    hint: "Hyrje me NID",
     idLabel: "Numri personal (NID)",
     idPlaceholder: "H90803041W",
     icon: UserRound,
@@ -62,7 +58,7 @@ const LOGIN_ROLES: Array<{
   {
     role: "business",
     title: "Biznes",
-    hint: "Shërbime për subjektet",
+    hint: "Hyrje me NIPT",
     idLabel: "NIPT i subjektit",
     idPlaceholder: "L22334455B",
     icon: Building2,
@@ -70,9 +66,9 @@ const LOGIN_ROLES: Array<{
   },
   {
     role: "operator",
-    title: "Nëpunës",
-    hint: "Hapësira institucionale",
-    idLabel: "ID e nëpunësit",
+    title: "Nepunes",
+    hint: "Hapesire pune",
+    idLabel: "ID e nepunesit",
     idPlaceholder: "OP-1024",
     icon: UserCog,
     demoId: "OP-1024",
@@ -80,19 +76,6 @@ const LOGIN_ROLES: Array<{
 ];
 
 const DEMO_OTP = "246810";
-
-const PORTAL_LINKS = [
-  "NGJARJET E JETËS",
-  "SHËRBIMET MË TË PËRDORURA",
-  "KATEGORITË E SHËRBIMEVE",
-  "INSTITUCIONET",
-];
-
-const SERVICE_SHORTCUTS = [
-  { label: "Dokumente me vulë", icon: FileCheck2 },
-  { label: "Pagesa elektronike", icon: Landmark },
-  { label: "Ndihmë dhe suport", icon: HelpCircle },
-];
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -138,20 +121,20 @@ function LoginPage() {
 
   function continueToOtp() {
     if (authMode === "register" && !fullName.trim()) {
-      toast.error("Plotësoni emrin për të vazhduar me regjistrimin.");
+      toast.error("Plotesoni emrin per te vazhduar me regjistrimin.");
       return;
     }
     if (!identifier.trim() || !password.trim()) {
-      toast.error("Plotësoni të dhënat e identifikimit për të vazhduar.");
+      toast.error("Plotesoni te dhenat e identifikimit per te vazhduar.");
       return;
     }
     setStep("otp");
-    toast.success(`Kodi OTP demo u dërgua: ${DEMO_OTP}`);
+    toast.success(`Kodi OTP demo u dergua: ${DEMO_OTP}`);
   }
 
   async function verifyOtp() {
     if (otp !== DEMO_OTP) {
-      toast.error("Kodi OTP nuk është i saktë. Për demo përdorni 246810.");
+      toast.error("Kodi OTP nuk eshte i sakte. Per demo perdorni 246810.");
       return;
     }
     setStep("done");
@@ -166,26 +149,30 @@ function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#f4f7fb] text-foreground">
-      <header className="bg-white text-sm shadow-soft">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-2 text-muted-foreground md:px-8">
-          <div className="hidden items-center gap-5 md:flex">
-            <span>Historia e e-Albania</span>
-            <span>Ndihmë dhe suport</span>
-            <span>Institucionet</span>
+      <header className="border-b bg-white">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="grid size-10 shrink-0 place-items-center rounded-md bg-[#0b3d76] text-white">
+              <ShieldCheck className="size-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="truncate text-lg font-semibold tracking-tight">Smart Dossier</div>
+              <div className="truncate text-xs text-muted-foreground">Hyrje e sigurt ne portal</div>
+            </div>
           </div>
-          <div className="flex w-full items-center justify-between gap-3 md:w-auto">
-            <span className="font-medium text-foreground">SQ</span>
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="hidden text-sm font-semibold text-foreground sm:inline">SQ</span>
             <Button
               asChild
               variant="ghost"
-              className="h-8 px-3 text-sm font-semibold text-muted-foreground hover:text-primary"
+              className="h-9 px-2 text-sm font-semibold text-muted-foreground hover:text-primary sm:px-3"
             >
               <Link to="/admin-login">Hyrje admin</Link>
             </Button>
             <Button
               type="button"
-              variant="ghost"
-              className="h-8 px-3 text-sm font-semibold text-primary"
+              variant="outline"
+              className="h-9 px-3 text-sm font-semibold text-primary"
               onClick={startRegister}
             >
               Regjistrohu
@@ -194,70 +181,26 @@ function LoginPage() {
         </div>
       </header>
 
-      <section className="bg-[#0b3d76] text-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-5 md:px-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="grid size-11 place-items-center rounded-md bg-white text-[#0b3d76] shadow-soft">
-                <ShieldCheck className="size-5" />
-              </div>
-              <div>
-                <div className="text-2xl font-semibold tracking-tight">Smart Dossier</div>
-                <div className="text-xs text-white/70">Hapësira ime e shërbimeve digjitale</div>
-              </div>
+      <main className="mx-auto grid min-h-[calc(100vh-4.25rem)] max-w-6xl gap-5 px-4 py-5 md:px-6 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start">
+        <section className="rounded-md border bg-white p-5 shadow-soft md:p-6">
+          <div>
+            <div className="mb-2 inline-flex rounded-md bg-[var(--brand-blue-soft)] px-2.5 py-1 text-xs font-semibold text-primary">
+              Portal sherbimesh
             </div>
-            <nav className="hidden items-center gap-5 text-xs font-semibold tracking-wide text-white/85 lg:flex">
-              {PORTAL_LINKS.map((item) => (
-                <span key={item}>{item}</span>
-              ))}
-            </nav>
-          </div>
-          <div className="flex min-h-12 items-center gap-3 rounded-md bg-white px-4 text-[#2b3850] shadow-soft">
-            <Search className="size-5 text-primary" />
-            <span className="text-sm text-muted-foreground">
-              Kërko shërbimin, institucionin ose kodin e dosjes
-            </span>
-          </div>
-        </div>
-      </section>
-
-      <main className="mx-auto grid min-h-[calc(100vh-11rem)] max-w-7xl gap-8 px-5 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_460px] lg:items-start">
-        <section className="space-y-7">
-          <div className="max-w-3xl">
-            <div className="mb-3 inline-flex rounded-md bg-white px-3 py-1 text-xs font-semibold text-primary shadow-soft">
-              Njoftim
-            </div>
-            <h1 className="text-4xl font-semibold tracking-tight text-[#172338] md:text-5xl">
-              Gjithçka për dosjen tuaj, në një hapësirë.
+            <h1 className="max-w-2xl text-3xl font-semibold tracking-tight text-[#172338] md:text-4xl">
+              Identifikohuni dhe vazhdoni me dosjen tuaj.
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
-              Identifikohuni si qytetar, biznes ose nëpunës për të aplikuar, gjurmuar dosjen,
-              shkarkuar dokumente me vulë dhe kryer pagesa elektronike.
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+              Zgjidhni profilin, konfirmoni hyrjen me OTP dhe vazhdoni me aplikime, gjurmim dosjeje
+              ose dokumente elektronike.
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3">
-            {SERVICE_SHORTCUTS.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.label}
-                  className="flex min-h-24 items-center gap-3 rounded-md border bg-white p-4 shadow-soft"
-                >
-                  <div className="grid size-10 place-items-center rounded-md bg-[var(--brand-blue-soft)] text-primary">
-                    <Icon className="size-5" />
-                  </div>
-                  <div className="text-sm font-semibold">{item.label}</div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="rounded-md border bg-white p-5 shadow-soft">
-            <div className="mb-4 text-sm font-semibold text-muted-foreground">
+          <div className="mt-5">
+            <div className="mb-3 text-sm font-semibold text-muted-foreground">
               Zgjidhni profilin e hyrjes
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
               {LOGIN_ROLES.map((item) => {
                 const Icon = item.icon;
                 const active = item.role === selectedRole;
@@ -267,7 +210,7 @@ function LoginPage() {
                     type="button"
                     onClick={() => chooseRole(item.role)}
                     className={cn(
-                      "flex min-h-28 flex-col items-start justify-between rounded-md border p-4 text-left transition-colors",
+                      "flex min-h-24 flex-col items-start justify-between rounded-md border p-3 text-left transition-colors",
                       active
                         ? "border-primary bg-[var(--brand-blue-soft)] text-primary"
                         : "border-border bg-white text-foreground hover:border-primary/50",
@@ -285,46 +228,46 @@ function LoginPage() {
           </div>
         </section>
 
-        <Card className="border bg-white p-5 shadow-lift md:p-6">
-          <div className="border-b pb-5">
+        <Card className="border bg-white p-4 shadow-lift md:p-5">
+          <div className="border-b pb-4">
             <div className="text-xs font-semibold uppercase tracking-wide text-primary">
-              Hyr në portal
+              Hyr ne portal
             </div>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+            <h2 className="mt-1.5 text-xl font-semibold tracking-tight">
               {step === "otp"
                 ? "Verifikimi me kod OTP"
                 : authMode === "register"
                   ? "Regjistrim i ri"
                   : "Identifikimi elektronik"}
             </h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            <p className="mt-1.5 text-sm leading-5 text-muted-foreground">
               {step === "otp"
-                ? "Vendosni kodin e dërguar për të përfunduar hyrjen."
+                ? "Vendosni kodin e derguar per te perfunduar hyrjen."
                 : authMode === "register"
                   ? `Krijoni profil demo si ${DEMO_ROLES[selectedRole].label} dhe konfirmojeni me OTP.`
-                  : `Profili aktiv: ${DEMO_ROLES[selectedRole].label}. Të dhënat janë të plotësuara për demo.`}
+                  : `Profili aktiv: ${DEMO_ROLES[selectedRole].label}. Te dhenat jane te plotesuara per demo.`}
             </p>
           </div>
 
           {step === "credentials" ? (
-            <div className="mt-6 space-y-5">
+            <div className="mt-4 space-y-4">
               {authMode === "register" ? (
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <Label className="text-sm font-semibold text-foreground">
-                    Emri i plotë <span className="text-primary">*</span>
+                    Emri i plote <span className="text-primary">*</span>
                   </Label>
                   <div className="flex items-center gap-3 rounded-md border bg-card px-3">
                     <UserRound className="size-5 text-primary" />
                     <Input
                       value={fullName}
                       onChange={(event) => setFullName(event.target.value)}
-                      className="h-12 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
+                      className="h-11 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
                     />
                   </div>
                 </div>
               ) : null}
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label className="text-sm font-semibold text-foreground">
                   {selected.idLabel} <span className="text-primary">*</span>
                 </Label>
@@ -334,14 +277,14 @@ function LoginPage() {
                     value={identifier}
                     onChange={(event) => setIdentifier(event.target.value)}
                     placeholder={selected.idPlaceholder}
-                    className="h-12 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
+                    className="h-11 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label className="text-sm font-semibold text-foreground">
-                  Fjalëkalimi <span className="text-primary">*</span>
+                  Fjalekalimi <span className="text-primary">*</span>
                 </Label>
                 <div className="flex items-center gap-3 rounded-md border bg-card px-3">
                   <LockKeyhole className="size-5 text-primary" />
@@ -349,7 +292,7 @@ function LoginPage() {
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     type={showPassword ? "text" : "password"}
-                    className="h-12 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
+                    className="h-11 border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
                   />
                   <button
                     type="button"
@@ -361,32 +304,32 @@ function LoginPage() {
                   </button>
                 </div>
                 <button type="button" className="text-sm font-medium text-primary">
-                  Keni harruar fjalëkalimin?
+                  Keni harruar fjalekalimin?
                 </button>
               </div>
 
-              <label className="flex items-center gap-3 text-sm">
+              <label className="flex items-center gap-2 text-sm">
                 <Checkbox
                   checked={remember}
                   onCheckedChange={(value) => setRemember(Boolean(value))}
                 />
-                Më mbaj mend
+                Me mbaj mend
               </label>
 
-              <div className="space-y-3 pt-2">
+              <div className="space-y-2 pt-1">
                 {authMode === "register" ? (
                   <>
                     <Button
                       type="button"
                       onClick={continueToOtp}
-                      className="h-12 w-full text-base font-semibold"
+                      className="h-11 w-full text-base font-semibold"
                     >
                       Regjistrohu
                     </Button>
                     <Button
                       type="button"
                       variant="ghost"
-                      className="h-11 w-full text-primary"
+                      className="h-10 w-full text-primary"
                       onClick={startLogin}
                     >
                       Kam llogari, hyr
@@ -397,14 +340,14 @@ function LoginPage() {
                     <Button
                       type="button"
                       onClick={continueToOtp}
-                      className="h-12 w-full text-base font-semibold"
+                      className="h-11 w-full text-base font-semibold"
                     >
                       Hyr
                     </Button>
                     <Button
                       type="button"
                       variant="outline"
-                      className="h-12 w-full border-primary text-base font-semibold text-primary hover:bg-primary/10"
+                      className="h-11 w-full border-primary text-base font-semibold text-primary hover:bg-primary/10"
                       onClick={startRegister}
                     >
                       Regjistrohu
@@ -413,17 +356,17 @@ function LoginPage() {
                 )}
               </div>
 
-              <div className="rounded-md bg-muted p-3 text-xs leading-5 text-muted-foreground">
-                Për demo: përdorni fjalëkalimin <span className="font-mono">demo2026</span> dhe
+              <div className="rounded-md bg-muted p-2.5 text-xs leading-5 text-muted-foreground">
+                Per demo: perdorni fjalekalimin <span className="font-mono">demo2026</span> dhe
                 kodin OTP <span className="font-mono">{DEMO_OTP}</span>.
               </div>
             </div>
           ) : null}
 
           {step === "otp" ? (
-            <div className="mt-6 space-y-6 text-center">
+            <div className="mt-5 space-y-5 text-center">
               <div className="rounded-md border bg-muted px-4 py-3 text-sm text-muted-foreground">
-                Kodi OTP demo për {DEMO_ROLES[selectedRole].label} është{" "}
+                Kodi OTP demo per {DEMO_ROLES[selectedRole].label} eshte{" "}
                 <span className="font-mono font-semibold text-foreground">{DEMO_OTP}</span>.
               </div>
               <InputOTP
@@ -437,23 +380,23 @@ function LoginPage() {
                     <InputOTPSlot
                       key={index}
                       index={index}
-                      className="h-12 w-12 bg-white text-lg"
+                      className="h-11 w-11 bg-white text-lg"
                     />
                   ))}
                 </InputOTPGroup>
               </InputOTP>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Button
                   type="button"
                   onClick={verifyOtp}
-                  className="h-12 w-full text-base font-semibold"
+                  className="h-11 w-full text-base font-semibold"
                 >
                   Konfirmo
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
-                  className="h-11 w-full"
+                  className="h-10 w-full"
                   onClick={() => {
                     setOtp("");
                     setStep("credentials");
@@ -466,7 +409,7 @@ function LoginPage() {
           ) : null}
 
           {step === "done" ? (
-            <div className="mt-6 rounded-md border bg-muted p-4 text-center">
+            <div className="mt-5 rounded-md border bg-muted p-4 text-center">
               <CheckCircle2 className="mx-auto size-8 text-success" />
               <div className="mt-2 text-sm font-semibold">Hyrja u konfirmua</div>
             </div>

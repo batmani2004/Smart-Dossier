@@ -17,7 +17,7 @@ function audit(d: Dossier, ev: Omit<AuditEvent, "id" | "at">) {
 }
 
 export const applyExtractedFields = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         id: z.string(),

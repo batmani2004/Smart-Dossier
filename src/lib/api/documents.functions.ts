@@ -42,7 +42,7 @@ function ensureTemplateAllowed(d: Dossier, key: DocTemplateKey) {
 // --------------------- list templates for a dossier ---------------------
 
 export const listDocTemplates = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) => z.object({ dossierId: z.string() }).parse(input))
+  .validator((input: unknown) => z.object({ dossierId: z.string() }).parse(input))
   .handler(async ({ data }) => {
     const d = getById(data.dossierId);
     if (!d) notFound();
@@ -56,7 +56,7 @@ export const listDocTemplates = createServerFn({ method: "GET" })
 // --------------------- preview (HTML + structured doc) ---------------------
 
 export const previewDocument = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         dossierId: z.string(),
@@ -76,7 +76,7 @@ export const previewDocument = createServerFn({ method: "POST" })
 // --------------------- generate (persist + audit) ---------------------
 
 export const generateDocument = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         dossierId: z.string(),
@@ -146,7 +146,7 @@ export const generateDocument = createServerFn({ method: "POST" })
 // --------------------- AI improve wording (preserves facts) ---------------------
 
 export const aiImproveDocumentWording = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         dossierId: z.string(),
@@ -214,7 +214,7 @@ export const aiImproveDocumentWording = createServerFn({ method: "POST" })
 // --------------------- on-demand DOCX download (no extra audit; only file bytes) ---------------------
 
 export const downloadDocx = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         dossierId: z.string(),

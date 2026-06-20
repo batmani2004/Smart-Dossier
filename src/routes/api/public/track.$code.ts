@@ -10,6 +10,14 @@ import {
   submitExpeditedProcedureRequest,
 } from "@/lib/api/dossiers.functions";
 
+type ComplaintStage = "phase_review" | "final_review";
+
+function bytesToArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
+}
+
 export const Route = createFileRoute("/api/public/track/$code")({
   server: {
     handlers: {
@@ -20,7 +28,7 @@ export const Route = createFileRoute("/api/public/track/$code")({
           if (!map) {
             return Response.json({ error: "not_found" }, { status: 404 });
           }
-          return new Response(map.body, {
+          return new Response(bytesToArrayBuffer(map.body), {
             headers: {
               "content-type": map.mimeType,
               "content-disposition": `attachment; filename="${map.fileName}"`,
@@ -46,7 +54,7 @@ export const Route = createFileRoute("/api/public/track/$code")({
           if (!form) {
             return Response.json({ error: "not_found" }, { status: 404 });
           }
-          return new Response(form.body, {
+          return new Response(bytesToArrayBuffer(form.body), {
             headers: {
               "content-type": form.mimeType,
               "content-disposition": `attachment; filename="${form.fileName}"`,
@@ -61,7 +69,7 @@ export const Route = createFileRoute("/api/public/track/$code")({
             return Response.json({ error: "document_not_found" }, { status: 404 });
           }
           const disposition = url.searchParams.get("download") === "1" ? "attachment" : "inline";
-          return new Response(download.body, {
+          return new Response(bytesToArrayBuffer(download.body), {
             headers: {
               "content-type": download.mimeType,
               "content-disposition": `${disposition}; filename="${download.fileName}"`,
@@ -76,7 +84,7 @@ export const Route = createFileRoute("/api/public/track/$code")({
             return Response.json({ error: "document_not_found" }, { status: 404 });
           }
           const disposition = url.searchParams.get("download") === "1" ? "attachment" : "inline";
-          return new Response(download.body, {
+          return new Response(bytesToArrayBuffer(download.body), {
             headers: {
               "content-type": download.mimeType,
               "content-disposition": `${disposition}; filename="${download.fileName}"`,
@@ -201,7 +209,7 @@ export const Route = createFileRoute("/api/public/track/$code")({
           const subject = typeof value.subject === "string" ? value.subject.trim() : "";
           const message = typeof value.message === "string" ? value.message.trim() : "";
           const contact = typeof value.contact === "string" ? value.contact.trim() : "";
-          const stage =
+          const stage: ComplaintStage | undefined =
             value.stage === "final_review" || value.stage === "phase_review"
               ? value.stage
               : undefined;

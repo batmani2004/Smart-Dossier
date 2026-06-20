@@ -231,7 +231,7 @@ function applicationDocsStorageKey(kind: ApplicationKind, type: ApplicantType) {
   return `${APPLICATION_DOCS_STORAGE_PREFIX}:${kind}:${type}`;
 }
 
-function defaultDocs(kind: ApplicationKind, type: ApplicantType) {
+function defaultDocs(kind: ApplicationKind, type: ApplicantType): Record<string, string> {
   if (kind === "ekb_privatization") {
     return {
       id_card_copy: "ID-qytetari.pdf",
@@ -270,7 +270,10 @@ function defaultDocs(kind: ApplicationKind, type: ApplicantType) {
       };
 }
 
-function readSavedDocumentNames(kind: ApplicationKind, type: ApplicantType) {
+function readSavedDocumentNames(
+  kind: ApplicationKind,
+  type: ApplicantType,
+): Record<string, string> {
   const defaults = defaultDocs(kind, type);
   if (typeof window === "undefined") return defaults;
   try {

@@ -314,6 +314,12 @@ function buildClientPdf(content: string): Uint8Array {
   return new TextEncoder().encode(pdf);
 }
 
+function bytesToArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
+}
+
 function buildCompletedExpeditePdfFile(input: {
   trackingCode: string;
   reasonLabel: string;
@@ -368,7 +374,9 @@ function buildCompletedExpeditePdfFile(input: {
     "Q",
   ].join("\n");
   const fileName = `${input.trackingCode}-formular-pershpejtimi-plotesuar.pdf`;
-  return new File([buildClientPdf(content)], fileName, { type: "application/pdf" });
+  return new File([bytesToArrayBuffer(buildClientPdf(content))], fileName, {
+    type: "application/pdf",
+  });
 }
 
 function ExpeditedDocumentTile({
