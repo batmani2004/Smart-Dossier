@@ -5,12 +5,10 @@ import {
   Building2,
   Eye,
   EyeOff,
-  FileText,
   LockKeyhole,
   Mail,
   MapPin,
   Phone,
-  ShieldCheck,
   UserCog,
   UserRound,
   type LucideIcon,
@@ -282,47 +280,22 @@ function LoginPage() {
       </header>
 
       <main className="mx-auto grid min-h-[calc(100vh-4.25rem)] max-w-6xl gap-4 px-3 py-4 sm:px-4 md:px-6 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-start">
-        <section className="rounded-md border bg-white p-4 shadow-soft md:p-6">
-          <div className="mb-2 inline-flex rounded-md bg-[var(--brand-blue-soft)] px-2.5 py-1 text-xs font-semibold text-primary">
-            Hyrje e thjeshte
-          </div>
-          <h1 className="max-w-2xl text-2xl font-semibold tracking-tight text-foreground sm:text-3xl md:text-4xl">
-            Zgjidh profilin dhe hap direkt faqen qe te duhet.
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Qytetaret aplikojne ose gjurmojne dosjen, bizneset regjistrojne prone me NIPT, ndersa
-            operatoret hyjne ne hapesiren e punes.
-          </p>
-
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            <AccessPath
-              icon={FileText}
-              title="Qytetar"
-              body="Aplikim per privatizim, shpronesim ose gjurmim me kod."
+        <section className="rounded-md border bg-white p-5 shadow-soft md:p-8">
+          <div className="flex min-h-[360px] flex-col items-center justify-center text-center">
+            <img
+              src="/brand/smart-dossier-logo-mark-blue.svg"
+              alt="Smart Dossier"
+              className="h-24 w-24 object-contain sm:h-28 sm:w-28"
             />
-            <AccessPath
-              icon={Building2}
-              title="Biznes"
-              body="Regjistrim prone dhe ndjekje e aplikimit me link."
-            />
-            <AccessPath
-              icon={UserCog}
-              title="Operator"
-              body="Dosje, AI Akt Vleresimi, audit dhe raporte."
-            />
-          </div>
-
-          <div className="mt-5 rounded-md border bg-muted/30 p-4">
-            <div className="flex items-start gap-3">
-              <ShieldCheck className="mt-0.5 size-5 shrink-0 text-primary" />
-              <div>
-                <div className="text-sm font-semibold">Pa hapa te panevojshem</div>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  Ky prototip hap menjehere faqen perkatese pas hyrjes ose regjistrimit. Kodi i
-                  gjurmimit krijohet me vone, kur dergohet aplikimi.
-                </p>
-              </div>
-            </div>
+            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
+              Smart Dossier
+            </p>
+            <h1 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl md:text-5xl">
+              Menaxhim inteligjent i dosjeve të pronës.
+            </h1>
+            <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">
+              Në ndihmë të ASHSH, ASHK, AKPT dhe Ministrisë së Ekonomisë dhe Inovacionit.
+            </p>
           </div>
         </section>
 
@@ -666,26 +639,6 @@ function FieldShell({ icon: Icon, children }: { icon: LucideIcon; children: Reac
     <div className="flex items-center gap-3 rounded-md border bg-card px-3">
       <Icon className="size-5 shrink-0 text-primary" />
       {children}
-    </div>
-  );
-}
-
-function AccessPath({
-  icon: Icon,
-  title,
-  body,
-}: {
-  icon: LucideIcon;
-  title: string;
-  body: string;
-}) {
-  return (
-    <div className="rounded-md border bg-white p-3 shadow-soft">
-      <div className="flex items-center gap-2 text-sm font-semibold">
-        <Icon className="size-4 text-primary" />
-        {title}
-      </div>
-      <p className="mt-2 text-xs leading-5 text-muted-foreground">{body}</p>
     </div>
   );
 }
