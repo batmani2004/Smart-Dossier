@@ -77,7 +77,11 @@ function AdminLoginPage() {
             Kthehu te hyrja publike
           </Link>
           <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-            <ShieldCheck className="size-4" />
+            <img
+              src="/brand/smart-dossier-logo.png"
+              alt="Smart Dossier"
+              className="h-10 w-12 object-contain"
+            />
             Admin
           </div>
         </div>

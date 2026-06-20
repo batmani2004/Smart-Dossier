@@ -11,7 +11,6 @@ import {
   Home,
   LayoutDashboard,
   Menu,
-  Rocket,
   Scale,
   ShieldCheck,
   UserRound,
@@ -85,8 +84,12 @@ export function AppShell({
     <div className="min-h-screen bg-background">
       <div className="hidden min-h-[78px] items-center justify-between gap-4 border-b-4 border-accent bg-[var(--brand-navy)] px-8 text-white md:flex">
         <div className="flex min-w-0 items-center gap-4">
-          <div className="grid size-10 shrink-0 place-items-center rounded-full bg-destructive text-white shadow-soft">
-            <Rocket className="size-5" />
+          <div className="grid h-14 w-16 shrink-0 place-items-center">
+            <img
+              src="/brand/smart-dossier-logo.png"
+              alt="Smart Dossier"
+              className="h-full w-full object-contain"
+            />
           </div>
           <div className="min-w-0">
             <div className="text-[10px] font-bold uppercase text-accent">Materiali C</div>
@@ -107,8 +110,12 @@ export function AppShell({
         <aside className="hidden w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
           <div className="border-b border-sidebar-border px-4 pb-4 pt-4">
             <div className="flex items-center gap-2.5">
-              <div className="grid size-9 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground shadow-soft">
-                <ShieldCheck className="size-4" />
+              <div className="grid h-11 w-12 shrink-0 place-items-center">
+                <img
+                  src="/brand/smart-dossier-logo.png"
+                  alt="Smart Dossier"
+                  className="h-full w-full object-contain"
+                />
               </div>
               <div className="min-w-0 leading-tight">
                 <div className="truncate text-sm font-semibold tracking-tight text-primary">
@@ -212,8 +219,12 @@ export function AppShell({
           </div>
 
           <div className="flex items-center gap-2 border-b-4 border-accent bg-[var(--brand-navy)] px-4 py-2.5 text-white md:hidden">
-            <div className="grid size-8 shrink-0 place-items-center rounded-full bg-destructive">
-              <Rocket className="size-4" />
+            <div className="grid h-10 w-11 shrink-0 place-items-center">
+              <img
+                src="/brand/smart-dossier-logo.png"
+                alt="Smart Dossier"
+                className="h-full w-full object-contain"
+              />
             </div>
             <span className="min-w-0 flex-1 truncate text-sm font-semibold">Smart Dossier</span>
             <div className="w-[190px] shrink-0">

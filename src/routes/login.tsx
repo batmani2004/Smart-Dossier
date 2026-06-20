@@ -10,7 +10,6 @@ import {
   Landmark,
   LockKeyhole,
   Search,
-  ShieldCheck,
   UserCog,
   UserRound,
 } from "lucide-react";
@@ -80,13 +79,6 @@ const LOGIN_ROLES: Array<{
 ];
 
 const DEMO_OTP = "246810";
-
-const PORTAL_LINKS = [
-  "NGJARJET E JETËS",
-  "SHËRBIMET MË TË PËRDORURA",
-  "KATEGORITË E SHËRBIMEVE",
-  "INSTITUCIONET",
-];
 
 const SERVICE_SHORTCUTS = [
   { label: "Dokumente me vulë", icon: FileCheck2 },
@@ -167,13 +159,8 @@ function LoginPage() {
   return (
     <div className="min-h-screen bg-[#f4f7fb] text-foreground">
       <header className="bg-white text-sm shadow-soft">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-2 text-muted-foreground md:px-8">
-          <div className="hidden items-center gap-5 md:flex">
-            <span>Historia e e-Albania</span>
-            <span>Ndihmë dhe suport</span>
-            <span>Institucionet</span>
-          </div>
-          <div className="flex w-full items-center justify-between gap-3 md:w-auto">
+        <div className="mx-auto flex max-w-7xl items-center justify-end px-5 py-2 text-muted-foreground md:px-8">
+          <div className="flex items-center gap-3">
             <span className="font-medium text-foreground">SQ</span>
             <Button
               asChild
@@ -181,6 +168,14 @@ function LoginPage() {
               className="h-8 px-3 text-sm font-semibold text-muted-foreground hover:text-primary"
             >
               <Link to="/admin-login">Hyrje admin</Link>
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="h-8 px-3 text-sm font-semibold text-muted-foreground hover:text-primary"
+              onClick={startLogin}
+            >
+              Hyrje Login
             </Button>
             <Button
               type="button"
@@ -198,19 +193,18 @@ function LoginPage() {
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-5 md:px-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="grid size-11 place-items-center rounded-md bg-white text-[#0b3d76] shadow-soft">
-                <ShieldCheck className="size-5" />
+              <div className="grid h-24 w-32 place-items-center">
+                <img
+                  src="/brand/smart-dossier-logo.png"
+                  alt="Smart Dossier"
+                  className="h-full w-full object-contain object-center"
+                />
               </div>
               <div>
                 <div className="text-2xl font-semibold tracking-tight">Smart Dossier</div>
                 <div className="text-xs text-white/70">Hapësira ime e shërbimeve digjitale</div>
               </div>
             </div>
-            <nav className="hidden items-center gap-5 text-xs font-semibold tracking-wide text-white/85 lg:flex">
-              {PORTAL_LINKS.map((item) => (
-                <span key={item}>{item}</span>
-              ))}
-            </nav>
           </div>
           <div className="flex min-h-12 items-center gap-3 rounded-md bg-white px-4 text-[#2b3850] shadow-soft">
             <Search className="size-5 text-primary" />
@@ -224,9 +218,6 @@ function LoginPage() {
       <main className="mx-auto grid min-h-[calc(100vh-11rem)] max-w-7xl gap-8 px-5 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_460px] lg:items-start">
         <section className="space-y-7">
           <div className="max-w-3xl">
-            <div className="mb-3 inline-flex rounded-md bg-white px-3 py-1 text-xs font-semibold text-primary shadow-soft">
-              Njoftim
-            </div>
             <h1 className="text-4xl font-semibold tracking-tight text-[#172338] md:text-5xl">
               Gjithçka për dosjen tuaj, në një hapësirë.
             </h1>
