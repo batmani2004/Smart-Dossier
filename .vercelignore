@@ -1,0 +1,6 @@
+apps/mobile
+.tanstack
+tmp
+tests
+sample-documents
+output
