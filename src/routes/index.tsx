@@ -82,7 +82,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Smart Dossier" },
+      { title: "Faqja Kryesore — Smart Dossier" },
       { name: "description", content: "Paneli i nëpunësit civil për menaxhimin e dosjeve." },
     ],
   }),
@@ -137,7 +137,7 @@ function DashboardPage() {
 
   // Error toasts (one per error transition).
   useEffect(() => {
-    if (dashQ.error) toast.error("Gabim gjatë ngarkimit të dashboard-it");
+    if (dashQ.error) toast.error("Gabim gjatë ngarkimit të faqes kryesore");
   }, [dashQ.error]);
   useEffect(() => {
     if (listQ.error) toast.error("Gabim gjatë ngarkimit të dosjeve");
@@ -740,7 +740,7 @@ function DashboardPage() {
           total={listQ.data?.total}
           loading={listQ.isLoading}
           title="Dosjet kryesore"
-          description="E njejta kategorizim si radha e dosjeve, ne pamje kompakte per dashboard."
+          description="E njejta kategorizim si radha e dosjeve, ne pamje kompakte per faqen kryesore."
           initialView="compact"
           initialGroupBy="priority"
           maxItems={12}

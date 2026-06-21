@@ -100,8 +100,8 @@ export const CITIZEN_FAQ: FaqItem[] = [
     category: "Udhezues per operatorin",
     question: "Cfare duhet te beje nje operator i ri ne Smart Dossier?",
     answer:
-      "Operatori fillon nga Dashboard ose Dosjet. Fillimisht kontrollon dosjet me alarm, afatet dhe dokumentet qe mungojne. Pastaj hap dosjen, perdor tab-in AI per permbledhje, nxjerrje fushash ose sugjerim hapi, verifikon dokumentet dhe avancon procesin vetem pasi te kete kontrolluar faktet.",
-    tags: ["operator", "hapi i pare", "dashboard", "dosje", "ai"],
+      "Operatori fillon nga Faqja Kryesore ose Dosjet. Fillimisht kontrollon dosjet me alarm, afatet dhe dokumentet qe mungojne. Pastaj hap dosjen, perdor tab-in AI per permbledhje, nxjerrje fushash ose sugjerim hapi, verifikon dokumentet dhe avancon procesin vetem pasi te kete kontrolluar faktet.",
+    tags: ["operator", "hapi i pare", "faqja kryesore", "dosje", "ai"],
   },
   {
     id: "ai-valuation-act",
