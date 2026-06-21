@@ -362,7 +362,7 @@ function DossierWorkspace() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <div className="grid w-full gap-2 rounded-xl border bg-white/80 p-2 shadow-soft sm:grid-cols-2 sm:p-3 xl:grid-cols-5">
+          <div className="grid w-full grid-cols-2 gap-2 rounded-xl border bg-white/80 p-2 shadow-soft sm:grid-cols-3 sm:p-3 xl:grid-cols-5">
             <DossierTabDropdown
               title="Orientim"
               description="Pamja e shpejte"
@@ -1242,7 +1242,7 @@ function DossierProgressRail({
 
       <div className="-mx-1 mt-4 overflow-x-auto px-1 pb-1 sm:mt-5">
         <ol
-          className="grid min-w-[700px] gap-0 sm:min-w-[860px] lg:min-w-0"
+          className="grid min-w-[540px] gap-0 lg:min-w-0"
           style={{ gridTemplateColumns: `repeat(${phases.length}, minmax(0, 1fr))` }}
         >
           {phases.map((phase, index) => {

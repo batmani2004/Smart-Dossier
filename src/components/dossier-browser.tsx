@@ -380,15 +380,15 @@ function ListView({ groups }: { groups: DossierGroup[] }) {
             <GroupHeader group={group} compact />
           </div>
           <div className="overflow-x-auto">
-            <Table className="min-w-[720px]">
+            <Table className="min-w-[480px]">
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-xs">Kodi</TableHead>
                   <TableHead className="text-xs">Dosja</TableHead>
-                  <TableHead className="hidden text-xs md:table-cell">Aplikuesi</TableHead>
+                  <TableHead className="hidden text-xs sm:table-cell">Aplikuesi</TableHead>
                   <TableHead className="hidden text-xs lg:table-cell">Faza</TableHead>
                   <TableHead className="text-xs">Sinjale</TableHead>
-                  <TableHead className="text-xs">Status</TableHead>
+                  <TableHead className="hidden text-xs md:table-cell">Status</TableHead>
                   <TableHead className="text-xs text-right">Veprim</TableHead>
                 </TableRow>
               </TableHeader>
@@ -487,7 +487,7 @@ function DossierTableRow({ item }: { item: DossierListItem }) {
           {PROCESSES[item.process].title}
         </div>
       </TableCell>
-      <TableCell className="hidden max-w-[170px] truncate text-xs md:table-cell">
+      <TableCell className="hidden max-w-[170px] truncate text-xs sm:table-cell">
         {applicantName(item)}
       </TableCell>
       <TableCell className="hidden text-xs lg:table-cell">
@@ -499,7 +499,7 @@ function DossierTableRow({ item }: { item: DossierListItem }) {
           <SignalBadges item={item} />
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="hidden md:table-cell">
         <StatusBadge status={item.status} />
       </TableCell>
       <TableCell className="text-right">

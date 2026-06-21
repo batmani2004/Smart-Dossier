@@ -1170,7 +1170,7 @@ function AiWorkConsole({
 
   return (
     <Card className="overflow-hidden border-primary/25 bg-primary/5">
-      <div className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_260px]">
+      <div className="grid gap-4 p-4 sm:grid-cols-[minmax(0,1fr)_220px] lg:grid-cols-[minmax(0,1fr)_260px]">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <Badge className="bg-primary text-primary-foreground">AI workspace</Badge>
@@ -1203,7 +1203,7 @@ function AiWorkConsole({
         </div>
       </div>
 
-      <div className="grid gap-3 border-t bg-background/60 p-4 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 border-t bg-background/60 p-4 md:grid-cols-3">
         <AgentTile
           icon={<UserCheck className="size-4" />}
           title="Agjenti i ndarjes se puneve"
