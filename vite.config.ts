@@ -11,8 +11,9 @@ export default defineConfig({
     server: { entry: "server" },
   },
   // Nitro is normally only active inside the Lovable sandbox.
-  // Setting an explicit preset forces it on for any `vite build` (including Vercel CI).
-  nitro: { preset: "vercel" },
+  // cloudflare-pages preset outputs .output/public/_worker.js + static assets
+  // which Cloudflare Pages picks up automatically.
+  nitro: { preset: "cloudflare-pages", cloudflare: { nodeCompat: true } },
   vite: {
     cacheDir: ".tanstack/vite",
     resolve: {

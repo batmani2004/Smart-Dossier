@@ -1,0 +1,61 @@
+<svg
+  width="344"
+  height="88"
+  viewBox="0 0 344 88"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-labelledby="smartDossierLogoTitle smartDossierLogoDesc"
+>
+  <title id="smartDossierLogoTitle">Smart Dossier Logo</title>
+  <desc id="smartDossierLogoDesc">Smart Dossier wordmark with a clear digital dossier mark.</desc>
+
+  <defs>
+    <linearGradient id="sdMarkBlue" x1="14" y1="15" x2="68" y2="76" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2F80D8" />
+      <stop offset="1" stop-color="#174B92" />
+    </linearGradient>
+    <linearGradient id="sdPaper" x1="20" y1="22" x2="58" y2="70" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" />
+      <stop offset="1" stop-color="#E9F2FF" />
+    </linearGradient>
+    <linearGradient id="sdSeal" x1="48" y1="48" x2="66" y2="68" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F45A6B" />
+      <stop offset="1" stop-color="#C91F3B" />
+    </linearGradient>
+  </defs>
+
+  <rect x="2" y="10" width="68" height="68" rx="16" fill="#0F2F57" />
+  <rect x="8" y="16" width="52" height="52" rx="12" fill="url(#sdMarkBlue)" />
+  <rect x="20" y="22" width="34" height="44" rx="6" fill="url(#sdPaper)" />
+  <path d="M44 22H48.2C51.4 22 54 24.6 54 27.8V32L44 22Z" fill="#CFE3FF" />
+  <rect x="25" y="34" width="20" height="4" rx="2" fill="#1E5AA8" />
+  <rect x="25" y="43" width="17" height="4" rx="2" fill="#80B8F2" />
+  <rect x="48" y="49" width="16" height="17" rx="4" fill="url(#sdSeal)" />
+  <rect x="51" y="53" width="10" height="3" rx="1.5" fill="#FFFFFF" opacity="0.9" />
+  <rect x="51" y="59" width="7" height="3" rx="1.5" fill="#FFFFFF" opacity="0.75" />
+  <rect x="2" y="75" width="68" height="3" rx="1.5" fill="#D7193F" />
+
+  <text
+    x="88"
+    y="38"
+    fill="#0F2F57"
+    font-family="Inter, Arial, sans-serif"
+    font-size="24"
+    font-weight="800"
+    letter-spacing="0"
+  >
+    Smart Dossier
+  </text>
+  <text
+    x="89"
+    y="58"
+    fill="#52657A"
+    font-family="Inter, Arial, sans-serif"
+    font-size="9.5"
+    font-weight="700"
+    letter-spacing="1.15"
+  >
+    MENAXHIM I DOSJEVE DIGJITALE
+  </text>
+</svg>
