@@ -4,6 +4,8 @@ import {
   Link,
   createRootRouteWithContext,
   redirect,
+  useNavigate,
+  useLocation,
   useRouter,
   HeadContent,
   Scripts,
@@ -144,6 +146,17 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+    if (isPublic) return;
+    const stored = window.localStorage.getItem(ROLE_KEY);
+    if (!VALID_ROLES.includes(stored ?? "")) {
+      void navigate({ to: "/login" });
+    }
+  }, [pathname]);
 
   return (
     <QueryClientProvider client={queryClient}>
