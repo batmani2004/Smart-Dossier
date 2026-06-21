@@ -3,6 +3,7 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  redirect,
   useRouter,
   HeadContent,
   Scripts,
@@ -13,6 +14,10 @@ import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+
+const PUBLIC_PATHS = ["/login", "/track"];
+const VALID_ROLES = ["admin", "operator", "citizen", "business"];
+const ROLE_KEY = "smart-dossier-demo-role";
 
 function NotFoundComponent() {
   return (
@@ -79,6 +84,15 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  beforeLoad: ({ location }) => {
+    if (typeof window === "undefined") return;
+    const isPublic = PUBLIC_PATHS.some((p) => location.pathname.startsWith(p));
+    if (isPublic) return;
+    const stored = window.localStorage.getItem(ROLE_KEY);
+    if (!VALID_ROLES.includes(stored ?? "")) {
+      throw redirect({ to: "/login" });
+    }
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },

@@ -159,10 +159,9 @@ export function useDemoRole() {
   };
 
   const logout = () => {
-    setRoleState(DEFAULT_ROLE);
     if (typeof window !== "undefined") {
       window.localStorage.removeItem(STORAGE_KEY);
-      window.dispatchEvent(new CustomEvent(ROLE_EVENT, { detail: DEFAULT_ROLE }));
+      window.dispatchEvent(new CustomEvent(ROLE_EVENT, { detail: null }));
     }
   };
 
